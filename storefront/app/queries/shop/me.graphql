@@ -1,0 +1,6 @@
+query ShopMe {
+  me {
+    id
+    identifier
+  }
+}

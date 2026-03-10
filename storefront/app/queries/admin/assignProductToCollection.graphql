@@ -1,0 +1,24 @@
+mutation AssignProductToCollection($collectionId: ID!, $productIds: String!) {
+  updateCollection(input: {
+    id: $collectionId
+    filters: [
+      {
+        code: "product-id-filter"
+        arguments: [
+          {
+            name: "productIds"
+            value: $productIds
+          },
+          {
+            name: "combineWithAnd"
+            value: "true"
+          },
+        ]
+      }
+    ],
+    inheritFilters: false,
+  }) {
+    id
+    name
+  }
+}

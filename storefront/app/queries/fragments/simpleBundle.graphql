@@ -1,0 +1,13 @@
+fragment SimpleBundleFields on Collection {
+  id
+  name
+  slug
+  featuredAsset {
+    preview
+  }
+  productVariants {
+    items {
+      ... SimpleProductVariantFields
+    }
+  }
+}

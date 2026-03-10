@@ -1,0 +1,19 @@
+fragment SimpleProductVariantFields on ProductVariant {
+  id,
+  price,
+  currencyCode,
+  name
+  product {
+    id
+    name
+    slug
+    description
+    featuredAsset {
+      preview
+    }
+    collections {
+      id
+      name
+    }
+  }
+}

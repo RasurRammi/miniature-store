@@ -1,0 +1,5 @@
+mutation CreateProductVariant($input: [CreateProductVariantInput!]!) {
+  createProductVariants(input: $input) {
+    ... SimpleProductVariantFields
+  }
+}

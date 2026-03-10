@@ -2,9 +2,9 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      POSTGRES_USER: medusa
+      POSTGRES_USER: rami
       POSTGRES_PASSWORD: ramirami
-      POSTGRES_DB: medusa_db
+      POSTGRES_DB: backend
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
@@ -19,18 +19,22 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - "9001:9001"   # only expose the UI, not the API publicly
-
-  backend:
-    build: ./backend
-    environment:
-      DATABASE_URL: postgresql://medusa:ramirami@postgres:5432/medusa_db
-      MINIO_ENDPOINT: http://minio:9000
-    ports:
       - "9000:9000"
+      - "9001:9001"
+
+  vendure:
+    build: ./backend-vendure
+    environment:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: vendure
+      DB_USERNAME: rami
+      DB_PASSWORD: ramirami
+    ports:
+      - "3000:3000"
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
 
   storefront:
     build: ./storefront  # builds from your Nuxt project folder

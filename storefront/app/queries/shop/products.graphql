@@ -1,0 +1,5 @@
+query GetProducts {
+  products(options: {filter: {enabled: {eq: true}}}) {
+    items {...SimpleProductFields}
+  }
+}

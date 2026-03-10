@@ -1,0 +1,14 @@
+fragment SimpleProductFields on Product {
+  id
+  name
+  slug
+  description
+  featuredAsset {
+    preview
+  }
+  variants {
+    id
+    price
+    currencyCode
+  }
+}

@@ -1,0 +1,14 @@
+query GetCollectionFilters($options: CollectionListOptions) {
+  collections(options: $options) {
+    items {
+      id
+      filters {
+        code
+        args {
+          name
+          value
+        }
+      }
+    }
+  }
+}

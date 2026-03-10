@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
+
 useHead({
   meta: [
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+    {name: 'viewport', content: 'width=device-width, initial-scale=1'}
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' }
+    {rel: 'icon', href: '/favicon.ico'}
   ],
   htmlAttrs: {
     lang: 'en'
@@ -23,42 +24,18 @@ useSeoMeta({
   twitterImage: 'https://ui.nuxt.com/assets/templates/nuxt/starter-light.png',
   twitterCard: 'summary_large_image'
 })
-import medusa from '~/composables/useMedusa.ts'
 
-const { products } = await medusa.store.product.list()
-console.log(products)
 </script>
 
 <template>
   <UApp>
-    <UHeader>
-      <template #left>
-        <NuxtLink to="/">
-          <AppLogo class="w-auto h-6 shrink-0" />
-        </NuxtLink>
-
-        <TemplateMenu />
-      </template>
-
-      <template #right>
-        <UColorModeButton />
-
-        <UButton
-          to="https://github.com/nuxt-ui-templates/starter"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="neutral"
-          variant="ghost"
-        />
-      </template>
-    </UHeader>
+    <HeaderBar/>
 
     <UMain>
-      <NuxtPage />
+      <NuxtPage/>
     </UMain>
 
-    <USeparator icon="i-simple-icons-nuxtdotjs" />
+    <USeparator icon="i-simple-icons-nuxtdotjs"/>
 
     <UFooter>
       <template #left>

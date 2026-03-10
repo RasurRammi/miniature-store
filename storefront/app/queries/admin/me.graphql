@@ -1,0 +1,6 @@
+query AdminMe {
+  me {
+    id
+    identifier
+  }
+}

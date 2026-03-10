@@ -1,0 +1,12 @@
+mutation VerifyCustomerAccount($token: String!) {
+  verifyCustomerAccount(token: $token) {
+    ...on CurrentUser {
+      id
+      identifier
+    }
+    ...on ErrorResult {
+      errorCode
+      message
+    }
+  }
+}
