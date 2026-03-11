@@ -3,10 +3,10 @@ const headerLogo = '/nomnom-logo.png'
 const logoAlt = 'NomNom Miniatures'
 useHead({
   meta: [
-    {name: 'viewport', content: 'width=device-width, initial-scale=1'}
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
   ],
   link: [
-    {rel: 'icon', href: headerLogo}
+    { rel: 'icon', href: headerLogo }
   ],
   htmlAttrs: {
     lang: 'en'
@@ -25,15 +25,18 @@ useSeoMeta({
 </script>
 
 <template>
-  <HeaderBar :headerLogo="headerLogo" :logoAlt="logoAlt"/>
+  <HeaderBar
+    :header-logo="headerLogo"
+    :logo-alt="logoAlt"
+  />
 
   <UMain>
     <UContainer>
-      <slot/>
+      <slot />
     </UContainer>
   </UMain>
 
-  <USeparator icon="i-simple-icons-nuxtdotjs"/>
+  <USeparator icon="i-simple-icons-nuxtdotjs" />
 
   <UFooter>
     <template #left>

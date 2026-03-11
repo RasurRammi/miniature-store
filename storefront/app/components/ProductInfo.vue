@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type {ProductDraft, ProductVariant} from "~/types/product";
-import {useProductDrawerStore} from "~/stores/productDrawer";
-import {useBundles} from "~/composables/useBundles";
-import type {Collection} from "~/gql/shop/graphql";
-import {type ProductInput, useSubmitProduct} from "~/composables/useSubmitProduct";
+import type { ProductDraft, ProductVariant } from '~/types/product'
+import { useProductDrawerStore } from '~/stores/productDrawer'
+import { useBundles } from '~/composables/useBundles'
+import type { Collection } from '~/gql/shop/graphql'
+import { type ProductInput, useSubmitProduct } from '~/composables/useSubmitProduct'
 
 const productDrawer = useProductDrawerStore()
 
-const {productV, canEdit} = defineProps<{
-  productV?: ProductVariant,
+const { productV, canEdit } = defineProps<{
+  productV?: ProductVariant
   canEdit?: boolean
 }>()
 const emit = defineEmits<{
@@ -36,19 +36,19 @@ function productVToForm(): ProductInput {
     name: productV?.product.name ?? '',
     description: productV?.product.description ?? '',
     price: productV?.price ?? 0,
-    collectionIds: productV?.product.collections.map(c => c.id) ?? [],
+    collectionIds: productV?.product.collections.map(c => c.id) ?? []
   }
 }
 
-const {data: bundleData} = useBundles();
+const { data: bundleData } = useBundles()
 const viableBundles = computed(() => {
   if (!bundleData.value) {
-    return [];
+    return []
   }
   return bundleData.value.collections.items.map((bundle: Collection) => {
     return {
       id: bundle.id,
-      label: bundle.name,
+      label: bundle.name
     }
   })
 })
@@ -80,7 +80,6 @@ async function submitForm() {
     }
   })
 }
-
 </script>
 
 <template>
@@ -93,18 +92,45 @@ async function submitForm() {
           <span v-if="productV && !isEditing">
             {{ productV.product.name }}
           </span>
-          <UInput v-else v-model="form.name" placeholder="Product name" size="xl"/>
+          <UInput
+            v-else
+            v-model="form.name"
+            placeholder="Product name"
+            size="xl"
+          />
         </h2>
         <div class="flex items-center gap-1">
           <template v-if="!isNew">
-            <UButton v-if="isEditing" icon="i-lucide-pencil-off" color="neutral" variant="ghost"
-                     @click.prevent="cancelEditing" class="cursor-pointer"/>
-            <UButton v-else icon="i-lucide-pencil" color="neutral" variant="ghost" @click.prevent="startEditing"
-                     class="cursor-pointer"/>
+            <UButton
+              v-if="isEditing"
+              icon="i-lucide-pencil-off"
+              color="neutral"
+              variant="ghost"
+              class="cursor-pointer"
+              @click.prevent="cancelEditing"
+            />
+            <UButton
+              v-else
+              icon="i-lucide-pencil"
+              color="neutral"
+              variant="ghost"
+              class="cursor-pointer"
+              @click.prevent="startEditing"
+            />
           </template>
-          <UButton icon="i-lucide-expand" color="neutral" variant="ghost" class="cursor-pointer"/>
-          <UButton icon="i-lucide-arrow-right" color="neutral" variant="ghost" @click="productDrawer.close()"
-                   class="cursor-pointer"/>
+          <UButton
+            icon="i-lucide-expand"
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+          />
+          <UButton
+            icon="i-lucide-arrow-right"
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+            @click="productDrawer.close()"
+          />
         </div>
       </div>
 
@@ -167,22 +193,60 @@ async function submitForm() {
       -->
 
       <!-- Bundles -->
-      <UInputMenu v-if="isEditing" v-model="form.collectionIds" multiple icon="i-lucide-package-2" value-key="id" :items="viableBundles"/>
+      <UInputMenu
+        v-if="isEditing"
+        v-model="form.collectionIds"
+        multiple
+        icon="i-lucide-package-2"
+        value-key="id"
+        :items="viableBundles"
+      />
 
       <!-- Description -->
-      <p v-if="productV && !isEditing" class="p-2 text-muted bg-elevated rounded-md">
+      <p
+        v-if="productV && !isEditing"
+        class="p-2 text-muted bg-elevated rounded-md"
+      >
         {{ productV.product.description }}
       </p>
-      <UTextarea v-else v-model="form.description" placeholder="Description" color="neutral"
-                 variant="subtle"/>
+      <UTextarea
+        v-else
+        v-model="form.description"
+        placeholder="Description"
+        color="neutral"
+        variant="subtle"
+      />
 
       <!-- Buttons -->
-      <div v-if="isEditing" class="flex justify-center">
-        <UButton icon="i-lucide-check" size="xl" @click="submitForm">{{ isNew ? 'Create' : 'Update' }}</UButton>
+      <div
+        v-if="isEditing"
+        class="flex justify-center"
+      >
+        <UButton
+          icon="i-lucide-check"
+          size="xl"
+          @click="submitForm"
+        >
+          {{ isNew ? 'Create' : 'Update' }}
+        </UButton>
       </div>
-      <div v-else class="flex flex-row-reverse gap-2">
-        <UButton icon="i-lucide-shopping-basket" size="xl" color="success">Add to Cart</UButton>
-        <UButton icon="i-lucide-download" size="xl">Download</UButton>
+      <div
+        v-else
+        class="flex flex-row-reverse gap-2"
+      >
+        <UButton
+          icon="i-lucide-shopping-basket"
+          size="xl"
+          color="success"
+        >
+          Add to Cart
+        </UButton>
+        <UButton
+          icon="i-lucide-download"
+          size="xl"
+        >
+          Download
+        </UButton>
       </div>
     </div>
   </div>

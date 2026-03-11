@@ -5,7 +5,7 @@ const form = reactive({
   lastName: '',
   emailAddress: '',
   password: '',
-  passwordConfirm: '',
+  passwordConfirm: ''
 })
 
 const toast = useToast()
@@ -46,16 +46,43 @@ function submit() {
 <template>
   <div class="flex items-center justify-center min-h-screen">
     <div class="flex flex-col gap-4 w-80">
-      <h1 class="text-2xl font-bold">Register</h1>
+      <h1 class="text-2xl font-bold">
+        Register
+      </h1>
       <div class="flex flex-row gap-1">
-        <UInput v-model="form.firstName" placeholder="First name" />
-        <UInput v-model="form.lastName" placeholder="Last name" />
+        <UInput
+          v-model="form.firstName"
+          placeholder="First name"
+        />
+        <UInput
+          v-model="form.lastName"
+          placeholder="Last name"
+        />
       </div>
-      <UInput v-model="form.emailAddress" placeholder="Email" />
-      <UInput v-model="form.password" type="password" placeholder="Password" />
-      <UInput v-model="form.passwordConfirm" type="password" placeholder="Confirm password" />
-      <UButton :loading="isPending" @click="submit">Register</UButton>
-      <NuxtLink to="/store/login" class="text-center text-sm text-muted hover:text-primary transition-colors">
+      <UInput
+        v-model="form.emailAddress"
+        placeholder="Email"
+      />
+      <UInput
+        v-model="form.password"
+        type="password"
+        placeholder="Password"
+      />
+      <UInput
+        v-model="form.passwordConfirm"
+        type="password"
+        placeholder="Confirm password"
+      />
+      <UButton
+        :loading="isPending"
+        @click="submit"
+      >
+        Register
+      </UButton>
+      <NuxtLink
+        to="/store/login"
+        class="text-center text-sm text-muted hover:text-primary transition-colors"
+      >
         Already have an account? Login
       </NuxtLink>
     </div>

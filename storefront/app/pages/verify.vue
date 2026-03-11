@@ -1,6 +1,6 @@
 <!-- app/pages/verify.vue -->
 <script setup lang="ts">
-import {VerifyCustomerAccountDocument} from "~/gql/shop/graphql";
+import { VerifyCustomerAccountDocument } from '~/gql/shop/graphql'
 
 const route = useRoute()
 const toast = useToast()

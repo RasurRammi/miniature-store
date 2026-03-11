@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import {useAdminUser} from "~/composables/admin/useAdminUser";
-import type {DropdownMenuItem} from "#ui/components/DropdownMenu.vue";
+import { useAdminUser } from '~/composables/admin/useAdminUser'
 
-const {headerLogo, logoAlt} = defineProps<{headerLogo: string, logoAlt: string}>();
-const {data: adminUser} = useAdminUser()
-const {data: currentUser} = useCurrentUser()
+const { headerLogo, logoAlt } = defineProps<{ headerLogo: string, logoAlt: string }>()
+const { data: adminUser } = useAdminUser()
+const { data: currentUser } = useCurrentUser()
 const isAdmin = computed(() => !!adminUser.value?.me)
 const isLoggedIn = computed(() => !!currentUser.value?.me)
 
-watch(() => adminUser.value?.me, (val) => console.log('me changed:', JSON.stringify(val)))
+watch(() => adminUser.value?.me, val => console.log('me changed:', JSON.stringify(val)))
 
 const baseNavItems = [
   {
     label: 'Home',
     icon: 'i-lucide-house',
-    to: '/',
+    to: '/'
   },
   {
     label: 'Store',
     icon: 'i-lucide-shopping-cart',
-    to: '/store/products',
+    to: '/store/products'
   },
   {
     label: 'Community',
@@ -35,26 +34,26 @@ const baseNavItems = [
         label: 'Discord',
         icon: 'i-simple-icons-discord',
         to: '/',
-        target: '_blank',
+        target: '_blank'
       },
       {
         label: 'Patreon',
         icon: 'i-simple-icons-patreon',
         to: '/',
-        target: '_blank',
-      },
+        target: '_blank'
+      }
     ]
-  },
+  }
 ]
 
 const navItems = computed(() => {
-  if (!!adminUser.value?.me) {
+  if (adminUser.value?.me) {
     return [
       ...baseNavItems,
       {
         label: 'Administration',
         icon: 'i-lucide-cog',
-        to: '/admin/administration/products',
+        to: '/admin/administration/products'
       }
     ]
   } else {
@@ -63,15 +62,15 @@ const navItems = computed(() => {
       {
         label: 'Admin Login',
         icon: 'i-lucide-cog',
-        to: '/admin/login',
+        to: '/admin/login'
       }
     ]
   }
-});
+})
 
 const logoutMut = useLogout()
 const userNavItems = computed(() => {
-  if (!currentUser.value) return [];
+  if (!currentUser.value) return []
   return [
     [
       {
@@ -86,8 +85,8 @@ const userNavItems = computed(() => {
       },
       {
         label: 'Settings',
-        icon: 'i-lucide-cog',
-      },
+        icon: 'i-lucide-cog'
+      }
     ],
     [
       {
@@ -97,14 +96,18 @@ const userNavItems = computed(() => {
       }
     ]
   ]
-});
+})
 </script>
 
 <template>
   <UHeader>
     <template #left>
       <NuxtLink to="/">
-        <img :src="headerLogo" :alt="logoAlt" class="size-12" />
+        <img
+          :alt="logoAlt"
+          :src="headerLogo"
+          class="size-12"
+        >
       </NuxtLink>
     </template>
 
@@ -114,7 +117,11 @@ const userNavItems = computed(() => {
     />
 
     <template #body>
-      <UNavigationMenu :items="navItems" orientation="vertical" class="-mx-2.5" />
+      <UNavigationMenu
+        :items="navItems"
+        class="-mx-2.5"
+        orientation="vertical"
+      />
     </template>
 
     <template #right>
@@ -127,15 +134,20 @@ const userNavItems = computed(() => {
         variant="ghost"
       />
 
-
-      <UDropdownMenu v-if="isLoggedIn" :items="userNavItems">
+      <UDropdownMenu
+        v-if="isLoggedIn"
+        :items="userNavItems"
+      >
         <UButton
           icon="i-lucide-user"
           color="neutral"
           variant="ghost"
         />
       </UDropdownMenu>
-      <ULink v-else to="/store/login">
+      <ULink
+        v-else
+        to="/store/login"
+      >
         <UButton
           color="primary"
           variant="solid"
