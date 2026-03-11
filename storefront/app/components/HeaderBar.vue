@@ -2,6 +2,7 @@
 import {useAdminUser} from "~/composables/admin/useAdminUser";
 import type {DropdownMenuItem} from "#ui/components/DropdownMenu.vue";
 
+const {headerLogo, logoAlt} = defineProps<{headerLogo: string, logoAlt: string}>();
 const {data: adminUser} = useAdminUser()
 const {data: currentUser} = useCurrentUser()
 const isAdmin = computed(() => !!adminUser.value?.me)
@@ -53,7 +54,7 @@ const navItems = computed(() => {
       {
         label: 'Administration',
         icon: 'i-lucide-cog',
-        to: '/admin/products',
+        to: '/admin/administration/products',
       }
     ]
   } else {
@@ -103,7 +104,7 @@ const userNavItems = computed(() => {
   <UHeader>
     <template #left>
       <NuxtLink to="/">
-        <img src="/nomnom-logo.png" alt="NomNom Miniatures" class="size-12" />
+        <img :src="headerLogo" :alt="logoAlt" class="size-12" />
       </NuxtLink>
     </template>
 

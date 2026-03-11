@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: rami
       POSTGRES_PASSWORD: ramirami
-      POSTGRES_DB: backend
+      POSTGRES_DB: vendure
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
