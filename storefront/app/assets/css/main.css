@@ -1,87 +1,8 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@theme static {
-  --font-sans: 'Public Sans', sans-serif;
-
-  /*
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
-   */
-
-  /* Off-white background */
-  --color-nomnom-background-50: #f9f6f3;
-  --color-nomnom-background-100: #ebe2d6; /* this */
-  --color-nomnom-background-200: #e2d5c6;
-  --color-nomnom-background-300: #d0b9a1;
-  --color-nomnom-background-400: #bc987b;
-  --color-nomnom-background-500: #af8060;
-  --color-nomnom-background-600: #a16f55;
-  --color-nomnom-background-700: #865a48;
-  --color-nomnom-background-800: #6d4a3f;
-  --color-nomnom-background-900: #593e35;
-  --color-nomnom-background-950: #2f1f1b;
-
-  /* Yellow primary  */
-  --color-nomnom-main-50: #fff7eb;
-  --color-nomnom-main-100: #ffe9c6;
-  --color-nomnom-main-200: #ffcf88;
-  --color-nomnom-main-300: #ffb049; /* this */
-  --color-nomnom-main-400: #ff9420;
-  --color-nomnom-main-500: #f96f07;
-  --color-nomnom-main-600: #dd4b02;
-  --color-nomnom-main-700: #b73006;
-  --color-nomnom-main-800: #94240c;
-  --color-nomnom-main-900: #7a1f0d;
-  --color-nomnom-main-950: #460c02;
-
-  /* Reddish accent */
-  --color-nomnom-accent-50: #fff7ec;
-  --color-nomnom-accent-100: #ffecd3;
-  --color-nomnom-accent-200: #ffd5a5;
-  --color-nomnom-accent-300: #ffb76d;
-  --color-nomnom-accent-400: #ff8c32;
-  --color-nomnom-accent-500: #ff6c0a;
-  --color-nomnom-accent-600: #fd5100; /* this */
-  --color-nomnom-accent-700: #cc3902;
-  --color-nomnom-accent-800: #a12d0b;
-  --color-nomnom-accent-900: #82270c;
-  --color-nomnom-accent-950: #461104;
-
-
-}
-
-:root {
-  /* Backgrounds */
-  --ui-bg: var(--color-nomnom-background-100);
-  --ui-bg-muted: var(--color-nomnom-background-200);
-  --ui-bg-elevated: var(--color-nomnom-background-50);
-  --ui-bg-accented: var(--color-nomnom-background-300);
-  --ui-bg-inverted: var(--color-nomnom-background-950);
-
-  /* Text */
-  --ui-text: var(--color-nomnom-accent-900);
-  --ui-text-muted: var(--color-nomnom-accent-700);
-  --ui-text-toned: var(--color-nomnom-accent-600);
-  --ui-text-dimmed: var(--color-nomnom-accent-500);
-  --ui-text-highlighted: var(--color-nomnom-accent-950);
-  --ui-text-inverted: var(--color-nomnom-accent-50);
-
-  /* Borders */
-  --ui-border: var(--color-nomnom-background-300);
-  --ui-border-muted: var(--color-nomnom-background-200);
-  --ui-border-accented: var(--color-nomnom-background-400);
-  --ui-border-inverted: var(--color-nomnom-background-950);
-}
+/* @import "./defaultStyle.css"; */
+@import "./nomnomStyle.css";
 
 /*
 :root {

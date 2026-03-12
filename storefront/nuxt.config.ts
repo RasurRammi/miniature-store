@@ -33,7 +33,10 @@ export default defineNuxtConfig({
   },
   eslint: {
     config: {
-      stylistic: true
+      stylistic: {
+        commaDangle: 'always-multiline',
+        braceStyle: 'stroustrup'
+      }
     }
   }
 })
