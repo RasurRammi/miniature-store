@@ -894,9 +894,13 @@ export type CreateProductOptionInput = {
   translations: Array<ProductOptionGroupTranslationInput>;
 };
 
+export type CreateProductVariantCustomFieldsInput = {
+  isDigital?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type CreateProductVariantInput = {
   assetIds?: InputMaybe<Array<Scalars['ID']['input']>>;
-  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  customFields?: InputMaybe<CreateProductVariantCustomFieldsInput>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   facetValueIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   featuredAssetId?: InputMaybe<Scalars['ID']['input']>;
@@ -960,11 +964,15 @@ export type CreateSellerInput = {
   name: Scalars['String']['input'];
 };
 
+export type CreateShippingMethodCustomFieldsInput = {
+  isDigital?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type CreateShippingMethodInput = {
   calculator: ConfigurableOperationInput;
   checker: ConfigurableOperationInput;
   code: Scalars['String']['input'];
-  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  customFields?: InputMaybe<CreateShippingMethodCustomFieldsInput>;
   fulfillmentHandler: Scalars['String']['input'];
   translations: Array<ShippingMethodTranslationInput>;
 };
@@ -1966,7 +1974,7 @@ export type FulfillOrderInput = {
 export type Fulfillment = Node & {
   __typename?: 'Fulfillment';
   createdAt: Scalars['DateTime']['output'];
-  customFields?: Maybe<Scalars['JSON']['output']>;
+  customFields?: Maybe<FulfillmentCustomFields>;
   id: Scalars['ID']['output'];
   lines: Array<FulfillmentLine>;
   method: Scalars['String']['output'];
@@ -1976,6 +1984,11 @@ export type Fulfillment = Node & {
   summary: Array<FulfillmentLine>;
   trackingCode?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type FulfillmentCustomFields = {
+  __typename?: 'FulfillmentCustomFields';
+  downloadUrls?: Maybe<Array<Scalars['String']['output']>>;
 };
 
 export type FulfillmentLine = {
@@ -4908,7 +4921,7 @@ export type ProductVariant = Node & {
   channels: Array<Channel>;
   createdAt: Scalars['DateTime']['output'];
   currencyCode: CurrencyCode;
-  customFields?: Maybe<Scalars['JSON']['output']>;
+  customFields?: Maybe<ProductVariantCustomFields>;
   enabled: Scalars['Boolean']['output'];
   facetValues: Array<FacetValue>;
   featuredAsset?: Maybe<Asset>;
@@ -4943,6 +4956,11 @@ export type ProductVariantStockMovementsArgs = {
   options?: InputMaybe<StockMovementListOptions>;
 };
 
+export type ProductVariantCustomFields = {
+  __typename?: 'ProductVariantCustomFields';
+  isDigital?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type ProductVariantFilterParameter = {
   _and?: InputMaybe<Array<ProductVariantFilterParameter>>;
   _or?: InputMaybe<Array<ProductVariantFilterParameter>>;
@@ -4951,6 +4969,7 @@ export type ProductVariantFilterParameter = {
   enabled?: InputMaybe<BooleanOperators>;
   facetValueId?: InputMaybe<IdOperators>;
   id?: InputMaybe<IdOperators>;
+  isDigital?: InputMaybe<BooleanOperators>;
   languageCode?: InputMaybe<StringOperators>;
   name?: InputMaybe<StringOperators>;
   outOfStockThreshold?: InputMaybe<NumberOperators>;
@@ -4995,6 +5014,7 @@ export type ProductVariantPrice = {
 export type ProductVariantSortParameter = {
   createdAt?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
+  isDigital?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
   outOfStockThreshold?: InputMaybe<SortOrder>;
   price?: InputMaybe<SortOrder>;
@@ -6037,7 +6057,7 @@ export type ShippingMethod = Node & {
   checker: ConfigurableOperation;
   code: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
-  customFields?: Maybe<Scalars['JSON']['output']>;
+  customFields?: Maybe<ShippingMethodCustomFields>;
   description: Scalars['String']['output'];
   fulfillmentHandlerCode: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -6045,6 +6065,11 @@ export type ShippingMethod = Node & {
   name: Scalars['String']['output'];
   translations: Array<ShippingMethodTranslation>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ShippingMethodCustomFields = {
+  __typename?: 'ShippingMethodCustomFields';
+  isDigital?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ShippingMethodFilterParameter = {
@@ -6055,6 +6080,7 @@ export type ShippingMethodFilterParameter = {
   description?: InputMaybe<StringOperators>;
   fulfillmentHandlerCode?: InputMaybe<StringOperators>;
   id?: InputMaybe<IdOperators>;
+  isDigital?: InputMaybe<BooleanOperators>;
   languageCode?: InputMaybe<StringOperators>;
   name?: InputMaybe<StringOperators>;
   updatedAt?: InputMaybe<DateOperators>;
@@ -6082,7 +6108,7 @@ export type ShippingMethodListOptions = {
 export type ShippingMethodQuote = {
   __typename?: 'ShippingMethodQuote';
   code: Scalars['String']['output'];
-  customFields?: Maybe<Scalars['JSON']['output']>;
+  customFields?: Maybe<ShippingMethodCustomFields>;
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   /** Any optional metadata returned by the ShippingCalculator in the ShippingCalculationResult */
@@ -6098,6 +6124,7 @@ export type ShippingMethodSortParameter = {
   description?: InputMaybe<SortOrder>;
   fulfillmentHandlerCode?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
+  isDigital?: InputMaybe<SortOrder>;
   name?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
@@ -6773,9 +6800,13 @@ export type UpdateProductOptionInput = {
   translations?: InputMaybe<Array<ProductOptionGroupTranslationInput>>;
 };
 
+export type UpdateProductVariantCustomFieldsInput = {
+  isDigital?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type UpdateProductVariantInput = {
   assetIds?: InputMaybe<Array<Scalars['ID']['input']>>;
-  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  customFields?: InputMaybe<UpdateProductVariantCustomFieldsInput>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   facetValueIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   featuredAssetId?: InputMaybe<Scalars['ID']['input']>;
@@ -6849,11 +6880,15 @@ export type UpdateSellerInput = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateShippingMethodCustomFieldsInput = {
+  isDigital?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type UpdateShippingMethodInput = {
   calculator?: InputMaybe<ConfigurableOperationInput>;
   checker?: InputMaybe<ConfigurableOperationInput>;
   code?: InputMaybe<Scalars['String']['input']>;
-  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  customFields?: InputMaybe<UpdateShippingMethodCustomFieldsInput>;
   fulfillmentHandler?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   translations: Array<ShippingMethodTranslationInput>;

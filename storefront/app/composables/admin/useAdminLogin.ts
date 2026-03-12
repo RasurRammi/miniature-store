@@ -1,24 +1,23 @@
-import {useMutation, useQueryClient} from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { LoginDocument } from '~/gql/admin/graphql'
 
 export function useAdminLogin() {
   const { $adminGqlClient } = useNuxtApp()
-  const queryClient = useQueryClient()
   const toast = useToast()
 
   return useMutation({
     mutationFn: (input: { username: string, password: string }) =>
       $adminGqlClient.request(LoginDocument, input),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.add({
         title: 'Admin Login Success',
         description: data.login.message,
         icon: 'i-lucide-check',
-        color: 'success'
+        color: 'success',
       })
-      queryClient.invalidateQueries({ queryKey: ['me'] })
-      queryClient.invalidateQueries({ queryKey: ['admin', 'me'] })
-      navigateTo('/admin/products')
+      await refreshNuxtData('auth.user')
+      await refreshNuxtData('auth.adminUser')
+      navigateTo('/admin/administration/bundles')
     },
     onError: (err) => {
       console.log(err)
@@ -26,8 +25,8 @@ export function useAdminLogin() {
         title: 'Login Failed',
         description: JSON.stringify(err),
         icon: 'i-lucide-x',
-        color: 'error'
+        color: 'error',
       })
-    }
+    },
   })
 }

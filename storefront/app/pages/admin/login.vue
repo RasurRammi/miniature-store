@@ -4,12 +4,11 @@ import { useAdminLogin } from '~/composables/admin/useAdminLogin'
 
 const form = reactive({
   username: '',
-  password: ''
+  password: '',
 })
 
 const { mutate, isPending, isError, error } = useAdminLogin()
 
-const toast = useToast()
 function submit() {
   mutate(form)
 }

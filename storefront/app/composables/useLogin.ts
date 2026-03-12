@@ -6,6 +6,6 @@ export function useCustomerLogin() {
 
   return useMutation({
     mutationFn: (input: { username: string, password: string }) =>
-      $gqlClient.request(LoginDocument, input)
+      $gqlClient.request(LoginDocument, input),
   })
 }

@@ -3,14 +3,14 @@ const headerLogo = '/nomnom-logo.png'
 const logoAlt = 'NomNom Miniatures'
 useHead({
   meta: [
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
   ],
   link: [
-    { rel: 'icon', href: headerLogo }
+    { rel: 'icon', href: headerLogo },
   ],
   htmlAttrs: {
-    lang: 'en'
-  }
+    lang: 'en',
+  },
 })
 
 const title = 'Miniature Store Base'
@@ -20,42 +20,47 @@ useSeoMeta({
   title,
   description,
   ogTitle: title,
-  ogDescription: description
+  ogDescription: description,
 })
 </script>
 
 <template>
-  <HeaderBar
-    :header-logo="headerLogo"
-    :logo-alt="logoAlt"
-  />
+  <div class="flex flex-col min-h-screen">
+    <HeaderBar
+      :header-logo="headerLogo"
+      :logo-alt="logoAlt"
+    />
 
-  <UMain>
-    <UContainer>
+    <UMain>
       <slot />
-    </UContainer>
-  </UMain>
+    </UMain>
 
-  <USeparator icon="i-simple-icons-nuxtdotjs" />
+    <USeparator
+      :avatar="{
+        src: headerLogo,
+        loading: 'lazy',
+      }"
+    />
 
-  <UFooter>
-    <template #left>
-      <p class="text-sm text-muted">
-        Built with Nuxt UI • © {{ new Date().getFullYear() }}
-      </p>
-    </template>
+    <UFooter>
+      <template #left>
+        <p class="text-sm text-muted">
+          Built with for great creators • © {{ new Date().getFullYear() }}
+        </p>
+      </template>
 
-    <template #right>
-      <UButton
-        to="https://github.com/nuxt-ui-templates/starter"
-        target="_blank"
-        icon="i-simple-icons-github"
-        aria-label="GitHub"
-        color="neutral"
-        variant="ghost"
-      />
-    </template>
-  </UFooter>
+      <template #right>
+        <UButton
+          to="https://github.com/RasurRammi/miniature-store"
+          target="_blank"
+          icon="i-simple-icons-github"
+          aria-label="GitHub"
+          color="neutral"
+          variant="ghost"
+        />
+      </template>
+    </UFooter>
+  </div>
 </template>
 
 <style lang="scss" scoped>

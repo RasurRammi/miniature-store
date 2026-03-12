@@ -1,10 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation } from '@tanstack/vue-query'
 import { ShopLogoutDocument } from '~/gql/shop/graphql'
 import { AdminLogoutDocument } from '~/gql/admin/graphql'
 
 export function useLogout() {
   const { $gqlClient, $adminGqlClient } = useNuxtApp()
-  const queryClient = useQueryClient()
   const toast = useToast()
 
   return useMutation({
@@ -14,14 +13,14 @@ export function useLogout() {
         $adminGqlClient.request(AdminLogoutDocument),
       ])
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.add({
         title: 'Logout successful',
         icon: 'i-lucide-check',
         color: 'success',
       })
-      queryClient.refetchQueries({ queryKey: ['me'] })
-      queryClient.refetchQueries({ queryKey: ['admin', 'me'] })
+      await refreshNuxtData('auth.user')
+      await refreshNuxtData('auth.adminUser')
       navigateTo('/store/login')
     },
     onError: () => {
@@ -30,6 +29,6 @@ export function useLogout() {
         icon: 'i-lucide-check',
         color: 'error',
       })
-    }
+    },
   })
 }

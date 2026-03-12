@@ -2,6 +2,7 @@
 import { useProductDrawerStore } from '~/stores/productDrawer'
 import { formatCurrency } from '~/utils/formatCurrency'
 import type { ProductVariant } from '~/gql/shop/graphql'
+import GridCard from '~/components/common/GridCard.vue'
 
 const { productV } = defineProps<{ productV: ProductVariant }>()
 
@@ -9,10 +10,7 @@ const productDrawer = useProductDrawerStore()
 </script>
 
 <template>
-  <UCard
-    :variant="'subtle'"
-    :ui="{ root: '', body: 'p-0 sm:p-0', footer: 'p-2 sm:px-2' }"
-  >
+  <GridCard>
     <button
       class="aspect-square w-full bg-muted cursor-pointer block"
       @click="productDrawer.open(productV)"
@@ -35,27 +33,31 @@ const productDrawer = useProductDrawerStore()
     </button>
 
     <template #footer>
-      <div class="flex flex-col gap-2">
-        <UButton
-          variant="link"
-          color="neutral"
-          class="cursor-pointer p-0 text-lg font-semibold"
-          @click="productDrawer.open(productV)"
-        >
-          {{ productV.name }}
-        </UButton>
+      <UButton
+        variant="link"
+        color="neutral"
+        class="cursor-pointer p-0 text-lg font-semibold"
+        @click="productDrawer.open(productV)"
+      >
+        {{ productV.name }}
+      </UButton>
 
-        <div class="flex flex-row justify-between items-center">
-          <div>
-            {{ formatCurrency(productV.price) }} {{ productV.currencyCode === 'EUR' ? '€' : '?' }}
-          </div>
-          <div class="flex flex-row gap-1">
-            <UButton icon="i-lucide-shopping-basket" />
-          </div>
+      <div class="flex flex-row justify-between items-center">
+        <div v-if="productV.price > 0">
+          {{ formatCurrency(productV.price) }} {{ productV.currencyCode === 'EUR' ? '€' : '?' }}
+        </div>
+        <div
+          v-else
+          class="text-primary"
+        >
+          Free
+        </div>
+        <div class="flex flex-row gap-1">
+          <UButton icon="i-lucide-shopping-basket" />
         </div>
       </div>
     </template>
-  </UCard>
+  </GridCard>
 </template>
 
 <style scoped>

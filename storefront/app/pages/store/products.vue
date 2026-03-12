@@ -21,102 +21,106 @@ const filteredBundles = computed(() => {
       let productVariants = bundle.productVariants.items
       if (!bundleMatches) {
         productVariants = bundle.productVariants.items.filter((productV: ProductVariant) =>
-          productV.name.toLowerCase().includes(query)
+          productV.name.toLowerCase().includes(query),
         )
       }
       return {
         ...bundle,
-        productVariants: { items: productVariants }
+        productVariants: { items: productVariants },
       }
     })
     .filter((bundle: Collection) =>
       bundle.name.toLowerCase().includes(query)
-      || bundle.productVariants.items.length > 0
+      || bundle.productVariants.items.length > 0,
     )
 })
 </script>
 
 <template>
-  <div class="w-full h-80 bg-muted mb-10">
-    <img alt="Product Banner">
-  </div>
+  <div>
+    <div class="w-full h-80 bg-muted mb-10">
+      <img alt="Product Banner">
+    </div>
 
-  <UContainer>
-    <div class="flex flex-col gap-2">
-      <div class="mx-8 mb-4">
-        <UInput
-          v-model="searchTerm"
-          trailing-icon="i-lucide-search"
-          placeholder="Search..."
-          size="xl"
-          class="w-full"
-        />
-      </div>
-      <div class="flex flex-row-reverse gap-1">
-        <UButton
-          icon="i-lucide-grid-2x2"
-          color="primary"
-          variant="outline"
-          size="xl"
-          @click="console.log('test')"
-        />
-        <UButton
-          icon="i-lucide-list"
-          color="neutral"
-          variant="ghost"
-          size="xl"
-          @click="console.log('test')"
-        />
-      </div>
-      <div class="flex flex-col lg:flex-row gap-4">
-        <div class="w-full lg:w-72 shrink-0">
-          Filter
+    <UContainer>
+      <div class="flex flex-col gap-2">
+        <div class="mx-8 mb-4">
+          <UInput
+            v-model="searchTerm"
+            trailing-icon="i-lucide-search"
+            placeholder="Search..."
+            size="xl"
+            class="w-full"
+          />
         </div>
-
-        <div class="flex-1 flex flex-col gap-4">
-          <div v-if="isLoading">
-            <div class="border border-default rounded-xl">
-              <USkeleton class="w-full h-14 rounded-xl" />
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-4">
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-                <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
-              </div>
-            </div>
+        <div class="flex flex-row-reverse gap-1">
+          <UButton
+            icon="i-lucide-grid-2x2"
+            color="primary"
+            variant="outline"
+            size="xl"
+            @click="console.log('test')"
+          />
+          <UButton
+            icon="i-lucide-list"
+            color="neutral"
+            variant="ghost"
+            size="xl"
+            @click="console.log('test')"
+          />
+        </div>
+        <div class="flex flex-col lg:flex-row gap-4">
+          <div class="w-full lg:w-72 shrink-0">
+            Filter
           </div>
 
-          <BundleArea
-            v-for="bundle in filteredBundles"
-            v-else-if="filteredBundles.length"
-            :key="bundle.id"
-            :bundle="bundle"
-          />
+          <div class="flex-1 flex flex-col gap-4">
+            <div v-if="isLoading">
+              <div class="border border-default rounded-xl">
+                <USkeleton class="w-full h-14 rounded-xl" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-4">
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                  <USkeleton class="w-[207.5px] h-[292.5px] rounded-xl" />
+                </div>
+              </div>
+            </div>
 
-          <template v-else>
-            <UEmpty title="No products found" />
-          </template>
+            <BundleArea
+              v-for="bundle in filteredBundles"
+              v-else-if="filteredBundles.length"
+              :key="bundle.id"
+              :bundle="bundle"
+            />
+
+            <template v-else>
+              <UEmpty title="No products found" />
+            </template>
+          </div>
         </div>
       </div>
-    </div>
-  </UContainer>
+    </UContainer>
 
-  <USlideover
-    v-model:open="productDrawer.isOpen"
-    :title="productDrawer.productV?.product.name ?? ''"
-    :description="productDrawer.productV?.product.description ?? ''"
-  >
-    <template #content>
-      <ProductInfo
-        :product-v="productDrawer.productV"
-        :can-edit="true"
-      />
-    </template>
-  </USlideover>
+    <USlideover
+      v-model:open="productDrawer.isOpen"
+      :title="productDrawer.productV?.product.name ?? ''"
+      :description="productDrawer.productV?.product.description ?? ''"
+      :ui="{ content: 'max-w-1/3' }"
+      :modal="false"
+    >
+      <template #content>
+        <ProductInfo
+          :product-v="productDrawer.productV"
+          :can-edit="true"
+        />
+      </template>
+    </USlideover>
+  </div>
 </template>
 
 <style scoped>

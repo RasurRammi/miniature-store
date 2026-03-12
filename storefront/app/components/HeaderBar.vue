@@ -2,23 +2,21 @@
 import { useAdminUser } from '~/composables/admin/useAdminUser'
 
 const { headerLogo, logoAlt } = defineProps<{ headerLogo: string, logoAlt: string }>()
-const { data: adminUser } = useAdminUser()
-const { data: currentUser } = useCurrentUser()
-const isAdmin = computed(() => !!adminUser.value?.me)
-const isLoggedIn = computed(() => !!currentUser.value?.me)
-
-watch(() => adminUser.value?.me, val => console.log('me changed:', JSON.stringify(val)))
+const { data: adminUser } = await useAdminUser()
+const { data: currentUser } = await useCurrentUser()
+const isAdmin = computed(() => !!adminUser.value)
+const isLoggedIn = computed(() => !!currentUser.value)
 
 const baseNavItems = [
   {
     label: 'Home',
     icon: 'i-lucide-house',
-    to: '/'
+    to: '/',
   },
   {
     label: 'Store',
     icon: 'i-lucide-shopping-cart',
-    to: '/store/products'
+    to: '/store/products',
   },
   {
     label: 'Community',
@@ -28,42 +26,43 @@ const baseNavItems = [
       {
         label: 'FAQ',
         icon: 'i-lucide-badge-question-mark',
-        to: '/'
+        to: '/',
       },
       {
         label: 'Discord',
         icon: 'i-simple-icons-discord',
         to: '/',
-        target: '_blank'
+        target: '_blank',
       },
       {
         label: 'Patreon',
         icon: 'i-simple-icons-patreon',
         to: '/',
-        target: '_blank'
-      }
-    ]
-  }
+        target: '_blank',
+      },
+    ],
+  },
 ]
 
 const navItems = computed(() => {
-  if (adminUser.value?.me) {
+  if (adminUser.value) {
     return [
       ...baseNavItems,
       {
         label: 'Administration',
-        icon: 'i-lucide-cog',
-        to: '/admin/administration/products'
-      }
+        icon: 'i-lucide-shield',
+        to: '/admin/administration/bundles',
+      },
     ]
-  } else {
+  }
+  else {
     return [
       ...baseNavItems,
       {
         label: 'Admin Login',
         icon: 'i-lucide-cog',
-        to: '/admin/login'
-      }
+        to: '/admin/login',
+      },
     ]
   }
 })
@@ -74,27 +73,27 @@ const userNavItems = computed(() => {
   return [
     [
       {
-        label: currentUser.value.me.identifier,
-        type: 'label'
-      }
+        label: currentUser.value.identifier,
+        type: 'label',
+      },
     ],
     [
       {
         label: 'Profile',
-        icon: 'i-lucide-user'
+        icon: 'i-lucide-user',
       },
       {
         label: 'Settings',
-        icon: 'i-lucide-cog'
-      }
+        icon: 'i-lucide-cog',
+      },
     ],
     [
       {
         label: 'Logout',
         icon: 'i-lucide-log-out',
-        onSelect: logoutMut.mutate
-      }
-    ]
+        onSelect: logoutMut.mutate,
+      },
+    ],
   ]
 })
 </script>

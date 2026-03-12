@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import {
   CreateProductDocument,
@@ -9,8 +8,8 @@ import {
   GetCollectionFiltersDocument,
 } from '~/gql/admin/graphql'
 import { slugify } from '~/utils/slugify'
-import type {Collection} from "~/gql/shop/graphql";
-import {useUploadAssets} from "~/composables/admin/useUploadAssets";
+import type { Collection } from '~/gql/shop/graphql'
+import { useUploadAssets } from '~/composables/admin/useUploadAssets'
 
 export type ProductInput = {
   productId?: string
@@ -32,8 +31,8 @@ export function useSubmitProduct() {
       let product
       let productVariants
 
-      //const uploadFiles = useUploadAssets()
-      //uploadFiles.mutate(input.images)
+      // const uploadFiles = useUploadAssets()
+      // uploadFiles.mutate(input.images)
 
       if (isNew) {
         const { createProduct } = await $adminGqlClient.request(CreateProductDocument, {
@@ -43,8 +42,8 @@ export function useSubmitProduct() {
               name: input.name,
               slug: slugify(input.name),
               description: input.description,
-            }]
-          }
+            }],
+          },
         })
 
         // create variant
@@ -54,11 +53,12 @@ export function useSubmitProduct() {
             translations: [{ languageCode: 'en', name: input.name }],
             price: input.price,
             sku: slugify(input.name),
-          }]
+          }],
         })
         product = createProduct
         productVariants = createProductVariants
-      } else {
+      }
+      else {
         // update product
         const { updateProduct } = await $adminGqlClient.request(UpdateProductDocument, {
           input: {
@@ -67,8 +67,8 @@ export function useSubmitProduct() {
               languageCode: 'en',
               name: input.name,
               description: input.description,
-            }]
-          }
+            }],
+          },
         })
 
         // update variant
@@ -76,8 +76,8 @@ export function useSubmitProduct() {
           input: [{
             id: input.variantId,
             price: input.price,
-            translations: [{ languageCode: 'en', name: input.name }]
-          }]
+            translations: [{ languageCode: 'en', name: input.name }],
+          }],
         })
 
         product = updateProduct
@@ -87,8 +87,8 @@ export function useSubmitProduct() {
       if (!isNew || input.collectionIds.length) {
         const { collections } = await $adminGqlClient.request(GetCollectionFiltersDocument, {
           options: isNew
-            ? { filter: { id: { in: input.collectionIds } } }  // create: fetch only selected
-            : {}  // update: fetch all to remove from prior-ly included
+            ? { filter: { id: { in: input.collectionIds } } } // create: fetch only selected
+            : {}, // update: fetch all to remove from prior-ly included
         })
 
         await Promise.all(
@@ -110,16 +110,16 @@ export function useSubmitProduct() {
 
             await $adminGqlClient.request(AssignProductToCollectionDocument, {
               collectionId: collection.id,
-              productIds: JSON.stringify(mergedIds)
+              productIds: JSON.stringify(mergedIds),
             })
-          })
+          }),
         )
       }
-      return {product: product, variant: productVariants[0]}
+      return { product: product, variant: productVariants[0] }
     },
     onSuccess: () => {
       console.log('invalidate queries!')
       queryClient.invalidateQueries({ queryKey: ['bundles'] })
-    }
+    },
   })
 }

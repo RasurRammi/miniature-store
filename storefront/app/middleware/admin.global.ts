@@ -1,7 +1,10 @@
-import {AdminMeDocument} from "~/gql/admin/graphql";
-import {useToast} from "../../.nuxt/imports";
+import { AdminMeDocument } from '~/gql/admin/graphql'
+import { type Toast, useToast } from '#ui/composables'
 
 export default defineNuxtRouteMiddleware(async (to) => {
+  if (to.path.startsWith('/admin/administration')) {
+    setPageLayout('admin-administration')
+  }
 
   if (
     !to.path.startsWith('/admin')
@@ -13,10 +16,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Check for admin rights, otherwise redirect to admin login
   const { $adminGqlClient } = useNuxtApp()
-  const toast = useToast();
-  const loginNeededMsg = {
-    title: "Login",
-    description: "Login to your account",
+  const toast = useToast()
+  const loginNeededMsg: Partial<Toast> = {
+    title: 'Login',
+    description: 'Login to your account',
     color: 'error',
   }
 
@@ -26,11 +29,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
       toast.add(loginNeededMsg)
       return navigateTo('/admin/login')
     }
-
-    if (to.path.startsWith('/admin/administration')) {
-      setPageLayout('admin-administration')
-    }
-  } catch {
+  }
+  catch {
     toast.add(loginNeededMsg)
     return navigateTo('/admin/login')
   }

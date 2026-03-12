@@ -1,5 +1,5 @@
-query GetBundles {
-  collections {
+query GetBundles($options: CollectionListOptions) {
+  collections(options: $options) {
     items {
       ... SimpleBundleFields
     },

@@ -21,6 +21,7 @@ const isEditing = ref(isNew.value)
 const form = reactive<ProductInput>(productVToForm())
 
 function startEditing() {
+  Object.assign(form, productVToForm())
   isEditing.value = true
 }
 
@@ -36,7 +37,8 @@ function productVToForm(): ProductInput {
     name: productV?.product.name ?? '',
     description: productV?.product.description ?? '',
     price: productV?.price ?? 0,
-    collectionIds: productV?.product.collections.map(c => c.id) ?? []
+    collectionIds: productV?.product.collections.map(c => c.id) ?? [],
+    images: [],
   }
 }
 
@@ -48,17 +50,16 @@ const viableBundles = computed(() => {
   return bundleData.value.collections.items.map((bundle: Collection) => {
     return {
       id: bundle.id,
-      label: bundle.name
+      label: bundle.name,
     }
   })
 })
-const viableTags = ['Dragon', 'Huge', 'Ocean', 'Nature']
 
 const toast = useToast()
 const submitProduct = useSubmitProduct()
 
 async function submitForm() {
-  const res = submitProduct.mutate(form, {
+  submitProduct.mutate(form, {
     onSuccess: (data) => {
       console.log(data)
       cancelEditing()
@@ -67,7 +68,7 @@ async function submitForm() {
         title: 'Product successfully created',
         description: 'The product was successfully created',
         icon: 'i-lucide-check',
-        color: 'success'
+        color: 'success',
       })
     },
     onError: (err) => {
@@ -75,9 +76,9 @@ async function submitForm() {
         title: 'An error occurred when trying to create the product',
         description: err.name + ': ' + err.message,
         icon: 'i-lucide-x',
-        color: 'error'
+        color: 'error',
       })
-    }
+    },
   })
 }
 </script>
@@ -197,24 +198,30 @@ async function submitForm() {
         v-if="isEditing"
         v-model="form.collectionIds"
         multiple
+        size="xl"
         icon="i-lucide-package-2"
         value-key="id"
         :items="viableBundles"
       />
 
       <!-- Description -->
-      <p
+      <div
         v-if="productV && !isEditing"
-        class="p-2 text-muted bg-elevated rounded-md"
+        class="p-2"
       >
-        {{ productV.product.description }}
-      </p>
+        <p
+          v-if="productV.product.description"
+          class="text-muted bg-elevated rounded-md"
+        >
+          {{ productV.product.description }}
+        </p>
+      </div>
       <UTextarea
         v-else
         v-model="form.description"
-        placeholder="Description"
-        color="neutral"
-        variant="subtle"
+        placeholder="Description..."
+        :autoresize="true"
+        variant="soft"
       />
 
       <!-- Buttons -->
@@ -237,7 +244,6 @@ async function submitForm() {
         <UButton
           icon="i-lucide-shopping-basket"
           size="xl"
-          color="success"
         >
           Add to Cart
         </UButton>
