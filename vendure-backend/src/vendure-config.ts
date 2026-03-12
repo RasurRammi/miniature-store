@@ -11,6 +11,8 @@ import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import 'dotenv/config';
 import path from 'path';
+import {DigitalProductsPlugin} from "./plugins/digital-products/digital-products.plugin";
+import {WishlistPlugin} from "./plugins/wishlist/wishlist.plugin";
 
 const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
@@ -50,7 +52,7 @@ export const config: VendureConfig = {
         type: 'postgres',
         // See the README.md "Migrations" section for an explanation of
         // the `synchronize` and `migrations` options.
-        synchronize: false,
+        synchronize: true,
         migrations: [path.join(__dirname, './migrations/*.+(js|ts)')],
         logging: false,
         database: process.env.DB_NAME,
@@ -108,5 +110,8 @@ export const config: VendureConfig = {
                 ? path.join(__dirname, '../dist/dashboard')
                 : path.join(__dirname, 'dashboard'),
         }),
+
+        // Custom Plugins
+        WishlistPlugin,
     ],
 };
