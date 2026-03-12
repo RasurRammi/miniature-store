@@ -1,15 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import {
+  AssignProductToCollectionDocument,
   CreateProductDocument,
   CreateProductVariantDocument,
+  GetCollectionFiltersDocument,
   UpdateProductDocument,
   UpdateProductVariantDocument,
-  AssignProductToCollectionDocument,
-  GetCollectionFiltersDocument,
 } from '~/gql/admin/graphql'
 import { slugify } from '~/utils/slugify'
 import type { Collection } from '~/gql/shop/graphql'
-import { useUploadAssets } from '~/composables/admin/useUploadAssets'
 
 export type ProductInput = {
   productId?: string

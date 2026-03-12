@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/vue-query'
-import { GetBundleDocument, GetBundlesDocument } from '~/gql/shop/graphql'
+import { GetBundlesDocument } from '~/gql/shop/graphql'
+import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
 
 const releasesSlug = 'releases'
 
@@ -10,11 +11,8 @@ export function useBundles(releases: boolean = true) {
     queryKey: ['bundles', type],
     queryFn: async () => {
       if (releases) {
-        const { collection } = await $gqlClient.request(GetBundleDocument, { slug: releasesSlug })
-        if (!collection) {
-          throw new Error('Releases Bundles isn\'t initiated or doesnt have the slug "releases"')
-        }
-        return $gqlClient.request(GetBundlesDocument, { options: { filter: { parentId: { eq: collection.id } } } })
+        const { data: rootReleaseCol } = await useRootReleaseBundle()
+        return $gqlClient.request(GetBundlesDocument, { options: { filter: { parentId: { eq: rootReleaseCol.value.id } } } })
       }
       else {
         return $gqlClient.request(GetBundlesDocument, {

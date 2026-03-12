@@ -1,4 +1,4 @@
-fragment SimpleBundleFields on Collection {
+fragment SimpleCollectionFields on Collection {
   id
   name
   slug

@@ -3,7 +3,7 @@ import type { ProductDraft, ProductVariant } from '~/types/product'
 import { useProductDrawerStore } from '~/stores/productDrawer'
 import { useBundles } from '~/composables/useBundles'
 import type { Collection } from '~/gql/shop/graphql'
-import { type ProductInput, useSubmitProduct } from '~/composables/useSubmitProduct'
+import { type ProductInput, useSubmitProduct } from '~/composables/admin/useSubmitProduct'
 
 const productDrawer = useProductDrawerStore()
 
@@ -61,7 +61,6 @@ const submitProduct = useSubmitProduct()
 async function submitForm() {
   submitProduct.mutate(form, {
     onSuccess: (data) => {
-      console.log(data)
       cancelEditing()
       productDrawer.open(data.variant)
       toast.add({
