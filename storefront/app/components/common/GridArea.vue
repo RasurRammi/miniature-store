@@ -8,6 +8,7 @@ const isOpen = ref(initialState)
   <UCollapsible
     v-model:open="isOpen"
     class="border border-default rounded-xl"
+    :ui="{ content: '@container' }"
     :disabled="!collapsible"
   >
     <div
@@ -31,7 +32,7 @@ const isOpen = ref(initialState)
 
     <template #content>
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4"
+        class="grid grid-cols-1 gap-4 @xl:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-5 @6xl:grid-cols-6 @7xl:grid-cols-7"
         :class="(!isOpen && !collapsible) ? 'p-0' : 'p-4'"
       >
         <slot />

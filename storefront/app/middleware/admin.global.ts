@@ -2,8 +2,8 @@ import { AdminMeDocument } from '~/gql/admin/graphql'
 import { type Toast, useToast } from '#ui/composables'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path.startsWith('/admin/administration')) {
-    setPageLayout('admin-administration')
+  if (to.path.startsWith('/admin')) {
+    setPageLayout('admin')
   }
 
   if (

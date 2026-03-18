@@ -1,27 +1,33 @@
 <script setup lang="ts">
 import { useFacets } from '~/composables/admin/useFacets'
-import type { Facet, Product } from '~/gql/shop/graphql'
+import type { Facet, Product } from '~/gql/admin/graphql'
 import { useProducts } from '~/composables/useProducts'
-import FlexibleGrid from '~/components/common/FlexibleGrid.vue'
 import { type FilterMode, useProductFilter } from '~/stores/productFilter'
+import SelectionGrid from '~/components/common/SelectionGrid.vue'
+import { useSubmitFacets } from '~/composables/admin/useSubmitFacets'
+import { getFacetId } from '~/composables/useDirtyList'
 
 // TODO remove for production
 definePageMeta({
-  layout: 'admin-administration',
+  layout: 'admin',
 })
 
-const toast = useToast()
-
-const { resetAll } = useDirtyStateStore()
-const productFilter = useProductFilter()
-const { data: facetsData } = useFacets()
-const { data: productsData } = useProducts()
-const facetsCopy = ref<Facet[]>([])
 type FilterBadge = {
   facetId: string
   valueId: string
   name: string
 }
+
+const toast = useToast()
+
+const { resetAll } = useDirtyStateStore()
+const productFilter = useProductFilter()
+const dirtyStateStore = useDirtyStateStore()
+const { data: facetsData } = useFacets()
+const { data: productsData } = useProducts()
+const facetsCopy = ref<Facet[]>([])
+const selectedProducts = ref<string[]>([])
+console.log('rami!')
 
 const productFilterNames = computed(() => {
   const res: { included: FilterBadge[], excluded: FilterBadge[] } = { included: [], excluded: [] }
@@ -82,12 +88,58 @@ watch(
   { immediate: true },
 )
 
+const submitFacets = useSubmitFacets()
 function submitChanges() {
-  console.log('submit:', facetsCopy.value)
-  // TODO reload
-  toast.add({
-    title: 'All changes were successfully saved',
-    color: 'success',
+  const inputs = []
+  for (const f of facetsCopy.value) {
+    const trueId = f.id.startsWith('new-') ? undefined : f.id
+    const meta = dirtyStateStore.getValueMeta(getFacetId(f))
+    if (!meta) continue
+    if (meta.isDeleted) {
+      // facet deleted, delete all children
+      inputs.push({
+        id: trueId,
+        name: meta.model as string,
+        isDirty: true,
+        isDeleted: true,
+        values: [], // automatically cascades to all children
+      })
+      continue
+    }
+    const dirtyValues = []
+    for (const fV of f.values) {
+      const vMeta = dirtyStateStore.getValueMeta(getValueId(fV))
+      if (!vMeta || (vMeta.status === 'unchanged' && !vMeta.isDeleted)) continue
+      const trueVId = fV.id.startsWith('new-') ? undefined : fV.id
+      dirtyValues.push({
+        id: trueVId,
+        name: vMeta.model as string,
+        isDeleted: trueVId ? vMeta.isDeleted : false,
+      })
+    }
+    if (meta.status === 'unchanged' && !dirtyValues.length) continue
+    inputs.push({
+      id: trueId,
+      name: meta.model as string,
+      isDirty: meta.status !== 'unchanged',
+      values: dirtyValues,
+    })
+  }
+  console.log('submit:', inputs)
+  submitFacets.mutate(inputs, {
+    onSuccess: () => {
+      toast.add({
+        title: 'All changes were successfully saved',
+        color: 'success',
+      })
+    },
+    onError: (err) => {
+      toast.add({
+        title: 'Failed creating facets',
+        description: err.message,
+        color: 'error',
+      })
+    },
   })
 }
 
@@ -169,8 +221,8 @@ function resetChanges() {
       </div>
 
       <div class="mt-2 p-2 rounded-lg bg-elevated/50">
-        <FlexibleGrid
-          v-if="filteredProducts.length"
+        <SelectionGrid
+          v-model="selectedProducts"
           :items="filteredProducts"
         >
           <template #default="{ item }">
@@ -179,7 +231,7 @@ function resetChanges() {
               class="bg-muted"
             >
           </template>
-        </FlexibleGrid>
+        </SelectionGrid>
       </div>
     </div>
 

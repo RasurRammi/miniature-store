@@ -1,0 +1,44 @@
+mutation CreateFacet($input: CreateFacetInput!) {
+  createFacet(input: $input) {
+    ...SimpleFacetFields
+  }
+}
+
+mutation UpdateFacet($input: UpdateFacetInput!) {
+  updateFacet(input: $input) {
+    ...SimpleFacetFields
+  }
+}
+
+mutation DeleteFacet($id: ID!, $force: Boolean = true) {
+  deleteFacet(id: $id, force: $force) {
+    result
+    message
+  }
+}
+
+mutation DeleteFacets($ids: [ID!]!, $force: Boolean = true) {
+  deleteFacets(ids: $ids, force: $force) {
+    result
+    message
+  }
+}
+
+mutation CreateFacetValues($input: [CreateFacetValueInput!]!) {
+  createFacetValues(input: $input) {
+    ...SimpleFacetValueFields
+  }
+}
+
+mutation UpdateFacetValues($input: [UpdateFacetValueInput!]!) {
+  updateFacetValues(input: $input) {
+    ...SimpleFacetValueFields
+  }
+}
+
+mutation DeleteFacetValues($ids: [ID!]!, $force: Boolean = true) {
+  deleteFacetValues(ids: $ids, force: $force) {
+    result
+    message
+  }
+}

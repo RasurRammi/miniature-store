@@ -1,0 +1,11 @@
+fragment SimpleFacetValueFields on FacetValue {
+  id
+  facetId
+  name
+  code
+  translations {
+    id
+    name
+    languageCode
+  }
+}

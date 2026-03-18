@@ -16,6 +16,8 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
 type Documents = {
     "fragment SimpleAsset on Asset {\n  id\n  preview\n  source\n}": typeof types.SimpleAssetFragmentDoc,
     "fragment SimpleCollectionFields on Collection {\n  id\n  name\n  slug\n  featuredAsset {\n    id\n    preview\n    source\n  }\n  productVariants {\n    items {\n      ...SimpleProductVariantFields\n    }\n  }\n}": typeof types.SimpleCollectionFieldsFragmentDoc,
+    "fragment SimpleFacetFields on Facet {\n  id\n  name\n  code\n  values {\n    ...SimpleFacetValueFields\n  }\n  translations {\n    id\n    name\n    languageCode\n  }\n}": typeof types.SimpleFacetFieldsFragmentDoc,
+    "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}": typeof types.SimpleFacetValueFieldsFragmentDoc,
     "fragment SimpleProductFields on Product {\n  id\n  name\n  slug\n  description\n  facetValues {\n    id\n    facetId\n  }\n  featuredAsset {\n    ...SimpleAsset\n  }\n  assets {\n    ...SimpleAsset\n  }\n  collections {\n    id\n    name\n    slug\n  }\n}": typeof types.SimpleProductFieldsFragmentDoc,
     "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}": typeof types.SimpleProductVariantFieldsFragmentDoc,
     "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": typeof types.GetBundleDocument,
@@ -31,6 +33,8 @@ type Documents = {
 const documents: Documents = {
     "fragment SimpleAsset on Asset {\n  id\n  preview\n  source\n}": types.SimpleAssetFragmentDoc,
     "fragment SimpleCollectionFields on Collection {\n  id\n  name\n  slug\n  featuredAsset {\n    id\n    preview\n    source\n  }\n  productVariants {\n    items {\n      ...SimpleProductVariantFields\n    }\n  }\n}": types.SimpleCollectionFieldsFragmentDoc,
+    "fragment SimpleFacetFields on Facet {\n  id\n  name\n  code\n  values {\n    ...SimpleFacetValueFields\n  }\n  translations {\n    id\n    name\n    languageCode\n  }\n}": types.SimpleFacetFieldsFragmentDoc,
+    "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}": types.SimpleFacetValueFieldsFragmentDoc,
     "fragment SimpleProductFields on Product {\n  id\n  name\n  slug\n  description\n  facetValues {\n    id\n    facetId\n  }\n  featuredAsset {\n    ...SimpleAsset\n  }\n  assets {\n    ...SimpleAsset\n  }\n  collections {\n    id\n    name\n    slug\n  }\n}": types.SimpleProductFieldsFragmentDoc,
     "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}": types.SimpleProductVariantFieldsFragmentDoc,
     "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": types.GetBundleDocument,
@@ -66,6 +70,14 @@ export function graphql(source: "fragment SimpleAsset on Asset {\n  id\n  previe
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "fragment SimpleCollectionFields on Collection {\n  id\n  name\n  slug\n  featuredAsset {\n    id\n    preview\n    source\n  }\n  productVariants {\n    items {\n      ...SimpleProductVariantFields\n    }\n  }\n}"): (typeof documents)["fragment SimpleCollectionFields on Collection {\n  id\n  name\n  slug\n  featuredAsset {\n    id\n    preview\n    source\n  }\n  productVariants {\n    items {\n      ...SimpleProductVariantFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "fragment SimpleFacetFields on Facet {\n  id\n  name\n  code\n  values {\n    ...SimpleFacetValueFields\n  }\n  translations {\n    id\n    name\n    languageCode\n  }\n}"): (typeof documents)["fragment SimpleFacetFields on Facet {\n  id\n  name\n  code\n  values {\n    ...SimpleFacetValueFields\n  }\n  translations {\n    id\n    name\n    languageCode\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}"): (typeof documents)["fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -1,136 +1,76 @@
 <script setup lang="ts">
-import { UButton, UDropdownMenu, UInput } from '#components'
-import type { Facet } from '~/gql/admin/graphql'
-import type { DropdownMenuItem } from '#ui/components/DropdownMenu.vue'
-import { useDirtyStateStore } from '#imports'
+import { UButton, UInput } from '#components'
+import type { Facet, FacetValue } from '~/gql/admin/graphql'
+import { getFacetId, getValueId, useDirtyList } from '~/composables/useDirtyList'
 import List from '~/components/common/List.vue'
-import type { FacetValue } from '~/gql/shop/graphql'
 
 const facets = defineModel<Facet[]>({ required: true })
-
-const { addToList, removeFromList, getValueMeta, updateValue, getColorChip, deleteValue, restoreValue } = useDirtyStateStore()
-
-function getFacetId(facet: Facet) {
-  return `Facet:${facet.id}`
-}
-
-onMounted(() => {
-  facets.value.forEach(facet => addToList(getFacetId(facet), {
-    original: facet.name,
-    model: facet.name,
-    isNew: false,
-    isDeleted: false,
-  }))
-})
-onUnmounted(() => {
-  facets.value.forEach(facet => removeFromList(getFacetId(facet)))
-})
-function getDropdownActions(facet: Facet): DropdownMenuItem[][] {
-  return [
-    [
-      {
-        label: 'Noch keine Idee für Aktionen hier',
-        icon: 'i-lucide-book-check',
-        onSelect: () => {
-          console.log('tag group selected')
-        },
-      },
-    ],
-  ]
-}
+const dirtyFacetList = useDirtyList(facets, getFacetId)
 
 const newFacetName = ref('')
-let newFacetCounter = 0
 
 function onAddFacet() {
   if (!newFacetName.value?.trim()) return
-  const newFacet = {
-    id: `new-${newFacetCounter++}`,
-    name: newFacetName.value,
-    code: '',
-    values: [] as FacetValue[],
-  } as Facet
-  facets.value.push(newFacet)
-  addToList(getFacetId(newFacet), {
-    original: newFacet.name,
-    model: newFacet.name,
-    isNew: true,
-    isDeleted: false,
-  })
+  dirtyFacetList.addNewItem({ name: newFacetName.value, values: [] as FacetValue[] })
   newFacetName.value = ''
 }
 
-function deleteFacet(facet: Facet) {
-  if (facet.id.startsWith('new-')) {
-    // remove completely
-    facets.value = facets.value.filter(f => f.id !== facet.id)
-    removeFromList(getFacetId(facet))
-  }
-  else {
-    // mark as removed
-    deleteValue(getFacetId(facet))
-    facet.values.forEach(facetV => deleteValue(`FacetValue:${facetV.id}`))
-  }
+function onDeleteFacet(facet: Facet) {
+  dirtyFacetList.deleteItem(facet /* deleting values not necessary? */)
+  // TODO only if not hard-deleted?
+  facet.values.forEach(fV => dirtyFacetList.deleteValue(getValueId(fV)))
 }
 
-function restoreFacet(facet: Facet) {
-  restoreValue(getFacetId(facet))
-  facet.values.forEach(facetV => restoreValue(`FacetValue:${facetV.id}`))
+function onRestoreFacet(facet: Facet) {
+  dirtyFacetList.restoreItem(facet)
+  facet.values.forEach(fV => dirtyFacetList.restoreValue(getValueId(fV)))
 }
 </script>
 
 <template>
   <List
     :items="facets"
-    :item-class="(facet) => ({ 'opacity-50 line-through': getValueMeta(getFacetId(facet))?.isDeleted })"
+    :item-class="(facet: Facet) => ({ 'opacity-50': dirtyFacetList.getMeta(facet)?.isDeleted })"
   >
     <template #default="{ item: facet }">
       <UChip
         position="top-left"
         inset
-        :color="getColorChip(getFacetId(facet))"
+        :color="dirtyFacetList.getChipColor(facet)"
         size="xl"
-        :show="!!getColorChip(getFacetId(facet))"
+        :show="!!dirtyFacetList.getChipColor(facet)"
       >
         <UInput
-          v-if="!getValueMeta(getFacetId(facet))?.isDeleted"
-          :model-value="getValueMeta(getFacetId(facet))?.model"
+          v-if="!dirtyFacetList.getMeta(facet)?.isDeleted"
+          :model-value="dirtyFacetList.getMeta(facet)?.model"
           variant="ghost"
           class="text-primary"
-          @update:model-value="updateValue(getFacetId(facet), $event)"
+          @update:model-value="dirtyFacetList.updateItem(facet, $event)"
         />
         <span
           v-else
-          class="self-center text-muted pl-2"
+          class="self-center text-muted line-through pl-2"
         >
-          {{ getValueMeta(getFacetId(facet))?.model }}
+          {{ dirtyFacetList.getMeta(facet)?.model }}
         </span>
       </UChip>
     </template>
 
     <template #actions="{ item: facet }">
       <UButton
-        v-if="getValueMeta(getFacetId(facet))?.isDeleted"
+        v-if="dirtyFacetList.getMeta(facet)?.isDeleted"
         icon="i-lucide-undo"
         color="neutral"
         variant="ghost"
-        @click="restoreFacet(facet)"
+        @click="onRestoreFacet(facet)"
       />
       <UButton
         v-else
         icon="i-lucide-trash-2"
         color="primary"
         variant="ghost"
-        @click="deleteFacet(facet)"
+        @click="onDeleteFacet(facet)"
       />
-      <UDropdownMenu :items="getDropdownActions(facet)">
-        <UButton
-          icon="i-lucide-ellipsis-vertical"
-          color="neutral"
-          variant="ghost"
-          aria-label="Actions"
-        />
-      </UDropdownMenu>
     </template>
 
     <template #expanded-content="{ item: facet }">

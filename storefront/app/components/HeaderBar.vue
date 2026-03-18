@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAdminUser } from '~/composables/admin/useAdminUser'
-import { useAdminNav, useDefaultNavItems, useUserNav } from '~/composables/useNavItems'
+import { useDefaultNavItems, useUserNav } from '~/composables/useNavItems'
 
 const { headerLogo, logoAlt } = defineProps<{ headerLogo: string, logoAlt: string }>()
 const { data: adminUser } = useAdminUser()
@@ -12,20 +12,17 @@ const navItems = computed(() => getNavItems())
 const userNavItems = useUserNav(currentUser)
 
 function getNavItems() {
+  const nav = defaultNavItems
   if (adminUser.value) {
-    return [...defaultNavItems, ...useAdminNav()]
-  }
-  else {
-    // TODO for now enable Admin login
-    return [
-      ...defaultNavItems,
+    nav.push(
       {
-        label: 'Admin Login',
-        icon: 'i-lucide-cog',
-        to: '/admin/login',
+        label: 'To Admin Dashboard',
+        icon: 'i-lucide-shield',
+        to: '/admin/releases',
       },
-    ]
+    )
   }
+  return nav
 }
 </script>
 

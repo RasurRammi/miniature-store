@@ -26,7 +26,7 @@ function toggleExpanded(id: string) {
     >
       <div
         class="flex flex-row gap-2 justify-between rounded-lg  p-2"
-        :class="[expandedIds.has(item.id) ? 'bg-elevated' : 'bg-elevated/50', itemClass?.(item)]"
+        :class="[expandedIds.has(item.id) ? 'bg-elevated/75' : 'bg-elevated/50', itemClass?.(item)]"
       >
         <div class="flex flex-row items-center gap-1">
           <UButton
