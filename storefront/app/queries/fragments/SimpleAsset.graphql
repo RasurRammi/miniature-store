@@ -1,0 +1,5 @@
+fragment SimpleAsset on Asset {
+  id
+  preview
+  source
+}

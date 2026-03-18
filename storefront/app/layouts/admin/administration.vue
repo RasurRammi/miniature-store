@@ -1,26 +1,15 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+import { useAdministrationNav } from '~/composables/useNavItems'
 
-const navItems: NavigationMenuItem[] = [
-  {
-    label: 'Releases',
-    icon: 'i-lucide-package-2',
-    to: '/admin/administration/bundles',
-  },
-  {
-    label: 'Settings',
-    icon: 'i-lucide-cog',
-    to: '/admin/administration/settings',
-  },
-]
+const navItems = useAdministrationNav()
 </script>
 
 <template>
   <NuxtLayout name="default">
     <UContainer>
       <div class="flex flex-row">
-        <div class="w-1/5">
-          <h2 class="text-bold text-lg p-2">
+        <div class="hidden lg:block lg:w-1/6">
+          <h2 class="text-bold text-lg m-2">
             Navigation
           </h2>
           <UNavigationMenu
@@ -29,7 +18,7 @@ const navItems: NavigationMenuItem[] = [
           />
         </div>
 
-        <div class="w-4/5">
+        <div class="w-full lg:w-5/6 m-2">
           <slot />
         </div>
       </div>

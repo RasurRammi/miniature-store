@@ -3,7 +3,9 @@ fragment SimpleCollectionFields on Collection {
   name
   slug
   featuredAsset {
+    id
     preview
+    source
   }
   productVariants {
     items {

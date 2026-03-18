@@ -4,6 +4,7 @@ import { type CollectionInput, useSubmitCollection } from '~/composables/admin/u
 import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
 import { useBundles } from '~/composables/useBundles'
 import BundleArea from '~/components/BundleArea.vue'
+import { useAssets } from '~/composables/admin/useAssets'
 
 // TODO remove for production
 definePageMeta({
@@ -11,14 +12,18 @@ definePageMeta({
 })
 
 const { data: bundleData, isLoading, error } = useBundles()
+const { data: allAssets } = useAssets()
 
 const isCreating = ref(false)
-const { data: rootBundleCol } = await useRootReleaseBundle()
+const { data: rootBundleCol } = useRootReleaseBundle()
 
 const bundleForm: CollectionInput = {
   name: '',
-  parentId: rootBundleCol.value.id,
+  parentId: '',
 }
+watch(rootBundleCol, (val) => {
+  if (val?.id) bundleForm.parentId = val.id
+}, { immediate: true })
 
 const toast = useToast()
 const submitBundle = useSubmitCollection()
@@ -47,7 +52,7 @@ async function submitForm() {
 </script>
 
 <template>
-  <div class=" flex flex-col gap-4 m-12">
+  <div class=" flex flex-col gap-4 my-6 mx-1 lg:my-12 lg:mx-4">
     <template v-if="isCreating">
       <GridArea
         :collapsible="false"
@@ -96,6 +101,8 @@ async function submitForm() {
         <UEmpty title="No products found" />
       </template>
     </div>
+
+    <ProductSlideover />
   </div>
 </template>
 

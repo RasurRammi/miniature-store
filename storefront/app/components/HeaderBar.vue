@@ -1,63 +1,24 @@
 <script setup lang="ts">
 import { useAdminUser } from '~/composables/admin/useAdminUser'
+import { useAdminNav, useDefaultNavItems, useUserNav } from '~/composables/useNavItems'
 
 const { headerLogo, logoAlt } = defineProps<{ headerLogo: string, logoAlt: string }>()
-const { data: adminUser } = await useAdminUser()
-const { data: currentUser } = await useCurrentUser()
-const isAdmin = computed(() => !!adminUser.value)
+const { data: adminUser } = useAdminUser()
+const { data: currentUser } = useCurrentUser()
 const isLoggedIn = computed(() => !!currentUser.value)
 
-const baseNavItems = [
-  {
-    label: 'Home',
-    icon: 'i-lucide-house',
-    to: '/',
-  },
-  {
-    label: 'Store',
-    icon: 'i-lucide-shopping-cart',
-    to: '/store/products',
-  },
-  {
-    label: 'Community',
-    icon: 'i-lucide-users',
-    to: '/',
-    children: [
-      {
-        label: 'FAQ',
-        icon: 'i-lucide-badge-question-mark',
-        to: '/',
-      },
-      {
-        label: 'Discord',
-        icon: 'i-simple-icons-discord',
-        to: '/',
-        target: '_blank',
-      },
-      {
-        label: 'Patreon',
-        icon: 'i-simple-icons-patreon',
-        to: '/',
-        target: '_blank',
-      },
-    ],
-  },
-]
+const defaultNavItems = useDefaultNavItems()
+const navItems = computed(() => getNavItems())
+const userNavItems = useUserNav(currentUser)
 
-const navItems = computed(() => {
+function getNavItems() {
   if (adminUser.value) {
-    return [
-      ...baseNavItems,
-      {
-        label: 'Administration',
-        icon: 'i-lucide-shield',
-        to: '/admin/administration/bundles',
-      },
-    ]
+    return [...defaultNavItems, ...useAdminNav()]
   }
   else {
+    // TODO for now enable Admin login
     return [
-      ...baseNavItems,
+      ...defaultNavItems,
       {
         label: 'Admin Login',
         icon: 'i-lucide-cog',
@@ -65,37 +26,7 @@ const navItems = computed(() => {
       },
     ]
   }
-})
-
-const logoutMut = useLogout()
-const userNavItems = computed(() => {
-  if (!currentUser.value) return []
-  return [
-    [
-      {
-        label: currentUser.value.identifier,
-        type: 'label',
-      },
-    ],
-    [
-      {
-        label: 'Profile',
-        icon: 'i-lucide-user',
-      },
-      {
-        label: 'Settings',
-        icon: 'i-lucide-cog',
-      },
-    ],
-    [
-      {
-        label: 'Logout',
-        icon: 'i-lucide-log-out',
-        onSelect: logoutMut.mutate,
-      },
-    ],
-  ]
-})
+}
 </script>
 
 <template>
@@ -143,17 +74,13 @@ const userNavItems = computed(() => {
           variant="ghost"
         />
       </UDropdownMenu>
-      <ULink
+      <UButton
         v-else
+        color="primary"
+        variant="solid"
         to="/store/login"
-      >
-        <UButton
-          color="primary"
-          variant="solid"
-        >
-          Login
-        </UButton>
-      </ULink>
+        label="Login"
+      />
     </template>
   </UHeader>
 </template>

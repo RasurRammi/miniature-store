@@ -3,12 +3,19 @@ fragment SimpleProductFields on Product {
   name
   slug
   description
-  featuredAsset {
-    preview
-  }
-  variants {
+  facetValues {
     id
-    price
-    currencyCode
+    facetId
+  }
+  featuredAsset {
+    ...SimpleAsset
+  }
+  assets {
+    ...SimpleAsset
+  }
+  collections {
+    id
+    name
+    slug
   }
 }

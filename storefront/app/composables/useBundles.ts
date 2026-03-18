@@ -7,7 +7,7 @@ const releasesSlug = 'releases'
 export function useBundles(releases: boolean = true) {
   const { $gqlClient } = useNuxtApp()
   const type = releases ? 'releases' : 'collections'
-  return useQuery({
+  const query = useQuery({
     queryKey: ['bundles', type],
     queryFn: async () => {
       if (releases) {
@@ -24,4 +24,10 @@ export function useBundles(releases: boolean = true) {
       }
     },
   })
+
+  onServerPrefetch(async () => {
+    await query.suspense()
+  })
+
+  return query
 }

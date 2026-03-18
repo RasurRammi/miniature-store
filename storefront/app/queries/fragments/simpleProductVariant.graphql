@@ -4,16 +4,6 @@ fragment SimpleProductVariantFields on ProductVariant {
   currencyCode,
   name
   product {
-    id
-    name
-    slug
-    description
-    featuredAsset {
-      preview
-    }
-    collections {
-      id
-      name
-    }
+    ...SimpleProductFields
   }
 }

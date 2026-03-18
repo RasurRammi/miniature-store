@@ -1,19 +1,6 @@
-import { defineStore } from 'pinia'
-import type { ProductVariant } from '~/types/product'
+import type { ProductVariant } from '~/gql/shop/graphql'
 
 export const useProductDrawerStore = defineStore('productDrawer', () => {
-  const isOpen = ref(false)
-  const productV = ref<ProductVariant | null>(null)
-
-  function open(payload?: ProductVariant) {
-    productV.value = payload ?? null
-    isOpen.value = true
-  }
-
-  function close() {
-    isOpen.value = false
-    productV.value = null
-  }
-
-  return { isOpen, productV, open, close }
+  const { isOpen, data: productV, open, close, onAfterLeave } = useDrawerState<ProductVariant>()
+  return { isOpen, productV, open, close, onAfterLeave }
 })

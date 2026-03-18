@@ -1,6 +1,9 @@
-import { useMutation } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
 export function useUploadAssets() {
+  const toast = useToast()
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (files: File[]) => {
       const origin = window.location.origin
@@ -15,14 +18,14 @@ export function useUploadAssets() {
           }
         `,
         variables: {
-          input: files.map(() => ({ file: null }))
-        }
+          input: files.map(() => ({ file: null })),
+        },
       })
 
       const map = JSON.stringify(
         Object.fromEntries(
-          files.map((_, i) => [String(i), [`variables.input.${i}.file`]])
-        )
+          files.map((_, i) => [String(i), [`variables.input.${i}.file`]]),
+        ),
       )
 
       const formData = new FormData()
@@ -40,6 +43,15 @@ export function useUploadAssets() {
       const json = await response.json()
       if (json.errors?.length) throw new Error(json.errors[0]?.message ?? 'Upload failed')
       return json.data.createAssets
-    }
+    },
+    onSuccess: (result: File[]) => {
+      console.log(result)
+      toast.add({
+        title: 'Files successfully uploaded',
+        description: `Successfully uploaded ${result.length} files`,
+        color: 'success',
+      })
+      queryClient.invalidateQueries({ queryKey: ['assets'] })
+    },
   })
 }

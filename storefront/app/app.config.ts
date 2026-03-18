@@ -11,8 +11,8 @@ const nomnomColors = {
 export default defineAppConfig({
   ui: {
     colors: {
-      // ...defaultColors,
-      ...nomnomColors,
+      ...defaultColors,
+      // ...nomnomColors,
     },
   },
 })

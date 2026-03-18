@@ -13,5 +13,6 @@ export const useCurrentUser = () => {
   }, {
     server: true,
     lazy: false,
+    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
   })
 }

@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import BundleArea from '~/components/BundleArea.vue'
 import { useBundles } from '~/composables/useBundles'
-import { useProductDrawerStore } from '~/stores/productDrawer'
 import type { Collection, ProductVariant } from '~/gql/shop/graphql'
-
-const productDrawer = useProductDrawerStore()
 
 const { data: bundleData, isLoading, error } = useBundles()
 
@@ -106,20 +103,7 @@ const filteredBundles = computed(() => {
       </div>
     </UContainer>
 
-    <USlideover
-      v-model:open="productDrawer.isOpen"
-      :title="productDrawer.productV?.product.name ?? ''"
-      :description="productDrawer.productV?.product.description ?? ''"
-      :ui="{ content: 'max-w-1/3' }"
-      :modal="false"
-    >
-      <template #content>
-        <ProductInfo
-          :product-v="productDrawer.productV"
-          :can-edit="true"
-        />
-      </template>
-    </USlideover>
+    <ProductSlideover />
   </div>
 </template>
 

@@ -17,7 +17,7 @@ export type ProductInput = {
   description: string
   price: number
   collectionIds: string[]
-  images: File[]
+  assetIds: string[]
 }
 
 export function useSubmitProduct() {
@@ -27,32 +27,37 @@ export function useSubmitProduct() {
   return useMutation({
     mutationFn: async (input: ProductInput) => {
       const isNew = !input.productId
-      let product
-      let productVariants
+      let product, productVariants
 
-      // const uploadFiles = useUploadAssets()
-      // uploadFiles.mutate(input.images)
+      const inputProduct = {
+        id: input.productId,
+        translations: [{
+          languageCode: 'en',
+          name: input.name,
+          ...(isNew && { slug: slugify(input.name) }),
+          description: input.description,
+        }],
+        featuredAssetId: input.assetIds.length ? input.assetIds[0] : undefined,
+        assetIds: input.assetIds,
+      }
+      const inputProductVariant = {
+        ...(input.variantId && { id: input.variantId }),
+        price: input.price,
+        translations: [{
+          languageCode: 'en',
+          name: input.name,
+        }],
+        ...(isNew && { sku: slugify(input.name) }),
+      }
 
       if (isNew) {
         const { createProduct } = await $adminGqlClient.request(CreateProductDocument, {
-          input: {
-            translations: [{
-              languageCode: 'en',
-              name: input.name,
-              slug: slugify(input.name),
-              description: input.description,
-            }],
-          },
+          input: inputProduct,
         })
 
         // create variant
         const { createProductVariants } = await $adminGqlClient.request(CreateProductVariantDocument, {
-          input: [{
-            productId: createProduct.id,
-            translations: [{ languageCode: 'en', name: input.name }],
-            price: input.price,
-            sku: slugify(input.name),
-          }],
+          input: [{ ...inputProductVariant, productId: createProduct.id }],
         })
         product = createProduct
         productVariants = createProductVariants
@@ -60,23 +65,12 @@ export function useSubmitProduct() {
       else {
         // update product
         const { updateProduct } = await $adminGqlClient.request(UpdateProductDocument, {
-          input: {
-            id: input.productId,
-            translations: [{
-              languageCode: 'en',
-              name: input.name,
-              description: input.description,
-            }],
-          },
+          input: inputProduct,
         })
 
         // update variant
         const { updateProductVariants } = await $adminGqlClient.request(UpdateProductVariantDocument, {
-          input: [{
-            id: input.variantId,
-            price: input.price,
-            translations: [{ languageCode: 'en', name: input.name }],
-          }],
+          input: [inputProductVariant],
         })
 
         product = updateProduct
@@ -117,7 +111,7 @@ export function useSubmitProduct() {
       return { product: product, variant: productVariants[0] }
     },
     onSuccess: () => {
-      console.log('invalidate queries!')
+      console.log('useSubmitProduct: invalidate queries!')
       queryClient.invalidateQueries({ queryKey: ['bundles'] })
     },
   })

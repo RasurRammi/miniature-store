@@ -1,0 +1,25 @@
+query GetFacets($options: FacetListOptions) {
+  facets(options: $options) {
+    items {
+      id
+      name
+      code
+      values {
+        id
+        facetId
+        name
+        code
+        translations {
+          id
+          name
+          languageCode
+        }
+      }
+      translations {
+        id
+        name
+        languageCode
+      }
+    }
+  }
+}

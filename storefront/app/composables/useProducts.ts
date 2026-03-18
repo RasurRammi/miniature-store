@@ -3,8 +3,14 @@ import { GetProductsDocument } from '~/gql/shop/graphql'
 
 export function useProducts() {
   const { $gqlClient } = useNuxtApp()
-  return useQuery({
+  const query = useQuery({
     queryKey: ['products'],
     queryFn: () => $gqlClient.request(GetProductsDocument),
   })
+
+  onServerPrefetch(async () => {
+    await query.suspense()
+  })
+
+  return query
 }

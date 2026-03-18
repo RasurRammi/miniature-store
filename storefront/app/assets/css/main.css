@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-/* @import "./defaultStyle.css"; */
-@import "./nomnomStyle.css";
+@import "./defaultStyle.css";
+/* @import "./nomnomStyle.css"; */
 
 /*
 :root {
