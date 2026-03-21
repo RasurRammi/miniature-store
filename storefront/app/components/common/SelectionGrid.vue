@@ -2,7 +2,10 @@
 import FlexibleGrid from '~/components/common/FlexibleGrid.vue'
 
 const selectedItemIds = defineModel<string[]>({ required: true })
-const { items } = defineProps<{ items: T[] }>()
+const { items } = defineProps<{
+  items: T[]
+  size?: number
+}>()
 const selectedSet = computed(() => new Set(selectedItemIds.value))
 
 function toggle(id: string) {
@@ -20,6 +23,7 @@ function toggle(id: string) {
 <template>
   <FlexibleGrid
     :items="items"
+    :size="size"
     :item-class="(item: T) => ['transition-all cursor-pointer ring-2', selectedSet.has(item.id) ? 'ring-primary' : 'ring-transparent']"
     @click="(item: T) => toggle(item.id)"
   >
@@ -42,6 +46,9 @@ function toggle(id: string) {
         v-if="selectedSet.has(item.id)"
         class="absolute inset-0 bg-primary/20"
       />
+    </template>
+    <template #empty>
+      <slot name="empty" />
     </template>
   </FlexibleGrid>
 </template>

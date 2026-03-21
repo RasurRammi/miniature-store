@@ -6,6 +6,7 @@ import { type FilterMode, useProductFilter } from '~/stores/productFilter'
 import SelectionGrid from '~/components/common/SelectionGrid.vue'
 import { useSubmitFacets } from '~/composables/admin/useSubmitFacets'
 import { getFacetId } from '~/composables/useDirtyList'
+import FilteredSearch from '~/components/common/FilteredSearch.vue'
 
 // TODO remove for production
 definePageMeta({
@@ -16,6 +17,7 @@ type FilterBadge = {
   facetId: string
   valueId: string
   name: string
+  mode: FilterMode
 }
 
 const toast = useToast()
@@ -27,11 +29,10 @@ const { data: facetsData } = useFacets()
 const { data: productsData } = useProducts()
 const facetsCopy = ref<Facet[]>([])
 const selectedProducts = ref<string[]>([])
-console.log('rami!')
 
 const productFilterNames = computed(() => {
-  const res: { included: FilterBadge[], excluded: FilterBadge[] } = { included: [], excluded: [] }
-  if (!facetsData.value?.facets.items) return res
+  const badges: FilterBadge[] = []
+  if (!facetsData.value?.facets.items) return badges
 
   const facets = facetsData.value.facets.items
   for (const [facetId, values] of productFilter.facetGroups) {
@@ -42,12 +43,11 @@ const productFilterNames = computed(() => {
       const facetValue = facet.values.find(v => v.id === valueId)
       if (!facetValue) continue
 
-      const filterBadge = { facetId: facetId, valueId: valueId, name: `${facet.name}: ${facetValue.name}` }
-      mode === 'include' ? res.included.push(filterBadge) : res.excluded.push(filterBadge)
+      badges.push({ facetId: facetId, valueId: valueId, name: `${facet.name}: ${facetValue.name}`, mode: mode })
     }
   }
 
-  return res
+  return badges
 })
 const filteredProducts = computed<Product[]>(() => {
   const items = productsData.value?.products.items ?? []
@@ -153,85 +153,90 @@ function resetChanges() {
     color: 'success',
   })
 }
+const activeTokens = ref([])
 </script>
 
 <template>
   <div class="flex flex-col lg:flex-row gap-2">
+    <!-- Facets -->
     <div class="w-full lg:w-1/3 p-2 rounded-lg bg-elevated/25">
-      <h2 class="text-xl text-highlighted text-center p-2">
-        Tag Groups
-      </h2>
+      <div class="flex flex-row justify-center-safe items-center-safe p-2">
+        <div />
+        <div class="text-xl flex-1 text-center">
+          Tag Groups
+        </div>
+        <UButton
+          icon="i-lucide-pencil"
+          variant="ghost"
+          color="neutral"
+          class="aspect-square"
+        />
+      </div>
       <FacetsTable
         v-model="facetsCopy"
       />
     </div>
 
+    <!-- Products -->
     <div class="w-full lg:w-2/3 p-2 rounded-lg bg-elevated/25">
       <h2 class="text-xl text-highlighted text-center p-2">
         Products
       </h2>
-      <div class="flex flex-col p-2 gap-2 rounded-lg bg-elevated/50">
-        <div class="flex flex-row gap-2 items-center">
-          <UIcon
-            name="i-lucide-filter"
-            class="ml-1 my-1.5"
-          />
-          <UBadge
-            v-for="filterBadge in productFilterNames.included"
-            :key="filterBadge.facetId + '-' + filterBadge.valueId"
-            color="success"
-            variant="outline"
-            size="lg"
-          >
-            {{ filterBadge.name }}
-            <UButton
-              icon="i-lucide-x"
-              variant="ghost"
-              color="neutral"
-              size="sm"
-              class="p-0"
-              @click="productFilter.removeFacetValue(filterBadge.facetId, filterBadge.valueId)"
-            />
-          </UBadge>
-        </div>
-        <div class="flex flex-row gap-2 items-center">
-          <UIcon
-            name="i-lucide-filter-x"
-            class="ml-1 my-1.5"
-          />
-          <UBadge
-            v-for="filterBadge in productFilterNames.excluded"
-            :key="filterBadge.facetId + '-' + filterBadge.valueId"
-            :label="name"
-            color="error"
-            variant="outline"
-            size="lg"
-          >
-            {{ filterBadge.name }}
-            <UButton
-              icon="i-lucide-x"
-              variant="ghost"
-              color="neutral"
-              size="sm"
-              class="p-0"
-              @click="productFilter.removeFacetValue(filterBadge.facetId, filterBadge.valueId)"
-            />
-          </UBadge>
-        </div>
-      </div>
 
-      <div class="mt-2 p-2 rounded-lg bg-elevated/50">
-        <SelectionGrid
-          v-model="selectedProducts"
-          :items="filteredProducts"
-        >
-          <template #default="{ item }">
-            <img
-              :src="item.featuredAsset.preview"
-              class="bg-muted"
-            >
-          </template>
-        </SelectionGrid>
+      <div class="flex flex-col gap-4">
+        <FilteredSearch
+          v-model="activeTokens"
+          :categories="[
+            {
+              id: 'tags',
+              label: 'Tag',
+              icon: 'i-lucide-tag',
+              values: [
+                { id: '1', label: 'Orc' },
+                { id: '2', label: 'Elf' },
+              ],
+            },
+            {
+              id: 'releases',
+              label: 'Releases',
+              icon: 'i-lucide-package-2',
+              values: [
+                { id: '1', label: 'Dragons' },
+                { id: '2', label: 'Animals' },
+              ],
+            },
+            {
+              id: 'collection',
+              label: 'Collection',
+              icon: 'i-lucide-book-copy',
+              values: [
+                { id: '1', label: 'Dragons' },
+                { id: '2', label: 'Animals' },
+              ],
+            },
+          ]"
+        />
+
+        <!-- Product Selection -->
+        <div class="p-2 rounded-lg bg-elevated/50">
+          <SelectionGrid
+            v-model="selectedProducts"
+            :items="filteredProducts"
+            :size="6"
+          >
+            <template #default="{ item }">
+              <img
+                :src="item.featuredAsset.preview"
+                class="bg-muted"
+              >
+            </template>
+            <template #empty>
+              <UEmpty
+                title="No Products matching the currents filters"
+              />
+            </template>
+          </SelectionGrid>
+        </div>
       </div>
     </div>
 

@@ -28,6 +28,10 @@ const gridStyle = computed(() => ({
       <slot :item="item" />
     </div>
   </div>
+
+  <template v-if="!items.length">
+    <slot name="empty" />
+  </template>
 </template>
 
 <style scoped>

@@ -25,7 +25,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   try {
     const data = await $adminGqlClient.request(AdminMeDocument)
-    if (!data.me) {
+    if (!data.me && to.path !== '/admin/login') {
       toast.add(loginNeededMsg)
       return navigateTo('/admin/login')
     }

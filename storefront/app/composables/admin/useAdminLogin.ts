@@ -17,7 +17,7 @@ export function useAdminLogin() {
       })
       await refreshNuxtData('auth.user')
       await refreshNuxtData('auth.adminUser')
-      navigateTo('/admin/administration/releases')
+      navigateTo('/admin/releases')
     },
     onError: (err) => {
       console.log(err)
