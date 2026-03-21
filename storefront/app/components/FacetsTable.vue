@@ -5,6 +5,7 @@ import { getFacetId, getValueId, useDirtyList } from '~/composables/useDirtyList
 import List from '~/components/common/List.vue'
 
 const facets = defineModel<Facet[]>({ required: true })
+const { isEditing } = defineProps<{ isEditing: boolean }>()
 const dirtyFacetList = useDirtyList(facets, getFacetId)
 
 const newFacetName = ref('')
@@ -40,47 +41,54 @@ function onRestoreFacet(facet: Facet) {
         size="xl"
         :show="!!dirtyFacetList.getChipColor(facet)"
       >
+        <span
+          v-if="!isEditing || dirtyFacetList.getMeta(facet)?.isDeleted"
+          class="self-center text-sm pl-2.5 text-highlighted"
+          :class="{ 'text-muted line-through': dirtyFacetList.getMeta(facet)?.isDeleted }"
+        >
+          {{ dirtyFacetList.getMeta(facet)?.model }}
+        </span>
         <UInput
-          v-if="!dirtyFacetList.getMeta(facet)?.isDeleted"
+          v-else
           :model-value="dirtyFacetList.getMeta(facet)?.model"
           variant="ghost"
           class="text-primary"
           @update:model-value="dirtyFacetList.updateItem(facet, $event)"
         />
-        <span
-          v-else
-          class="self-center text-muted line-through pl-2"
-        >
-          {{ dirtyFacetList.getMeta(facet)?.model }}
-        </span>
       </UChip>
     </template>
 
     <template #actions="{ item: facet }">
-      <UButton
-        v-if="dirtyFacetList.getMeta(facet)?.isDeleted"
-        icon="i-lucide-undo"
-        color="neutral"
-        variant="ghost"
-        @click="onRestoreFacet(facet)"
-      />
-      <UButton
-        v-else
-        icon="i-lucide-trash-2"
-        color="primary"
-        variant="ghost"
-        @click="onDeleteFacet(facet)"
-      />
+      <template v-if="isEditing">
+        <UButton
+          v-if="dirtyFacetList.getMeta(facet)?.isDeleted"
+          icon="i-lucide-undo"
+          color="neutral"
+          variant="ghost"
+          @click="onRestoreFacet(facet)"
+        />
+        <UButton
+          v-else
+          icon="i-lucide-trash-2"
+          color="primary"
+          variant="ghost"
+          @click="onDeleteFacet(facet)"
+        />
+      </template>
     </template>
 
     <template #expanded-content="{ item: facet }">
       <FacetValuesTable
         v-model="facet.values"
         :facet-id="facet.id"
+        :is-editing="isEditing"
       />
     </template>
 
-    <template #add-row>
+    <template
+      v-if="isEditing"
+      #add-row
+    >
       <UInput
         v-model="newFacetName"
         variant="ghost"

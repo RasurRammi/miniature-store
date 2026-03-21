@@ -1,55 +1,22 @@
 <script setup lang="ts">
-import { useFacets } from '~/composables/admin/useFacets'
-import type { Facet, Product } from '~/gql/admin/graphql'
+import type { Product } from '~/gql/admin/graphql'
 import { useProducts } from '~/composables/useProducts'
 import { type FilterMode, useProductFilter } from '~/stores/productFilter'
 import SelectionGrid from '~/components/common/SelectionGrid.vue'
-import { useSubmitFacets } from '~/composables/admin/useSubmitFacets'
-import { getFacetId } from '~/composables/useDirtyList'
 import FilteredSearch from '~/components/common/FilteredSearch.vue'
 import type { ValueGroup } from '~/types/filteredSearch'
+import { useFacets } from '~/composables/admin/useFacets'
 
 // TODO remove for production
 definePageMeta({
   layout: 'admin',
 })
 
-type FilterBadge = {
-  facetId: string
-  valueId: string
-  name: string
-  mode: FilterMode
-}
-
-const toast = useToast()
-
-const { resetAll } = useDirtyStateStore()
 const productFilter = useProductFilter()
-const dirtyStateStore = useDirtyStateStore()
 const { data: facetsData } = useFacets()
 const { data: productsData } = useProducts()
-const facetsCopy = ref<Facet[]>([])
 const selectedProducts = ref<string[]>([])
 
-const productFilterNames = computed(() => {
-  const badges: FilterBadge[] = []
-  if (!facetsData.value?.facets.items) return badges
-
-  const facets = facetsData.value.facets.items
-  for (const [facetId, values] of productFilter.facetGroups) {
-    const facet = facets.find(f => f.id === facetId)
-    if (!facet) continue
-
-    for (const [valueId, mode] of values) {
-      const facetValue = facet.values.find(v => v.id === valueId)
-      if (!facetValue) continue
-
-      badges.push({ facetId: facetId, valueId: valueId, name: `${facet.name}: ${facetValue.name}`, mode: mode })
-    }
-  }
-
-  return badges
-})
 const filteredProducts = computed<Product[]>(() => {
   const items = productsData.value?.products.items ?? []
   if (!productFilter.facetGroups.size) return items
@@ -81,79 +48,6 @@ const filteredProducts = computed<Product[]>(() => {
   })
 })
 
-watch(
-  () => facetsData.value?.facets.items,
-  (items) => {
-    if (items) facetsCopy.value = structuredClone(toRaw(items))
-  },
-  { immediate: true },
-)
-
-const submitFacets = useSubmitFacets()
-function submitChanges() {
-  const inputs = []
-  for (const f of facetsCopy.value) {
-    const trueId = f.id.startsWith('new-') ? undefined : f.id
-    const meta = dirtyStateStore.getValueMeta(getFacetId(f))
-    if (!meta) continue
-    if (meta.isDeleted) {
-      // facet deleted, delete all children
-      inputs.push({
-        id: trueId,
-        name: meta.model as string,
-        isDirty: true,
-        isDeleted: true,
-        values: [], // automatically cascades to all children
-      })
-      continue
-    }
-    const dirtyValues = []
-    for (const fV of f.values) {
-      const vMeta = dirtyStateStore.getValueMeta(getValueId(fV))
-      if (!vMeta || (vMeta.status === 'unchanged' && !vMeta.isDeleted)) continue
-      const trueVId = fV.id.startsWith('new-') ? undefined : fV.id
-      dirtyValues.push({
-        id: trueVId,
-        name: vMeta.model as string,
-        isDeleted: trueVId ? vMeta.isDeleted : false,
-      })
-    }
-    if (meta.status === 'unchanged' && !dirtyValues.length) continue
-    inputs.push({
-      id: trueId,
-      name: meta.model as string,
-      isDirty: meta.status !== 'unchanged',
-      values: dirtyValues,
-    })
-  }
-  console.log('submit:', inputs)
-  submitFacets.mutate(inputs, {
-    onSuccess: () => {
-      toast.add({
-        title: 'All changes were successfully saved',
-        color: 'success',
-      })
-    },
-    onError: (err) => {
-      toast.add({
-        title: 'Failed creating facets',
-        description: err.message,
-        color: 'error',
-      })
-    },
-  })
-}
-
-function resetChanges() {
-  resetAll()
-  facetsCopy.value = facetsData.value
-    ? structuredClone(toRaw(facetsData.value?.facets.items))
-    : []
-  toast.add({
-    title: 'All changes were discarded',
-    color: 'success',
-  })
-}
 const activeTokens = ref([])
 
 const tagFilters = computed<ValueGroup[]>(() => {
@@ -173,21 +67,7 @@ const tagFilters = computed<ValueGroup[]>(() => {
   <div class="flex flex-col lg:flex-row gap-2">
     <!-- Facets -->
     <div class="w-full lg:w-1/3 p-2 rounded-lg bg-elevated/25">
-      <div class="flex flex-row justify-center-safe items-center-safe p-2">
-        <div />
-        <div class="text-xl flex-1 text-center">
-          Tag Groups
-        </div>
-        <UButton
-          icon="i-lucide-pencil"
-          variant="ghost"
-          color="neutral"
-          class="aspect-square"
-        />
-      </div>
-      <FacetsTable
-        v-model="facetsCopy"
-      />
+      <Facets v-model="facetsCopy" />
     </div>
 
     <!-- Products -->
@@ -249,11 +129,6 @@ const tagFilters = computed<ValueGroup[]>(() => {
         </div>
       </div>
     </div>
-
-    <FloatingBar
-      @save="submitChanges()"
-      @discard="resetChanges()"
-    />
   </div>
 </template>
 

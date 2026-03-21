@@ -2,13 +2,11 @@
 import { UButton, UInput } from '#components'
 import List from '~/components/common/List.vue'
 import type { Facet, FacetValue } from '~/gql/admin/graphql'
-import { useProductFilter } from '~/stores/productFilter'
 import { getFacetId, getValueId, useDirtyList } from '~/composables/useDirtyList'
 
 const facetValues = defineModel<FacetValue[]>({ required: true })
-const { facetId } = defineProps<{ facetId: string }>()
+const { facetId, isEditing } = defineProps<{ facetId: string, isEditing: boolean }>()
 
-const productFilter = useProductFilter()
 const dirtyFacetVList = useDirtyList(facetValues, getValueId)
 const isFacetDeleted = () => dirtyFacetVList.getValueMeta(getFacetId({ id: facetId } as Facet))?.isDeleted
 
@@ -18,31 +16,6 @@ function onAddValue() {
   if (!newValueName.value?.trim()) return
   dirtyFacetVList.addNewItem({ name: newValueName.value, facetId: facetId })
   newValueName.value = ''
-}
-
-function getFilterState(facetV: FacetValue) {
-  return productFilter.facetGroups.get(facetId)?.get(facetV.id)
-}
-// State-machine: none → include → exclude → none
-function toggleFilterState(facetV: FacetValue) {
-  const state = getFilterState(facetV)
-  if (!state) {
-    productFilter.addFacetValue(facetId, facetV.id, 'include')
-  }
-  else if (state === 'include') {
-    productFilter.addFacetValue(facetId, facetV.id, 'exclude')
-  }
-  else {
-    productFilter.removeFacetValue(facetId, facetV.id)
-  }
-}
-function getFilterButtonProps(facetV: FacetValue) {
-  const state = getFilterState(facetV)
-  return {
-    icon: state !== 'exclude' ? 'i-lucide-filter' : 'i-lucide-filter-x',
-    color: state === 'include' ? 'success' : state === 'exclude' ? 'error' : 'neutral',
-    variant: state ? 'subtle' : 'ghost',
-  } as const
 }
 </script>
 
@@ -60,23 +33,24 @@ function getFilterButtonProps(facetV: FacetValue) {
         :show="!!dirtyFacetVList.getChipColor(facetV)"
         class="min-w-0 justify-start flex-1"
       >
+        <span
+          v-if="!isEditing || dirtyFacetVList.getMeta(facetV)?.isDeleted"
+          class="self-center text-sm pl-2.5 text-highlighted"
+          :class="{ 'text-muted line-through': dirtyFacetVList.getMeta(facetV)?.isDeleted }"
+        >
+          {{ dirtyFacetVList.getMeta(facetV)?.model }}
+        </span>
         <UInput
-          v-if="!dirtyFacetVList.getMeta(facetV)?.isDeleted"
+          v-else
           :model-value="dirtyFacetVList.getMeta(facetV)?.model"
           variant="ghost"
           class="text-primary"
           @update:model-value="dirtyFacetVList.updateItem(facetV, $event)"
         />
-        <span
-          v-else
-          class="self-center text-muted pl-2"
-        >
-          {{ dirtyFacetVList.getMeta(facetV)?.model }}
-        </span>
       </UChip>
     </template>
     <template #actions="{ item: facetV }">
-      <template v-if="!isFacetDeleted()">
+      <template v-if="isEditing && !isFacetDeleted()">
         <UButton
           v-if="dirtyFacetVList.getMeta(facetV)?.isDeleted"
           icon="i-lucide-undo"
@@ -93,10 +67,6 @@ function getFilterButtonProps(facetV: FacetValue) {
         />
       </template>
       <UButton
-        v-bind="getFilterButtonProps(facetV)"
-        @click="toggleFilterState(facetV)"
-      />
-      <UButton
         icon="i-lucide-book-check"
         color="neutral"
         variant="ghost"
@@ -105,7 +75,7 @@ function getFilterButtonProps(facetV: FacetValue) {
       />
     </template>
     <template
-      v-if="!isFacetDeleted()"
+      v-if="isEditing && !isFacetDeleted()"
       #add-row
     >
       <UInput
