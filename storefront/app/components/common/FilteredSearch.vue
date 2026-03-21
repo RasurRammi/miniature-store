@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import FilteredSearchMenu from './FilteredSearchMenu.vue'
 import FilteredSearchToken from './FilteredSearchToken.vue'
-import type {
-  FilterCategory,
-  FilterOperator,
-  FilterToken,
-  FilterValue,
-  MenuStep, SearchMenuContext,
+import {
+  type FilterCategory,
+  type FilterOperator,
+  type FilterToken,
+  type FilterValue, getNextStep, getPriorStep,
+  type MenuStep, type SearchMenuContext, type SelectedTokenContext,
 } from '~/types/filteredSearch'
 
 const { categories, placeholder = 'Search or filter...' } = defineProps<{
@@ -26,26 +26,24 @@ const setSearch = (val: string) => searchValue.value = val
 const setStep = (step: MenuStep) => menuStep.value = step
 const setInputRef = (ref: HTMLInputElement | null) => searchInputRef.value = ref
 const setActiveCategory = (catId: string | null) => activeCategory.value = categories.find(cat => cat.id === catId) ?? null
-function openMenu() {
-  console.debug('openMenu')
-  isMenuOpen.value = true
-}
-
-function closeMenu() {
-  console.debug('closeMenu')
-  isMenuOpen.value = false
-}
+const openMenu = () => isMenuOpen.value = true
+const closeMenu = () => isMenuOpen.value = false
 
 const selectedToken = ref<FilterToken | null>(null)
-provide('selectedToken', selectedToken)
+const editTokenStep = ref<MenuStep | null>(null)
+const editTokenAtStart = ref<boolean>(false)
+function setSelectedToken(token: FilterToken | null, step: MenuStep = 'category', atStart: boolean = false) {
+  selectedToken.value = token
+  editTokenStep.value = step
+  editTokenAtStart.value = atStart
+}
+provide('selectedToken', { selTokenContext: [selectedToken, editTokenStep, editTokenAtStart], setSelectedToken })
 
-const stepOrder: MenuStep[] = ['category', 'operator', 'value']
-const stepIndex = computed(() => stepOrder.indexOf(menuStep.value))
+watch(menuStep, () => console.log('ActiveStep Changed!', menuStep.value))
+
 function advanceStep() {
   console.debug('advanceStep')
-  const currIndex = stepIndex.value
-  const nextStep = stepOrder[currIndex < stepOrder.length - 1 ? currIndex + 1 : 0]!
-  setStep(nextStep)
+  setStep(getNextStep(menuStep.value))
   inputValue.value = ''
   setSearch(inputValue.value)
 }
@@ -68,17 +66,10 @@ function revertStep() {
     inputValue.value = lastToken.categoryLabel
     removeToken(lastToken)
   }
-  const currIndex = stepIndex.value
-  const priorStep = stepOrder[currIndex === 0 ? stepOrder.length - 1 : currIndex - 1]!
-  setStep(priorStep)
+  setStep(getPriorStep(menuStep.value))
   setInputRef(inputRef.value)
   setSearch(inputValue.value)
   nextTick(updateDropdownPosition)
-}
-
-function tokenStartEdit(token: FilterToken) {
-  console.debug('tokenStartEdit', token)
-  selectedToken.value = token
 }
 
 function onSelectCategory(category: FilterCategory) {
@@ -169,7 +160,7 @@ const inputValue = ref('')
 
 function focusInput() {
   console.debug('focusInput')
-  selectedToken.value = null
+  setSelectedToken(null)
   nextTick(() => {
     console.debug('focusInput - set search and inputRef')
     setSearch(inputValue.value)
@@ -203,30 +194,41 @@ function onArrowLeft(e: KeyboardEvent) {
   // Only act when cursor is at position 0 in the input
   if ((e.target as HTMLInputElement).selectionStart !== 0) return
 
+  console.error('onArrowLeft!!?!??!?')
   e.preventDefault()
-  const currentIndex = selectedToken.value
-    ? tokens.value.findIndex(t => t.uid === selectedToken.value!.uid)
-    : tokens.value.length
+  setSelectedToken(tokens.value.at(-1)!, 'value')
+}
 
-  const prevIndex = currentIndex - 1
-  if (prevIndex >= 0) {
-    selectedToken.value = tokens.value[prevIndex]!
+function editPriorToken() {
+  if (tokens.value.length === 0) return
+  if (!selectedToken.value) {
+    console.log('New: editPriorToken:', tokens.value.at(-1)!)
+    setSelectedToken(tokens.value.at(-1)!, 'value', false)
+  }
+  else {
+    const tokenIndex = tokens.value.findIndex(t => t.uid === selectedToken.value?.uid)
+    if (tokenIndex <= 0) return
+    console.log('Prior: editPriorToken:', tokens.value.at(tokenIndex - 1)!)
+    setSelectedToken(tokens.value.at(tokenIndex - 1)!, 'value', false)
   }
 }
 
-function onArrowRight(e: KeyboardEvent) {
-  if (!selectedToken.value) return
-  if ((e.target as HTMLInputElement).selectionStart !== 0) return
-
-  e.preventDefault()
-  const currentIndex = tokens.value.findIndex(t => t.uid === selectedToken.value!.uid)
-  const nextIndex = currentIndex + 1
-
-  if (nextIndex < tokens.value.length) {
-    selectedToken.value = tokens.value[nextIndex]!
+function editNextToken() {
+  console.error('editNextToken????')
+  if (tokens.value.length === 0) return
+  if (!selectedToken.value) {
+    // shouldnt even occur
+    setSelectedToken(tokens.value.at(0)!, 'category', true)
   }
   else {
-    selectedToken.value = null
+    const tokenIndex = tokens.value.findIndex(t => t.uid === selectedToken.value?.uid)
+    if (tokenIndex < tokens.value.length - 1) {
+      setSelectedToken(tokens.value.at(tokenIndex + 1)!, 'category', true)
+    }
+    else {
+      focusInput()
+      setStep('category')
+    }
   }
 }
 
@@ -246,18 +248,11 @@ function removeToken(token: FilterToken) {
   tokens.value = tokens.value.filter(t => t.uid !== token.uid)
 }
 
-function selectToken(token: FilterToken) {
-  console.debug('selectToken')
-  selectedToken.value = selectedToken.value?.uid === token.uid ? null : token
-  focusInput()
-  closeMenu()
-}
-
 function clearAll() {
   console.debug('clearAll')
   tokens.value = []
-  menuStep.value = 'category'
-  selectedToken.value = null
+  setStep('category')
+  setSelectedToken(null)
   closeMenu()
 }
 
@@ -275,7 +270,7 @@ function onClickOutside(e: MouseEvent) {
   if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
     console.debug('outside: yes')
     closeMenu()
-    selectedToken.value = null
+    setSelectedToken(null)
     if (menuStep.value !== 'category') {
       setStep('category')
       inputValue.value = ''
@@ -300,7 +295,7 @@ function updateDropdownPosition() {
 }
 
 watch([searchInputRef, tokens, isMenuOpen], (vars) => {
-  console.debug('watch dropdownpos', vars)
+  console.debug('watch dropdown pos', vars)
   if (isMenuOpen.value) nextTick(updateDropdownPosition)
 })
 
@@ -328,44 +323,44 @@ provide('searchMenuContext', {
   >
     <!-- The filter bar -->
     <div
-      class="flex items-center gap-1 min-h-12 px-2 py-1.5 rounded-lg border border-default bg-default
-             overflow-x-auto whitespace-nowrap cursor-text"
+      class="flex flex-row items-start justify-between gap-1 min-h-12 px-2 py-1.5 rounded-lg border border-default bg-default
+             cursor-text"
       :class="isMenuOpen ? 'ring-2 ring-primary' : 'hover:border-accented'"
       @click="focusInput"
     >
       <!-- Search icon -->
       <UIcon
         name="i-lucide-search"
-        class="size-4 text-muted shrink-0 mr-0.5"
+        class="size-4 text-muted shrink-0 ml-0.5 mt-2 "
       />
 
-      <!-- Active tokens -->
-      <FilteredSearchToken
-        v-for="token in tokens"
-        :key="token.uid"
-        :token="token"
-        :selected="selectedToken?.uid === token.uid"
-        @token-clicked="() => tokenStartEdit(token)"
-        @remove="removeToken(token)"
-      />
+      <div class="flex flex-row flex-start flex-1 flex-wrap items-center gap-1">
+        <!-- Active tokens -->
+        <FilteredSearchToken
+          v-for="token in tokens"
+          :key="token.uid"
+          :token="token"
+          :selected="selectedToken?.uid === token.uid"
+          @remove="removeToken(token)"
+          @before-start-reached="editPriorToken"
+          @after-end-reached="editNextToken"
+        />
 
-      <!-- Input -->
-      <input
-        ref="inputRef"
-        v-model="inputValue"
-        class="w-32 outline-none bg-transparent text-sm placeholder:text-muted"
-        :placeholder="tokens.length === 0 ? placeholder : ''"
-        @input="setSearch($event.target.value)"
-        @focus="openMenu"
-        @keydown.delete="onBackspace"
-        @keydown.esc="onEscape"
-        @keydown.right="onArrowRight"
-        @keydown.left="onArrowLeft"
-        @keydown="onKeydown"
-      >
-
-      <!-- Spacer -->
-      <div class="flex-1" />
+        <!-- Input -->
+        <input
+          ref="inputRef"
+          v-model="inputValue"
+          class="w-32 outline-none bg-transparent text-sm placeholder:text-muted mt-1.5"
+          :placeholder="tokens.length === 0 ? placeholder : ''"
+          @input="setSearch($event.target.value)"
+          @focus="openMenu"
+          @keydown.delete="onBackspace"
+          @keydown.esc="onEscape"
+          @keydown.right="onArrowRight"
+          @keydown.left="onArrowLeft"
+          @keydown="onKeydown"
+        >
+      </div>
 
       <UButton
         v-if="tokens.length > 0"

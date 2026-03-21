@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { FilterToken, MenuStep, SearchMenuContext } from '~/types/filteredSearch'
+import {
+  type FilterToken,
+  getNextStep, getPriorStep,
+  type MenuStep,
+  type SearchMenuContext,
+  type SelectedTokenContext,
+} from '~/types/filteredSearch'
 
 const { token, selected } = defineProps<{
   token: FilterToken
@@ -10,21 +16,14 @@ watch(() => token, (newToken) => {
   tokenCopy.value = { ...newToken }
 })
 
-const { step: activeStep, openMenu, closeMenu, setStep, setSearch, setActiveCategory, setInputRef, emitKey } = inject<SearchMenuContext>('searchMenuContext')!
-const selectedToken = inject<Ref<FilterToken | null>>('selectedToken')!
+const { step: activeStep, isOpen: menuIsOpen, openMenu, closeMenu, setStep, setSearch, setActiveCategory, setInputRef, emitKey } = inject<SearchMenuContext>('searchMenuContext')!
+const { selTokenContext, setSelectedToken } = inject<SelectedTokenContext>('selectedToken')!
+const [selectedToken, editTokenStep, editTokenAtStart] = selTokenContext
 const isEditing = ref(false)
 
 const categoryInput = ref<HTMLInputElement | null>(null)
 const operatorInput = ref<HTMLInputElement | null>(null)
 const valueInput = ref<HTMLInputElement | null>(null)
-
-watch(selectedToken, (newToken: FilterToken | null) => {
-  console.debug('selectedToken changed!', newToken)
-  if (!newToken || newToken.uid !== token.uid) {
-    cancelEdit()
-  }
-})
-
 const inputStepMap: Record<MenuStep, Ref<HTMLInputElement | null>> = {
   category: categoryInput,
   operator: operatorInput,
@@ -32,18 +31,33 @@ const inputStepMap: Record<MenuStep, Ref<HTMLInputElement | null>> = {
 }
 
 function editToken(step: MenuStep) {
-  console.debug('editToken', step)
-  isEditing.value = true
-  setStep(step)
-  emit('tokenClicked')
-  openMenu()
+  setSelectedToken(token, step)
 }
 
-watch([activeStep, isEditing], ([newStep, newEditingState]) => {
-  console.debug('watch: activeStep - isEditing', newStep, newEditingState)
-  if (!newEditingState) return
-  console.debug('token and token copy', token, tokenCopy.value)
+// New token selected for editing!
+watch([selectedToken, editTokenStep, editTokenAtStart], ([newToken, step, atStart]) => {
+  console.log('selectedToken changed!', newToken)
+  if (!newToken || newToken.uid !== token.uid) {
+    cancelEdit()
+  }
+  else if (newToken.uid === token.uid) {
+    console.log('This token adressed!', step, atStart, isEditing.value)
+    // Edit this item
+    isEditing.value = true
+    setStep(step)
+    openMenu()
+    if (atStart) {
+      nextTick(() => inputStepMap[step].value?.setSelectionRange(0, 0))
+    }
+  }
+})
 
+watch([activeStep, isEditing], ([newStep, newEditingState]) => {
+  console.log('watch: activeStep - isEditing', newStep, newEditingState)
+  if (!newEditingState) return
+
+  console.error('This mofo: ', token)
+  setStep(newStep)
   if (newStep === 'category') {
     setActiveCategory(null)
     setSearch('')
@@ -56,6 +70,7 @@ watch([activeStep, isEditing], ([newStep, newEditingState]) => {
     setActiveCategory(token.categoryId)
     setSearch(token.valueLabel ?? '')
   }
+  openMenu()
 
   nextTick(() => {
     setInputRef(inputStepMap[newStep].value)
@@ -64,21 +79,46 @@ watch([activeStep, isEditing], ([newStep, newEditingState]) => {
 })
 
 function cancelEdit() {
-  console.debug('check cancelEdit')
   if (isEditing.value) {
-    console.debug('cancelEdit: yes', tokenCopy.value, token)
     isEditing.value = false
-    closeMenu()
     tokenCopy.value = { ...token } // reset
-    setStep('category')
+  }
+}
+
+function onBeforeLeft(e: KeyboardEvent, step: MenuStep) {
+  // Only act when most left side reached
+  if ((e.target as HTMLInputElement).selectionStart !== 0) return
+
+  e.preventDefault()
+  if (step === 'category') {
+    emit('beforeStartReached')
+  }
+  else {
+    console.log('onBeforeLeft set selectedToken', getPriorStep(step))
+    setSelectedToken(token, getPriorStep(step))
+  }
+}
+
+function onAfterRight(e: KeyboardEvent, step: MenuStep) {
+  // Only act when most end of input reached
+  const input = e.target as HTMLInputElement
+  if (input.selectionStart !== input.value.length) return
+
+  e.preventDefault()
+  if (step === 'value') {
+    emit('afterEndReached')
+  }
+  else {
+    console.log('onAfterRight set selectedToken', getNextStep(step))
+    setSelectedToken(token, getNextStep(step), true)
   }
 }
 
 const emit = defineEmits<{
   remove: []
-  tokenClicked: []
+  beforeStartReached: []
+  afterEndReached: []
 }>()
-// rounded-lg  px-2 py-1.5 gap-1.5
 </script>
 
 <template>
@@ -90,10 +130,12 @@ const emit = defineEmits<{
       v-if="isEditing && activeStep === 'category'"
       ref="categoryInput"
       v-model="tokenCopy.categoryLabel"
-      class="w-32 outline-none bg-default text-sm rounded-l-lg pl-2 pr-1 py-1.5"
+      class="w-48 outline-none bg-default text-sm rounded-l-lg pl-2 pr-1 py-1.5"
       @click.stop
       @input="setSearch($event.target.value)"
       @keydown="emitKey"
+      @keydown.left="onBeforeLeft($event, activeStep)"
+      @keydown.right="onAfterRight($event, activeStep)"
     >
     <span
       v-else
@@ -113,10 +155,12 @@ const emit = defineEmits<{
         v-if="isEditing && activeStep === 'operator'"
         ref="operatorInput"
         v-model="tokenCopy.operator"
-        class="w-32 outline-none bg-default text-sm ring-1 ring-default px-1 py-1.5"
+        class="w-48 outline-none bg-default text-sm ring-1 ring-default px-1 py-1.5"
         @click.stop
         @input="setSearch($event.target.value)"
         @keydown="emitKey"
+        @keydown.left="onBeforeLeft($event, activeStep)"
+        @keydown.right="onAfterRight($event, activeStep)"
       >
       <span
         v-else
@@ -133,10 +177,12 @@ const emit = defineEmits<{
         v-if="isEditing && activeStep === 'value'"
         ref="valueInput"
         v-model="tokenCopy.valueLabel"
-        class="w-32 outline-none bg-default text-sm ring-1 ring-default px-1 py-1.5"
+        class="w-48 outline-none bg-default text-sm ring-1 ring-default px-1 py-1.5"
         @click.stop
         @input="setSearch($event.target.value)"
         @keydown="emitKey"
+        @keydown.left="onBeforeLeft($event, activeStep)"
+        @keydown.right="onAfterRight($event, activeStep)"
       >
       <span
         v-else

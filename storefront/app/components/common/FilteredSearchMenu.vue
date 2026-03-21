@@ -93,7 +93,7 @@ function confirm() {
 </script>
 
 <template>
-  <div class="flex flex-col w-64">
+  <div class="flex flex-col min-w-48">
     <!-- Step: Category -->
     <template v-if="step === 'category'">
       <div class="px-1 py-1">
