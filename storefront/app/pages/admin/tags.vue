@@ -7,6 +7,7 @@ import SelectionGrid from '~/components/common/SelectionGrid.vue'
 import { useSubmitFacets } from '~/composables/admin/useSubmitFacets'
 import { getFacetId } from '~/composables/useDirtyList'
 import FilteredSearch from '~/components/common/FilteredSearch.vue'
+import type { ValueGroup } from '~/types/filteredSearch'
 
 // TODO remove for production
 definePageMeta({
@@ -154,6 +155,18 @@ function resetChanges() {
   })
 }
 const activeTokens = ref([])
+
+const tagFilters = computed<ValueGroup[]>(() => {
+  if (!facetsData.value?.facets.items) return []
+  return facetsData.value.facets.items
+    .map(f => (
+      {
+        id: f.id,
+        label: f.name,
+        values: f.values.map(fV => ({ id: fV.id, label: `${fV.name}` })),
+      }
+    ))
+})
 </script>
 
 <template>
@@ -191,27 +204,24 @@ const activeTokens = ref([])
               id: 'tags',
               label: 'Tag',
               icon: 'i-lucide-tag',
-              values: [
-                { id: '1', label: 'Orc' },
-                { id: '2', label: 'Elf' },
-              ],
+              valueGroups: tagFilters,
             },
             {
               id: 'releases',
               label: 'Releases',
               icon: 'i-lucide-package-2',
-              values: [
-                { id: '1', label: 'Dragons' },
-                { id: '2', label: 'Animals' },
+              valueGroups: [
+                { id: '1', label: '', values: [{ id: '1', label: 'Feb 2026' }, { id: '2', label: 'Jan 2026' }] },
+                { id: '2', label: '2025', values: [{ id: '3', label: 'Dec 2025' }, { id: '4', label: 'Nov 2025' }] },
               ],
             },
             {
               id: 'collection',
               label: 'Collection',
               icon: 'i-lucide-book-copy',
-              values: [
-                { id: '1', label: 'Dragons' },
-                { id: '2', label: 'Animals' },
+              valueGroups: [
+                { id: '1', label: 'Dragons', values: [{ id: '1', label: 'Red Dragons' }, { id: '2', label: 'Blue Dragons' }] },
+                { id: '2', label: 'Animals', values: [{ id: '3', label: 'Mice' }, { id: '4', label: 'Rabbits' }] },
               ],
             },
           ]"

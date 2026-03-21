@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FilterCategory, FilterOperator, FilterValue, SearchMenuContext } from '~/types/filteredSearch'
+import type { FilterCategory, FilterOperator, FilterValue, SearchMenuContext, ValueGroup } from '~/types/filteredSearch'
 
 const { categories } = defineProps<{
   categories: FilterCategory[]
@@ -25,11 +25,27 @@ const filteredCategories = computed(() => {
   )
 })
 
-const filteredValues = computed(() =>
-  (activeCategory.value?.values ?? []).filter(v =>
-    v.label.toLowerCase().includes(search.value.toLowerCase()),
-  ),
-)
+const filteredValueGroups = computed(() => {
+  const searchV = search.value.toLowerCase()
+  return (activeCategory.value?.valueGroups ?? []).map((vG) => {
+    if (vG.label.toLowerCase().includes(searchV)) {
+      return vG
+    }
+    const values = vG.values.filter((v) => {
+      const extValueName = vG.label.toLowerCase() + ' ' + v.label.toLowerCase()
+      return extValueName.includes(searchV)
+    })
+    return {
+      ...vG,
+      values,
+    }
+  }).filter(vG => vG.values.length > 0)
+})
+const selectedValueId = computed(() => {
+  if (selectedIndex.value === -1) return -1
+  const flatMap = filteredValueGroups.value.flatMap(vG => vG.values)
+  return flatMap[selectedIndex.value]?.id ?? -1
+})
 
 // -- Keyboard navigation
 
@@ -44,7 +60,7 @@ watch(keyEvent, (e: KeyboardEvent | null) => {
 const activeList = computed(() => {
   if (step.value === 'category') return filteredCategories.value
   if (step.value === 'operator') return OPERATORS
-  if (step.value === 'value') return filteredValues.value
+  if (step.value === 'value') return filteredValueGroups.value.flatMap(vG => vG.values)
   return []
 })
 
@@ -151,22 +167,34 @@ function confirm() {
     </template>
 
     <!-- Step: Value -->
-    <template v-else-if="step === 'value'">
+    <template v-else-if="step === 'value' && !!activeCategory">
       <div class="px-1 py-1">
         <p class="text-xs text-muted px-2 py-1 font-medium uppercase tracking-wide">
           {{ activeCategory?.label }} value
         </p>
-        <button
-          v-for="(value, idx) in filteredValues"
-          :key="value.id"
-          class="flex items-center gap-2 w-full px-2 py-1.5 rounded-md text-sm hover:bg-elevated transition-colors text-left"
-          :class="{ 'bg-elevated ring-1 ring-primary': selectedIndex === idx }"
-          @click="emit('selectValue', value)"
+
+        <template
+          v-for="group in filteredValueGroups"
+          :key="group.id"
         >
-          <span>{{ value.label }}</span>
-        </button>
+          <USeparator
+            v-if="group.label"
+            class="p-0.5"
+          >
+            <span class="text-muted text-sm">{{ group.label }}</span>
+          </USeparator>
+          <button
+            v-for="value in group.values"
+            :key="value.id"
+            class="flex items-center gap-2 w-full px-2 py-1.5 rounded-md text-sm hover:bg-elevated transition-colors text-left"
+            :class="{ 'bg-elevated ring-1 ring-primary': selectedValueId === value.id }"
+            @click="emit('selectValue', value)"
+          >
+            <span>{{ value.label }}</span>
+          </button>
+        </template>
         <p
-          v-if="filteredValues.length === 0"
+          v-if="filteredValueGroups.length === 0"
           class="text-sm text-muted px-2 py-2"
         >
           No values found

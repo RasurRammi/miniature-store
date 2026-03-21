@@ -9,6 +9,12 @@ export type FilterCategory = {
   id: string
   label: string
   icon?: string
+  valueGroups: ValueGroup[]
+}
+
+export type ValueGroup = {
+  id: string
+  label: string
   values: FilterValue[]
 }
 
