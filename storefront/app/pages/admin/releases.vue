@@ -8,7 +8,7 @@ import { useAssets } from '~/composables/admin/useAssets'
 
 // TODO remove for production
 definePageMeta({
-  layout: 'admin-administration',
+  layout: 'admin',
 })
 
 const { data: bundleData, isLoading, error } = useBundles()
@@ -52,41 +52,19 @@ async function submitForm() {
 </script>
 
 <template>
-  <div class=" flex flex-col gap-4 my-6 mx-1 lg:my-12 lg:mx-4">
-    <template v-if="isCreating">
-      <GridArea
-        :collapsible="false"
-        :initial-state="false"
-      >
-        <template #header>
-          <UInput
-            v-model="bundleForm.name"
-            placeholder="Bundle Name..."
-            class="ml-12"
-            size="lg"
-            autofocus
-          />
-        </template>
-        <template #actions>
-          <UButton
-            icon="i-lucide-check"
-            label="Create"
-            color="primary"
-            @click="submitForm"
-          />
-        </template>
-      </GridArea>
-    </template>
-
-    <template v-else>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-row justify-between items-center">
+      <h1 class="text-2xl font-bold ">
+        Releases
+      </h1>
       <UButton
-        variant="subtle"
-        icon="i-lucide-circle-plus"
+        variant="solid"
+        color="primary"
+        icon="i-lucide-plus"
         label="Add Release"
-        class="w-full h-16 rounded-xl flex items-center justify-center gap-2 text-2xl"
-        @click.prevent="isCreating = true"
+        size="xl"
       />
-    </template>
+    </div>
 
     <div class="flex-1 flex flex-col gap-4">
       <template v-if="bundleData">

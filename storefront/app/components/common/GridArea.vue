@@ -12,10 +12,10 @@ const isOpen = ref(initialState)
     :disabled="!collapsible"
   >
     <div
-      class="flex justify-between items-center rounded-xl p-4 bg-muted transition-colors"
+      class="flex justify-between items-center rounded-lg h-16 bg-muted transition-colors px-4"
       :class="collapsible ? 'cursor-pointer ' : ''"
     >
-      <div class="flex items-center gap-2 h-6">
+      <div class="flex items-center gap-2 h-6 ">
         <UIcon
           v-if="collapsible"
           :name="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"

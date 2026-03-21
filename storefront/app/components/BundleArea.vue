@@ -11,6 +11,15 @@ const { bundle } = defineProps<{ bundle: Collection }>()
     :collapsible="true"
     :initial-state="true"
   >
+    <template #actions>
+      <UButton
+        variant="solid"
+        color="primary"
+        icon="i-lucide-plus"
+        label="Add Product"
+        size="lg"
+      />
+    </template>
     <ProductCard
       v-for="productV in bundle.productVariants.items"
       :key="productV.id"
