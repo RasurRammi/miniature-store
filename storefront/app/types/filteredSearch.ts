@@ -5,8 +5,10 @@ export type FilterValue = {
   label: string
 }
 
+export type CategoryId = 'tags' | 'releases' | 'collections'
+
 export type FilterCategory = {
-  id: string
+  id: CategoryId
   label: string
   icon?: string
   valueGroups: ValueGroup[]
@@ -20,7 +22,7 @@ export type ValueGroup = {
 
 export type FilterToken = {
   uid: string
-  categoryId: string
+  categoryId: CategoryId
   categoryLabel: string
   categoryIcon?: string
   operator?: FilterOperator

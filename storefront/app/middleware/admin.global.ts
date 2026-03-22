@@ -8,7 +8,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (
     !to.path.startsWith('/admin')
-    || to.path === '/admin/login'
     || import.meta.server
   ) {
     return
@@ -25,13 +24,19 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   try {
     const data = await $adminGqlClient.request(AdminMeDocument)
+
+    if (data.me && to.path === '/admin/login') {
+      return navigateTo('/admin/releases')
+    }
     if (!data.me && to.path !== '/admin/login') {
       toast.add(loginNeededMsg)
       return navigateTo('/admin/login')
     }
   }
   catch {
-    toast.add(loginNeededMsg)
-    return navigateTo('/admin/login')
+    if (to.path !== '/admin/login') {
+      toast.add(loginNeededMsg)
+      return navigateTo('/admin/login')
+    }
   }
 })

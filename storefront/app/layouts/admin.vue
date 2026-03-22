@@ -4,23 +4,70 @@ const logoAlt = 'NomNom Miniatures'
 
 const navItems = [
   [
+
     {
-      label: 'Releases',
-      icon: 'i-lucide-package-2',
+      label: 'Dashboard',
+      icon: 'i-lucide-layout-dashboard',
+      to: '/admin/dashboard',
+    },
+    {
+      label: 'Catalogue',
+      icon: 'i-lucide-book-open',
       to: '/admin/releases',
+      open: true,
+      children: [
+        {
+          label: 'Releases',
+          icon: 'i-lucide-package-2',
+          to: '/admin/releases',
+        },
+        {
+          label: 'Products',
+          icon: 'i-lucide-book',
+          to: '/admin/products',
+        },
+        {
+          label: 'Collections',
+          icon: 'i-lucide-book-copy',
+          to: '/admin/collections',
+        },
+        {
+          label: 'Tags',
+          icon: 'i-lucide-tag',
+          to: '/admin/tags',
+        },
+        {
+          label: 'Assets',
+          icon: 'i-lucide-image',
+          to: '/admin/assets',
+        },
+      ],
     },
     {
-      label: 'Collections',
-      icon: 'i-lucide-book-copy',
-      to: '/admin/collections',
+      label: 'Users',
+      to: '/admin/insights',
+      icon: 'i-lucide-users',
+      open: true,
+      children: [
+        {
+          label: 'Insights',
+          icon: 'i-lucide-chart-area',
+          to: '/admin/insights',
+        },
+        {
+          label: 'Customers',
+          icon: 'i-lucide-user',
+          to: '/admin/customers',
+        },
+        {
+          label: 'Orders',
+          icon: 'i-lucide-shopping-bag',
+          to: '/admin/orders',
+        },
+      ],
     },
     {
-      label: 'Product Tags',
-      icon: 'i-lucide-tag',
-      to: '/admin/tags',
-    },
-    {
-      label: 'Settings',
+      label: 'Configuration',
       icon: 'i-lucide-cog',
       to: '/admin/settings',
     },

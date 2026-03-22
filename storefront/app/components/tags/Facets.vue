@@ -3,6 +3,7 @@ import { useFacets } from '~/composables/admin/useFacets'
 import { useSubmitFacets } from '~/composables/admin/useSubmitFacets'
 import { getFacetId } from '~/composables/useDirtyList'
 import type { Facet } from '~/gql/admin/graphql'
+import FacetsTable from '~/components/tags/FacetsTable.vue'
 
 const toast = useToast()
 const dirtyStateStore = useDirtyStateStore()
@@ -56,7 +57,7 @@ function submitChanges() {
       values: dirtyValues,
     })
   }
-  console.log('submit:', inputs)
+  console.debug('submit:', inputs)
   submitFacets.mutate(inputs, {
     onSuccess: () => {
       toast.add({
@@ -87,29 +88,31 @@ function resetChanges() {
 </script>
 
 <template>
-  <div class="flex flex-row justify-center-safe items-center-safe p-2">
-    <div />
-    <div class="text-xl flex-1 text-center">
-      Tag Groups
+  <div>
+    <div class="flex flex-row justify-center-safe items-center-safe p-2">
+      <div />
+      <div class="text-xl flex-1 text-center">
+        Tag Groups
+      </div>
+      <UButton
+        :icon="isEditingFacets ? 'i-lucide-pencil-off' : 'i-lucide-pencil'"
+        variant="ghost"
+        color="neutral"
+        class="aspect-square"
+        :disabled="dirtyStateStore.totalChanges > 0"
+        @click.prevent="isEditingFacets = !isEditingFacets"
+      />
     </div>
-    <UButton
-      :icon="isEditingFacets ? 'i-lucide-pencil-off' : 'i-lucide-pencil'"
-      variant="ghost"
-      color="neutral"
-      class="aspect-square"
-      :disabled="dirtyStateStore.totalChanges > 0"
-      @click.prevent="isEditingFacets = !isEditingFacets"
+    <FacetsTable
+      v-model="facetsCopy"
+      :is-editing="isEditingFacets"
+    />
+
+    <FloatingBar
+      @save="submitChanges()"
+      @discard="resetChanges()"
     />
   </div>
-  <FacetsTable
-    v-model="facetsCopy"
-    :is-editing="isEditingFacets"
-  />
-
-  <FloatingBar
-    @save="submitChanges()"
-    @discard="resetChanges()"
-  />
 </template>
 
 <style scoped>

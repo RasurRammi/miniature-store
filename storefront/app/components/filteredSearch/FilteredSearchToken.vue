@@ -36,12 +36,12 @@ function editToken(step: MenuStep) {
 
 // New token selected for editing!
 watch([selectedToken, editTokenStep, editTokenAtStart], ([newToken, step, atStart]) => {
-  console.log('selectedToken changed!', newToken)
+  console.debug('selectedToken changed!', newToken)
   if (!newToken || newToken.uid !== token.uid) {
     cancelEdit()
   }
   else if (newToken.uid === token.uid) {
-    console.log('This token adressed!', step, atStart, isEditing.value)
+    console.debug('This token adressed!', step, atStart, isEditing.value)
     // Edit this item
     isEditing.value = true
     setStep(step)
@@ -53,7 +53,7 @@ watch([selectedToken, editTokenStep, editTokenAtStart], ([newToken, step, atStar
 })
 
 watch([activeStep, isEditing], ([newStep, newEditingState]) => {
-  console.log('watch: activeStep - isEditing', newStep, newEditingState)
+  console.debug('watch: activeStep - isEditing', newStep, newEditingState)
   if (!newEditingState) return
 
   console.error('This mofo: ', token)
@@ -94,7 +94,7 @@ function onBeforeLeft(e: KeyboardEvent, step: MenuStep) {
     emit('beforeStartReached')
   }
   else {
-    console.log('onBeforeLeft set selectedToken', getPriorStep(step))
+    console.debug('onBeforeLeft set selectedToken', getPriorStep(step))
     setSelectedToken(token, getPriorStep(step))
   }
 }
@@ -109,7 +109,7 @@ function onAfterRight(e: KeyboardEvent, step: MenuStep) {
     emit('afterEndReached')
   }
   else {
-    console.log('onAfterRight set selectedToken', getNextStep(step))
+    console.debug('onAfterRight set selectedToken', getNextStep(step))
     setSelectedToken(token, getNextStep(step), true)
   }
 }

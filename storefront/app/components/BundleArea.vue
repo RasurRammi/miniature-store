@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Collection } from '~/gql/shop/graphql'
 import GridArea from '~/components/common/GridArea.vue'
+import { useProductDrawerStore } from '#imports'
 
+const productDrawer = useProductDrawerStore()
 const { bundle } = defineProps<{ bundle: Collection }>()
 </script>
 
@@ -18,6 +20,7 @@ const { bundle } = defineProps<{ bundle: Collection }>()
         icon="i-lucide-plus"
         label="Add Product"
         size="lg"
+        @click.stop="productDrawer.open()"
       />
     </template>
     <ProductCard

@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/vue-query'
-import { GetFacetsDocument, SortOrder } from '~/gql/admin/graphql'
+import { useQuery, type UseQueryReturnType } from '@tanstack/vue-query'
+import { GetFacetsDocument, type GetFacetsQuery, SortOrder } from '~/gql/admin/graphql'
 
 export function useFacets() {
   const { $adminGqlClient } = useNuxtApp()
-  const query = useQuery({
+  const query: UseQueryReturnType<GetFacetsQuery, Error> = useQuery({
     queryKey: ['facets'],
     queryFn: async () => {
       return $adminGqlClient.request(GetFacetsDocument, { options: { sort: { name: SortOrder.ASC } } })

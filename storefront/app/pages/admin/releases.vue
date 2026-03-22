@@ -67,7 +67,7 @@ async function submitForm() {
     </div>
 
     <div class="flex-1 flex flex-col gap-4">
-      <template v-if="bundleData">
+      <template v-if="bundleData && bundleData.collections.items.length">
         <BundleArea
           v-for="bundle in bundleData.collections.items"
           :key="bundle.id"
@@ -76,7 +76,10 @@ async function submitForm() {
       </template>
 
       <template v-else>
-        <UEmpty title="No products found" />
+        <UEmpty
+          title="No Releases found"
+          variant="subtle"
+        />
       </template>
     </div>
 

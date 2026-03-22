@@ -39,7 +39,7 @@ function setSelectedToken(token: FilterToken | null, step: MenuStep = 'category'
 }
 provide('selectedToken', { selTokenContext: [selectedToken, editTokenStep, editTokenAtStart], setSelectedToken })
 
-watch(menuStep, () => console.log('ActiveStep Changed!', menuStep.value))
+watch(menuStep, () => console.debug('ActiveStep Changed!', menuStep.value))
 
 function advanceStep() {
   console.debug('advanceStep')
@@ -202,13 +202,13 @@ function onArrowLeft(e: KeyboardEvent) {
 function editPriorToken() {
   if (tokens.value.length === 0) return
   if (!selectedToken.value) {
-    console.log('New: editPriorToken:', tokens.value.at(-1)!)
+    console.debug('New: editPriorToken:', tokens.value.at(-1)!)
     setSelectedToken(tokens.value.at(-1)!, 'value', false)
   }
   else {
     const tokenIndex = tokens.value.findIndex(t => t.uid === selectedToken.value?.uid)
     if (tokenIndex <= 0) return
-    console.log('Prior: editPriorToken:', tokens.value.at(tokenIndex - 1)!)
+    console.debug('Prior: editPriorToken:', tokens.value.at(tokenIndex - 1)!)
     setSelectedToken(tokens.value.at(tokenIndex - 1)!, 'value', false)
   }
 }

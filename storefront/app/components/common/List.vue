@@ -25,10 +25,10 @@ function toggleExpanded(id: string) {
       :key="item.id"
     >
       <div
-        class="flex flex-row gap-2 justify-between rounded-lg  p-2"
+        class="flex flex-row gap-2 justify-between rounded-lg p-2"
         :class="[expandedIds.has(item.id) ? 'bg-elevated/75' : 'bg-elevated/50', itemClass?.(item)]"
       >
-        <div class="flex flex-row items-center gap-1">
+        <div class="flex flex-row flex-1 items-center gap-1">
           <UButton
             v-if="$slots['expanded-content']"
             icon="i-lucide-chevron-down"
@@ -57,6 +57,11 @@ function toggleExpanded(id: string) {
         />
       </div>
     </template>
+
+    <slot
+      v-if="!items.length"
+      name="empty"
+    />
 
     <div
       v-if="$slots['add-row']"

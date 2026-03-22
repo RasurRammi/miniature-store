@@ -3,6 +3,7 @@ import { UButton, UInput } from '#components'
 import type { Facet, FacetValue } from '~/gql/admin/graphql'
 import { getFacetId, getValueId, useDirtyList } from '~/composables/useDirtyList'
 import List from '~/components/common/List.vue'
+import FacetValuesTable from '~/components/tags/FacetValuesTable.vue'
 
 const facets = defineModel<Facet[]>({ required: true })
 const { isEditing } = defineProps<{ isEditing: boolean }>()
@@ -100,6 +101,12 @@ function onRestoreFacet(facet: Facet) {
         color="primary"
         variant="ghost"
         @click="onAddFacet"
+      />
+    </template>
+    <template #empty>
+      <UEmpty
+        v-if="!isEditing"
+        title="No Tag groups exist yet. Edit the Tag groups to create new"
       />
     </template>
   </List>

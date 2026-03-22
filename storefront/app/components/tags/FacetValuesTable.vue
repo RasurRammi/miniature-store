@@ -67,11 +67,12 @@ function onAddValue() {
         />
       </template>
       <UButton
+        v-if="!isEditing"
         icon="i-lucide-book-check"
         color="neutral"
         variant="ghost"
         aria-label="Assign to selected Products"
-        @click="console.log('test')"
+        @click="console.debug('test')"
       />
     </template>
     <template
