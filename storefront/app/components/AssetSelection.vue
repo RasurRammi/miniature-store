@@ -3,7 +3,7 @@ import { useAssets } from '~/composables/admin/useAssets'
 import { useAssetSelectionDrawerStore } from '~/stores/assetSelectionDrawer'
 import DrawerLayout from '~/components/common/DrawerLayout.vue'
 import { useUploadAssets } from '~/composables/admin/useUploadAssets'
-import type { Asset } from '~/gql/shop/graphql'
+import type { Asset } from '~/types/fragmentAliases'
 import SelectionGrid from '~/components/common/SelectionGrid.vue'
 import FlexibleGrid from '~/components/common/FlexibleGrid.vue'
 

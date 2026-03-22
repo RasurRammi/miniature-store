@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Asset } from '~/gql/shop/graphql'
+import type { Asset } from '~/types/fragmentAliases'
 
 const { images } = defineProps<{
   images: Asset[]

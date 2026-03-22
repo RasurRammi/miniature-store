@@ -1,5 +1,5 @@
-import type { Product } from '~/gql/shop/graphql'
 import type { FilterToken } from '~/types/filteredSearch'
+import type { Product } from '~/types/fragmentAliases'
 
 export function filterProducts(products: Product[], filterTokens: FilterToken[]): Product[] {
   const groupedTokens = Object.groupBy(filterTokens, token => token.categoryId)

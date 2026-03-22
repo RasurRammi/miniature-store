@@ -1,5 +1,4 @@
-
-import type { CodegenConfig } from '@graphql-codegen/cli';
+import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -8,6 +7,9 @@ const config: CodegenConfig = {
       schema: 'http://localhost:3001/shop-api',
       documents: ['app/queries/shop/**/*.graphql', 'app/queries/fragments/**/*.graphql'],
       preset: 'client',
+      presetConfig: {
+        fragmentMasking: false,
+      },
       config: {
         useTypeImports: true,
         scalars: {
@@ -17,12 +19,15 @@ const config: CodegenConfig = {
         namingConvention: {
           enumValues: 'keep',
         },
-      }
+      },
     },
     './app/gql/admin/': {
       schema: 'http://localhost:3001/admin-api',
       documents: ['app/queries/admin/**/*.graphql', 'app/queries/fragments/**/*.graphql'],
       preset: 'client',
+      presetConfig: {
+        fragmentMasking: false,
+      },
       config: {
         useTypeImports: true,
         scalars: {
@@ -32,9 +37,9 @@ const config: CodegenConfig = {
         namingConvention: {
           enumValues: 'keep',
         },
-      }
-    }
-  }
-};
+      },
+    },
+  },
+}
 
-export default config;
+export default config

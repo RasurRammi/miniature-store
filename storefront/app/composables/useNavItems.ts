@@ -1,4 +1,4 @@
-import type { User } from '~/gql/shop/graphql'
+import type { User } from '~/types/fragmentAliases'
 
 export const useDefaultNavItems = () => {
   return [

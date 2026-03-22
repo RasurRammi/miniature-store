@@ -8,7 +8,7 @@ import {
   UpdateProductVariantDocument,
 } from '~/gql/admin/graphql'
 import { slugify } from '~/utils/slugify'
-import type { Collection } from '~/gql/shop/graphql'
+import type { Collection } from '~/types/fragmentAliases'
 
 export type ProductInput = {
   productId?: string

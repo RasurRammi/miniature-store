@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import SelectionGrid from '~/components/common/SelectionGrid.vue'
-import { useProducts } from '~/composables/useProducts'
-import type { FilterToken } from '~/types/filteredSearch'
-import { filterProducts } from '~/composables/admin/useFilterProducts'
+import type { Product } from '~/types/fragmentAliases'
 
-const { data: productsData } = useProducts()
-const { filterTokens } = defineProps<{ filterTokens: FilterToken[] }>()
-const selectedProducts = ref<string[]>([])
+const selectedProducts = defineModel<Product[]>()
+const { products } = defineProps<{ products: Product[] }>()
 
-const filteredProducts = computed(() => filterProducts(productsData.value?.products.items ?? [], filterTokens))
+const emit = defineEmits<{
+  productsSelected: [string[]]
+}>()
+
+const selectedIds = computed(() => selectedProducts.value?.map(p => p.id) ?? [])
 </script>
 
 <template>
   <SelectionGrid
-    v-model="selectedProducts"
-    :items="filteredProducts"
+    v-model="selectedIds"
+    :items="products"
     :size="6"
+    @update:model-value="(ids: string[]) => emit('productsSelected', ids)"
   >
     <template #default="{ item }">
       <img

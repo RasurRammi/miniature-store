@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useProductDrawerStore } from '~/stores/productDrawer'
 import { formatCurrency } from '~/utils/formatCurrency'
-import type { ProductVariant } from '~/gql/shop/graphql'
+import type { ProductVariant } from '~/types/fragmentAliases'
 import GridCard from '~/components/common/GridCard.vue'
 
 const { productV } = defineProps<{ productV: ProductVariant }>()

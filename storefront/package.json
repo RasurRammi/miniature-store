@@ -13,6 +13,7 @@
     "codegen:watch": "graphql-codegen  --watch --config codegen.ts"
   },
   "dependencies": {
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@iconify-json/lucide": "^1.2.90",
     "@iconify-json/simple-icons": "^1.2.70",
     "@medusajs/js-sdk": "^2.13.3",

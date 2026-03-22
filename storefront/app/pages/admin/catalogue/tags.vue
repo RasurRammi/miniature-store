@@ -4,19 +4,19 @@ import type { FilterCategory, FilterToken, ValueGroup } from '~/types/filteredSe
 import { useFacets } from '~/composables/admin/useFacets'
 import ProductsSelection from '~/components/tags/ProductsSelection.vue'
 import Facets from '~/components/tags/Facets.vue'
+import { filterProducts } from '~/composables/admin/useFilterProducts'
+import type { Product } from '~/types/fragmentAliases'
 
 // TODO remove for production
 definePageMeta({
   layout: 'admin',
 })
 
-const { data: facetsData } = useFacets()
-
+// --- Filter ---
 const activeSearchTokens = ref<FilterToken[]>([])
-const completedTokens = computed(() =>
-  activeSearchTokens.value.filter(t => t.isComplete),
-)
+const completedTokens = computed(() => activeSearchTokens.value.filter(t => t.isComplete))
 
+const { data: facetsData } = useFacets()
 const tagFilters = computed<ValueGroup[]>(() => {
   if (!facetsData.value?.facets.items) return []
   return facetsData.value.facets.items
@@ -55,6 +55,17 @@ const filterCategories = computed<FilterCategory[]>(() => [
     ],
   },
 ])
+
+// --- Products
+const { data: productsData } = useProducts()
+const filteredProducts = computed(() =>
+  filterProducts(productsData.value?.products.items ?? [], completedTokens.value),
+)
+const selectedProducts = ref<Product[]>([])
+function updateSelectedProducts(productIds: string[]) {
+  const products = productsData.value?.products.items ?? []
+  selectedProducts.value = products.filter(p => productIds.includes(p.id))
+}
 </script>
 
 <template>
@@ -78,7 +89,11 @@ const filterCategories = computed<FilterCategory[]>(() => [
 
         <!-- Product Selection -->
         <div class="p-2 rounded-lg bg-elevated/50">
-          <ProductsSelection :filter-tokens="completedTokens" />
+          <ProductsSelection
+            v-model="selectedProducts"
+            :products="filteredProducts"
+            @products-selected="updateSelectedProducts"
+          />
         </div>
       </div>
     </div>

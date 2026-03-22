@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Collection } from '~/gql/shop/graphql'
+import type { Collection } from '~/types/fragmentAliases'
 import GridArea from '~/components/common/GridArea.vue'
 import { useProductDrawerStore } from '#imports'
 

@@ -18,7 +18,7 @@ function getNavItems() {
       {
         label: 'To Admin Dashboard',
         icon: 'i-lucide-shield',
-        to: '/admin/releases',
+        to: '/admin/dashboard',
       },
     )
   }

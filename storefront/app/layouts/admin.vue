@@ -2,9 +2,10 @@
 const headerLogo = '/nomnom-logo.png'
 const logoAlt = 'NomNom Miniatures'
 
+const route = useRoute()
+
 const navItems = [
   [
-
     {
       label: 'Dashboard',
       icon: 'i-lucide-layout-dashboard',
@@ -13,56 +14,61 @@ const navItems = [
     {
       label: 'Catalogue',
       icon: 'i-lucide-book-open',
-      to: '/admin/releases',
-      open: true,
+      type: 'trigger',
+      defaultOpen: route.path.startsWith('/admin/catalogue'),
       children: [
-        {
-          label: 'Releases',
-          icon: 'i-lucide-package-2',
-          to: '/admin/releases',
-        },
         {
           label: 'Products',
           icon: 'i-lucide-book',
-          to: '/admin/products',
+          to: '/admin/catalogue/products',
+        },
+        {
+          label: 'Releases',
+          icon: 'i-lucide-package-2',
+          to: '/admin/catalogue/releases',
         },
         {
           label: 'Collections',
           icon: 'i-lucide-book-copy',
-          to: '/admin/collections',
+          to: '/admin/catalogue/collections',
         },
         {
           label: 'Tags',
           icon: 'i-lucide-tag',
-          to: '/admin/tags',
+          to: '/admin/catalogue/tags',
         },
         {
           label: 'Assets',
           icon: 'i-lucide-image',
-          to: '/admin/assets',
+          to: '/admin/catalogue/assets',
         },
       ],
     },
     {
+      label: 'Subscription',
+      icon: 'i-lucide-calendar-sync',
+      to: '/admin/subscriptions',
+    },
+    {
       label: 'Users',
-      to: '/admin/insights',
+      type: 'trigger',
       icon: 'i-lucide-users',
-      open: true,
+      defaultOpen: route.path.startsWith('/admin/users'),
       children: [
         {
           label: 'Insights',
           icon: 'i-lucide-chart-area',
-          to: '/admin/insights',
+          to: '/admin/users/insights',
         },
         {
           label: 'Customers',
           icon: 'i-lucide-user',
-          to: '/admin/customers',
+          to: '/admin/users/customers',
         },
         {
           label: 'Orders',
           icon: 'i-lucide-shopping-bag',
-          to: '/admin/orders',
+          to: '/admin/users/orders',
         },
       ],
     },

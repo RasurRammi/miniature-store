@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BundleArea from '~/components/BundleArea.vue'
 import { useBundles } from '~/composables/useBundles'
-import type { Collection, ProductVariant } from '~/gql/shop/graphql'
+import type { Collection, ProductVariant } from '~/types/fragmentAliases'
 
 const { data: bundleData, isLoading, error } = useBundles()
 

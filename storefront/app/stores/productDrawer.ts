@@ -1,4 +1,4 @@
-import type { ProductVariant } from '~/gql/shop/graphql'
+import type { ProductVariant } from '~/types/fragmentAliases'
 
 export const useProductDrawerStore = defineStore('productDrawer', () => {
   const { isOpen, data: productV, open, close, onAfterLeave } = useDrawerState<ProductVariant>()

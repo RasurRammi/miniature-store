@@ -1,4 +1,4 @@
-import type { Product } from '~/gql/shop/graphql'
+import type { Product } from '~/types/fragmentAliases'
 
 export const useAssetSelectionDrawerStore = defineStore('assetSelectionDrawer', () => {
   const { isOpen, data: product, open, close, onAfterLeave } = useDrawerState<Product>()
