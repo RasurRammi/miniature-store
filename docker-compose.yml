@@ -22,28 +22,28 @@ services:
       - "9000:9000"
       - "9001:9001"
 
-  vendure:
-    build: ./backend-vendure
-    environment:
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_NAME: vendure
-      DB_USERNAME: rami
-      DB_PASSWORD: ramirami
-    ports:
-      - "3000:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
+  #vendure:
+  #  build: ./backend-vendure
+  #  environment:
+  #    DB_HOST: localhost
+  #    DB_PORT: 5432
+  #    DB_NAME: vendure
+  #    DB_USERNAME: rami
+  #    DB_PASSWORD: ramirami
+  #  ports:
+  #    - "3000:3000"
+  #  depends_on:
+  #    postgres:
+  #      condition: service_healthy
 
-  storefront:
-    build: ./storefront  # builds from your Nuxt project folder
-    environment:
-      NUXT_PUBLIC_MEDUSA_URL: http://backend:9000
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+  #storefront:
+  #  build: ./storefront  # builds from your Nuxt project folder
+  #  environment:
+  #    NUXT_PUBLIC_MEDUSA_URL: http://backend:9000
+  #  ports:
+  #    - "3000:3000"
+  #  depends_on:
+  #    - backend
 
 volumes:
   postgres_data:
