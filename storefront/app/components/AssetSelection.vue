@@ -10,11 +10,12 @@ import FlexibleGrid from '~/components/common/FlexibleGrid.vue'
 const uploadAssets = useUploadAssets()
 const assetSelectionDrawer = useAssetSelectionDrawerStore()
 const { data: assetsData } = useAssets()
+const assets = computed(() => assetsData.value?.assets.items ?? [])
 
 const selectedAssets = defineModel<string[]>({ required: true })
 const selectedCopy = ref([...selectedAssets.value])
 const selectedAssetsCopy = computed(() => {
-  const itemMap = new Map(assetsData.value.assets.items.map((a: Asset) => [a.id, a]))
+  const itemMap = new Map(assets.value.map((a: Asset) => [a.id, a]))
   return selectedCopy.value.flatMap((id) => {
     const asset = itemMap.get(id)
     return asset ? [asset] : []
@@ -89,7 +90,7 @@ function submitSelection() {
 
         <SelectionGrid
           v-model="selectedCopy"
-          :items="assetsData.assets.items"
+          :items="assets"
         >
           <template #default="{ item }">
             <img

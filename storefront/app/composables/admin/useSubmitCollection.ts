@@ -1,16 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import {
-  CreateCollectionDocument,
-  type CreateCollectionInput,
-  LanguageCode,
-  UpdateCollectionDocument,
-} from '~/gql/admin/graphql'
+import { CreateCollectionDocument, LanguageCode, UpdateCollectionDocument } from '~/gql/admin/graphql'
 import { slugify } from '~/utils/slugify'
 
 export type CollectionInput = {
   collectionId?: string
   name: string
+  description: string
   parentId?: string
+  selectedProductIds: string[]
 }
 
 export function useSubmitCollection() {
@@ -19,47 +16,36 @@ export function useSubmitCollection() {
 
   return useMutation({
     mutationFn: async (input: CollectionInput) => {
-      const isNew = !input.collectionId
-      let collection
-
-      if (isNew) {
-        const colInput: CreateCollectionInput = {
-          translations: [{
-            languageCode: LanguageCode.en,
-            name: input.name,
-            slug: slugify(input.name),
-            description: '',
-          }],
-          filters: [
-            { code: 'product-id-filter', arguments: [{ name: 'productId', value: '[]' }, { name: 'combineWithAnd', value: 'true' }] },
-          ],
-          isPrivate: false,
-          parentId: input.parentId,
-        }
-        const { createCollection } = await $adminGqlClient.request(CreateCollectionDocument, { input: colInput })
-        collection = createCollection
-      }
-      else {
-        const { updateCollection } = await $adminGqlClient.request(UpdateCollectionDocument, {
-          input: {
-            id: input.collectionId,
-            translations: [{
-              languageCode: 'en',
-              name: input.name,
-              slug: slugify(input.name),
-            }],
-            isPrivate: false,
-            parentId: input.parentId,
+      const colInput = {
+        id: input.collectionId,
+        translations: [{
+          languageCode: LanguageCode.en,
+          name: input.name,
+          slug: slugify(input.name),
+          description: input.description,
+        }],
+        filters: [
+          {
+            code: 'product-id-filter',
+            arguments: [
+              { name: 'productIds', value: JSON.stringify(input.selectedProductIds) },
+              { name: 'combineWithAnd', value: 'true' }],
           },
-        })
-        collection = updateCollection
+        ],
+        isPrivate: false,
+        parentId: input.parentId,
       }
+
+      const collection = !input.collectionId
+        ? (await $adminGqlClient.request(CreateCollectionDocument, { input: colInput })).createCollection
+        : (await $adminGqlClient.request(UpdateCollectionDocument, { input: colInput })).updateCollection
 
       return { collection: collection }
     },
-    onSuccess: () => {
-      console.log('invalidate queries!')
-      queryClient.invalidateQueries({ queryKey: ['bundles'] })
+    onSuccess: async () => {
+      await new Promise(resolve => setTimeout(resolve, 200))
+      queryClient.invalidateQueries({ queryKey: ['releases'] })
+      queryClient.invalidateQueries({ queryKey: ['collections'] })
     },
   })
 }

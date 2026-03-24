@@ -2,6 +2,7 @@ fragment SimpleCollectionFields on Collection {
   id
   name
   slug
+  description
   featuredAsset {
     id
     preview

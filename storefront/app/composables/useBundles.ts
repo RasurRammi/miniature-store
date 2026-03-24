@@ -8,10 +8,13 @@ export function useBundles(releases: boolean = true) {
   const { $gqlClient } = useNuxtApp()
   const type = releases ? 'releases' : 'collections'
   const query = useQuery({
-    queryKey: ['bundles', type],
+    queryKey: [type],
     queryFn: async () => {
       if (releases) {
         const { data: rootReleaseCol } = await useRootReleaseBundle()
+        if (!rootReleaseCol.value) {
+          throw new Error(' Release Collection hasnt been set up, run the npm seed script!')
+        }
         return $gqlClient.request(GetBundlesDocument, { options: { filter: { parentId: { eq: rootReleaseCol.value.id } } } })
       }
       else {

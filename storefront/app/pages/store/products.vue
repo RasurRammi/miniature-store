@@ -6,7 +6,7 @@ import type { Collection, ProductVariant } from '~/types/fragmentAliases'
 const { data: bundleData, isLoading, error } = useBundles()
 
 const searchTerm = ref('')
-const filteredBundles = computed(() => {
+const filteredReleases = computed(() => {
   if (!bundleData.value) return []
   if (!searchTerm.value) return bundleData.value.collections.items
 
@@ -89,10 +89,10 @@ const filteredBundles = computed(() => {
             </div>
 
             <BundleArea
-              v-for="bundle in filteredBundles"
-              v-else-if="filteredBundles.length"
-              :key="bundle.id"
-              :bundle="bundle"
+              v-for="release in filteredReleases"
+              v-else-if="filteredReleases.length"
+              :key="release.id"
+              :release="release"
             />
 
             <template v-else>

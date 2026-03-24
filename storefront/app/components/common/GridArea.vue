@@ -32,11 +32,17 @@ const isOpen = ref(initialState)
 
     <template #content>
       <div
+        v-if="$slots['default']"
         class="grid grid-cols-1 gap-4 @xl:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-5 @6xl:grid-cols-6 @7xl:grid-cols-7"
         :class="(!isOpen && !collapsible) ? 'p-0' : 'p-4'"
       >
         <slot />
       </div>
+
+      <slot
+        v-if="!$slots['default']"
+        name="empty"
+      />
     </template>
   </UCollapsible>
 </template>

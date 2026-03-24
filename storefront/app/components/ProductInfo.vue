@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { ProductVariant } from '~/types/product'
 import { useProductDrawerStore } from '~/stores/productDrawer'
 import { useBundles } from '~/composables/useBundles'
-import type { Asset, Collection } from '~/types/fragmentAliases'
+import type { Asset, Collection, ProductVariant } from '~/types/fragmentAliases'
 import { type ProductInput, useSubmitProduct } from '~/composables/admin/useSubmitProduct'
 import ImageCarousel from '~/components/common/ImageCarousel.vue'
 import { useAssetSelectionDrawerStore } from '~/stores/assetSelectionDrawer'

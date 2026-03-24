@@ -11,44 +11,8 @@ definePageMeta({
   layout: 'admin',
 })
 
-const { data: bundleData, isLoading, error } = useBundles()
-const { data: allAssets } = useAssets()
-
-const isCreating = ref(false)
-const { data: rootBundleCol } = useRootReleaseBundle()
-
-const bundleForm: CollectionInput = {
-  name: '',
-  parentId: '',
-}
-watch(rootBundleCol, (val) => {
-  if (val?.id) bundleForm.parentId = val.id
-}, { immediate: true })
-
-const toast = useToast()
-const submitBundle = useSubmitCollection()
-async function submitForm() {
-  submitBundle.mutate(bundleForm, {
-    onSuccess: (data) => {
-      console.log(data)
-      toast.add({
-        title: 'Bundle successfully created',
-        description: `The bundle ${bundleForm.name} was successfully created`,
-        icon: 'i-lucide-check',
-        color: 'success',
-      })
-    },
-    onError: (error) => {
-      console.log(error)
-      toast.add({
-        title: 'Creating bundle failed',
-        description: error.message,
-        color: 'error',
-      })
-    },
-  })
-  isCreating.value = false
-}
+const { data: releasesData, isLoading, error } = useBundles()
+const releasesDrawer = useReleaseDrawerStore()
 </script>
 
 <template>
@@ -63,15 +27,16 @@ async function submitForm() {
         icon="i-lucide-plus"
         label="Add Release"
         size="xl"
+        @click.stop="releasesDrawer.open()"
       />
     </div>
 
     <div class="flex-1 flex flex-col gap-4">
-      <template v-if="bundleData && bundleData.collections.items.length">
+      <template v-if="releasesData && releasesData.collections.items.length">
         <BundleArea
-          v-for="bundle in bundleData.collections.items"
-          :key="bundle.id"
-          :bundle="bundle"
+          v-for="release in releasesData.collections.items"
+          :key="release.id"
+          :release="release"
         />
       </template>
 
@@ -83,6 +48,7 @@ async function submitForm() {
       </template>
     </div>
 
+    <ReleaseSlideover />
     <ProductSlideover />
   </div>
 </template>
