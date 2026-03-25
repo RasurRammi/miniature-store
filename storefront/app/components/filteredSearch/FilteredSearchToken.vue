@@ -41,7 +41,7 @@ watch([selectedToken, editTokenStep, editTokenAtStart], ([newToken, step, atStar
     cancelEdit()
   }
   else if (newToken.uid === token.uid) {
-    console.debug('This token adressed!', step, atStart, isEditing.value)
+    console.debug('This token addressed!', step, atStart, isEditing.value)
     // Edit this item
     isEditing.value = true
     setStep(step)

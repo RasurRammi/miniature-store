@@ -54,6 +54,15 @@ const filterCategories = computed<FilterCategory[]>(() => [
       { id: '2', label: 'Animals', values: [{ id: '3', label: 'Mice' }, { id: '4', label: 'Rabbits' }] },
     ],
   },
+  {
+    id: 'text',
+    label: 'Text Search',
+    icon: 'i-lucide-text-cursor-input',
+    valueGroups: [
+      { id: '1', label: 'Dragons', values: [{ id: '1', label: 'Red Dragons' }, { id: '2', label: 'Blue Dragons' }] },
+      { id: '2', label: 'Animals', values: [{ id: '3', label: 'Mice' }, { id: '4', label: 'Rabbits' }] },
+    ],
+  },
 ])
 
 // --- Products
