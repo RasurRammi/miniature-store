@@ -65,10 +65,16 @@ export type SelectedTokenContext = {
 }
 
 // -- Test
+export type SelectableItems = {
+  values: ValueGroup[] | FilterValue[]
+  multiple: boolean
+  noneAllowed: boolean
+  anyAllowed: boolean
+}
 
 export type TokenStep<T extends { uid: string }> = {
   id: string
-  getSelectableItems: (search: string, token: Partial<T>) => { values: FilterValue[], multiple: boolean }
+  getSelectableItems: (search: string, token: Partial<T>) => SelectableItems
   onSelect: (value: FilterValue, token: Partial<T>) => Partial<T>
   // is this step complete? determines whether to advance
   isComplete?: (token: Partial<T>) => boolean
@@ -110,19 +116,29 @@ export function FacetFilterStrategy(): FilterTokenStrategy<FacetFilterToken> {
     steps: [
       {
         id: 'operator',
-        getSelectableItems: (search, token) => ({ values: defaultOperators, multiple: false }),
+        getSelectableItems: (search, token) => ({
+          values: defaultOperators,
+          multiple: false,
+          anyAllowed: false,
+          noneAllowed: false,
+        }),
         onSelect: (value, token) => token,
         isComplete: token => false,
       },
       {
         id: 'value',
-        getSelectableItems: (search, token) => ({ values: [], multiple: token.operator !== 'is' }),
+        getSelectableItems: (search, token) => ({
+          values: [],
+          multiple: token.operator !== 'is',
+          noneAllowed: token.operator === 'is',
+          anyAllowed: token.operator === 'is',
+        }),
         onSelect: (value, token) => token,
         isComplete: token => false,
       },
     ],
     onThisStrategySelected: () => console.log('tags selected!'),
     buildToken: partial => ({ uid: 'tags', operator: 'is', valueId: 'tags', valueLabel: 'Tags' }),
-    getChipLabel: (token) => 'Tag',
+    getChipLabel: token => 'Tag',
   }
 }
