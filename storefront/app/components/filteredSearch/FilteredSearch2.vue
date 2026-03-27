@@ -1,55 +1,103 @@
-<script setup lang="ts">
-import FilteredSearchMenu from './FilteredSearchMenu.vue'
-import FilteredSearchToken from './FilteredSearchToken.vue'
-import {
-  type FilterCategory,
-  type FilterOperator,
-  type FilterToken, type FilterTokenStrategy,
-  type FilterValue, getNextStep, getPriorStep,
-  type MenuStep, type SearchMenuContext, type SelectedTokenContext, type TokenStep,
+<script setup lang="ts" generic="I">
+import type {
+  FilteredSearchContext,
+  FilterTokenBase,
+  FilterTokenStrategy,
+  FilterValue,
+  SelectableItems,
+  TokenData,
+  TokenStep,
 } from '~/types/filteredSearch'
 
 const { filterStrategies, placeholder = 'Search or filter...' } = defineProps<{
-  filterStrategies: FilterTokenStrategy<{ uid: string }>[]
+  filterStrategies: FilterTokenStrategy<I, any>[]
   placeholder?: string
 }>()
 
-const tokens = defineModel<FilterToken[]>({ default: () => [] })
+const tokens = defineModel<TokenData<any>[]>({ default: () => [] })
 
 // ---- Menu state machine ----
 const searchValue = ref('')
 const isMenuOpen = ref(false)
-const menuStep = ref<TokenStep<{ uid: string }>>()
-const activeStrategy = ref<FilterTokenStrategy<{ uid: string }> | null>(null)
-const searchInputRef = ref<HTMLInputElement | null>(null)
-const setSearch = (val: string) => searchValue.value = val
-const setStep = (step: TokenStep<{ uid: string }>) => menuStep.value = step
-const setInputRef = (ref: HTMLInputElement | null) => searchInputRef.value = ref
-const setActiveStrategy = (catId: string | null) => activeStrategy.value = filterStrategies.find(fS => fS.id === catId) ?? null
-const openMenu = () => isMenuOpen.value = true
-const closeMenu = () => isMenuOpen.value = false
-
-const selectedToken = ref<FilterToken | null>(null)
-const editTokenStep = ref<MenuStep | null>(null)
+const menuStep = ref<TokenStep<FilterTokenBase, unknown>>()
+const activeStrategy = ref<FilterTokenStrategy<I, any>>()
+const selectedToken = ref<Partial<FilterTokenBase> | TokenData<any>>()
 const editTokenAtStart = ref<boolean>(false)
-function setSelectedToken(token: FilterToken | null, step: MenuStep = 'category', atStart: boolean = false) {
-  selectedToken.value = token
-  editTokenStep.value = step
-  editTokenAtStart.value = atStart
+const searchInputRef = ref<HTMLInputElement | null>(null)
+// setters
+const setContext = (
+  stratId: string,
+  step?: TokenStep<FilterTokenBase, unknown>,
+  activeToken?: Partial<FilterTokenBase> | TokenData<any>,
+  sInputRef?: HTMLInputElement,
+  eTokenAtStart: boolean = false,
+) => {
+  activeStrategy.value = filterStrategies.find(fS => fS.id === stratId)
+  if (!activeStrategy.value) throw Error(`Selected Strategy could not be found: ${stratId}`)
+  selectedToken.value = activeToken ? activeToken : activeStrategy.value.initToken()
+  menuStep.value = step ? step : activeStrategy.value.steps[0]
+  searchInputRef.value = sInputRef ? sInputRef : inputRef.value
+  editTokenAtStart.value = eTokenAtStart
+  isMenuOpen.value = true
 }
-provide('selectedToken', { selTokenContext: [selectedToken, editTokenStep, editTokenAtStart], setSelectedToken })
+
+const clearContext = () => {
+  isMenuOpen.value = false
+  menuStep.value = undefined
+  activeStrategy.value = undefined
+  selectedToken.value = undefined
+  inputValue.value = ''
+  searchInputRef.value = inputRef.value
+}
+
+watch(searchInputRef, () => searchValue.value = searchInputRef.value?.value ?? '')
+
+const selectableItems = computed<SelectableItems<any> | null>(() => {
+  if (!activeStrategy.value) {
+    return {
+      values: filterStrategies.map(fS => ({ id: fS.id, label: fS.label })),
+      multiple: false,
+      noneAllowed: false,
+      anyAllowed: false,
+    }
+  }
+  if (!menuStep.value) return null
+  return menuStep.value.getSelectableItems(searchValue.value, selectedToken.value ?? {})
+})
+
+function menuItemSelected(fValue: FilterValue<string>) {
+  if (!activeStrategy.value) {
+    setContext(fValue.id)
+    return
+  }
+  if (!menuStep.value) throw Error(`Active Strategy, but no steps selected: ${activeStrategy.value}`)
+  if (!selectedToken.value) throw Error(`Step is active, but no token was selected: ${menuStep.value}`)
+  selectedToken.value = menuStep.value.onSelect(fValue, selectedToken.value)
+  const stepIdx = activeStrategy.value.steps.findIndex(s => s.id === menuStep.value!.id)
+  if (stepIdx === -1) {
+    console.error(activeStrategy.value, menuStep.value)
+    throw Error(`Current Step couldn't be found in the active Strategy: ${activeStrategy.value}, ${menuStep.value}`)
+  }
+  if (stepIdx < activeStrategy.value.steps.length - 1) {
+    menuStep.value = activeStrategy.value.steps[stepIdx + 1]
+  }
+  else {
+    const completeToken = activeStrategy.value.buildToken(selectedToken.value!)
+    tokens.value = [...tokens.value, { token: completeToken, stratId: activeStrategy.value.id }]
+    clearContext()
+  }
+}
 
 // ----- Input & keyboard -----
 const inputRef = ref<HTMLInputElement | null>(null)
 const inputValue = ref('')
 
 function focusInput() {
-  setSelectedToken(null)
+  clearContext()
   nextTick(() => {
-    setSearch(inputValue.value)
+    searchInputRef.value = inputRef.value
     inputRef.value?.focus()
-    setInputRef(inputRef.value)
-    openMenu()
+    isMenuOpen.value = true
   })
 }
 
@@ -69,7 +117,7 @@ function onBackspace(e) {
   if (inputValue.value) return
 
   e.preventDefault()
-  revertStep()
+  // revertStep()
 }
 
 function onArrowLeft(e: KeyboardEvent) {
@@ -107,7 +155,7 @@ function editNextToken() {
     }
     else {
       focusInput()
-      setStep('category')
+      setStep()
     }
   }
 }
@@ -123,15 +171,13 @@ function onEscape() {
 }
 
 // ----- Token management -----
-function removeToken(token: FilterToken) {
-  tokens.value = tokens.value.filter(t => t.uid !== token.uid)
+function removeToken(tokenData: TokenData<any>) {
+  tokens.value = tokens.value.filter(t => t.token.uid !== tokenData.token.uid)
 }
 
 function clearAll() {
   tokens.value = []
-  setStep('category')
-  setSelectedToken(null)
-  closeMenu()
+  clearContext()
 }
 
 // ----- Dropdown and defocus management -----
@@ -145,16 +191,7 @@ onUnmounted(() => {
 })
 function onClickOutside(e: MouseEvent) {
   if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-    closeMenu()
-    setSelectedToken(null)
-    if (menuStep.value !== 'category') {
-      setStep('category')
-      inputValue.value = ''
-    }
-    activeCategory.value = null
-    if (tokens.value.some(t => !t.isComplete)) {
-      tokens.value = tokens.value.filter(t => t.isComplete)
-    }
+    clearContext()
   }
 }
 
@@ -172,21 +209,19 @@ watch([searchInputRef, tokens, isMenuOpen], (vars) => {
   if (isMenuOpen.value) nextTick(updateDropdownPosition)
 })
 
-provide('searchMenuContext', {
+provide('searchMenuContext2', {
   search: searchValue,
-  setSearch: setSearch,
   step: menuStep,
-  setStep: setStep,
-  activeCategory: activeCategory,
-  setActiveCategory: setActiveCategory,
+  activeStrategy: activeStrategy,
+  activeToken: selectedToken,
   isOpen: isMenuOpen,
-  openMenu: openMenu,
-  closeMenu: closeMenu,
   searchInputRef: searchInputRef,
-  setInputRef: setInputRef,
+  selectableItems: selectableItems,
   keyEvent: keyEvent,
   emitKey: onKeydown,
-} as SearchMenuContext)
+  setContext: setContext,
+  clearContext: clearContext,
+} as FilteredSearchContext<I>)
 </script>
 
 <template>
@@ -209,12 +244,13 @@ provide('searchMenuContext', {
 
       <div class="flex flex-row flex-start flex-1 flex-wrap items-center gap-1">
         <!-- Active tokens -->
-        <FilteredSearchToken
-          v-for="token in tokens"
-          :key="token.uid"
-          :token="token"
-          :selected="selectedToken?.uid === token.uid"
-          @remove="removeToken(token)"
+        <FilteredSearchToken2
+          v-for="tokenData in tokens"
+          :key="tokenData.token.uid"
+          :token-data="tokenData"
+          :strategies="filterStrategies"
+          :selected="selectedToken?.uid === tokenData.token.uid"
+          @remove="removeToken(tokenData)"
           @before-start-reached="editPriorToken"
           @after-end-reached="editNextToken"
         />
@@ -260,11 +296,8 @@ provide('searchMenuContext', {
         class="absolute top-full left-0 z-50 mt-1 rounded-lg border border-default bg-default shadow-lg overflow-hidden"
         :style="{ left: `${dropdownLeft}px` }"
       >
-        <FilteredSearchMenu
-          :categories="categories"
-          @select-category="onSelectCategory"
-          @select-operator="onSelectOperator"
-          @select-value="onSelectValue"
+        <FilteredSearchMenu2
+          @select-item="menuItemSelected"
         />
       </div>
     </Transition>

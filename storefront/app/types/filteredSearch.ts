@@ -1,9 +1,6 @@
-export type FilterOperator = 'is' | 'is one of' | 'is not one of'
+import type { Product } from '~/types/fragmentAliases'
 
-export type FilterValue = {
-  id: string
-  label: string
-}
+export type FilterOperator = 'is' | 'is one of' | 'is not one of'
 
 export type CategoryId = 'tags' | 'releases' | 'collections' | 'text'
 
@@ -12,12 +9,6 @@ export type FilterCategory = {
   label: string
   icon?: string
   valueGroups: ValueGroup[]
-}
-
-export type ValueGroup = {
-  id: string
-  label: string
-  values: FilterValue[]
 }
 
 export type FilterToken = {
@@ -64,33 +55,58 @@ export type SelectedTokenContext = {
   setSelectedToken: (token: FilterToken | null, step?: MenuStep, atStart?: boolean) => void
 }
 
-// -- Test
-export type SelectableItems = {
-  values: ValueGroup[] | FilterValue[]
+// ------ Test -----
+
+// --- Base Structure ---
+// I stands for "Item": The type of the object to be filtered by the token
+// T stands for "Type": The type of the filtering object
+// V stands for "Value" and defines the types a FilterValue can take (e.g. special operators or any string)
+
+export type FilterTokenBase = {
+  uid: string
+}
+export type TokenData<T extends FilterTokenBase> = {
+  token: T
+  stratId: string
+}
+
+export type FilterValue<T = string> = {
+  id: T
+  label: string
+}
+
+export type ValueGroup<T = string> = {
+  id: string
+  label: string
+  values: FilterValue<T>[]
+}
+
+export type SelectableItems<T> = {
+  values: ValueGroup<T>[] | FilterValue<T>[]
   multiple: boolean
   noneAllowed: boolean
   anyAllowed: boolean
 }
 
-export type TokenStep<T extends { uid: string }> = {
+export type TokenStep<T extends FilterTokenBase, V> = {
   id: string
-  getSelectableItems: (search: string, token: Partial<T>) => SelectableItems
-  onSelect: (value: FilterValue, token: Partial<T>) => Partial<T>
-  // is this step complete? determines whether to advance
-  isComplete?: (token: Partial<T>) => boolean
+  getSelectableItems: (search: string, token: Partial<T>) => SelectableItems<V>
+  onSelect: (value: FilterValue<V>, token: Partial<T> | TokenData<T>) => Partial<T> | TokenData<T>
 }
 
-export type FilterTokenStrategy<T extends { uid: string }> = {
+export type FilterTokenStrategy<I, T extends FilterTokenBase> = {
   id: string
   label: string
   icon?: string
-  steps: TokenStep<T>[]
-  onThisStrategySelected: () => void
+  steps: TokenStep<T, any>[]
+  initToken: () => Partial<T>
   buildToken: (partial: Partial<T>) => T
-  getChipLabel: (token: T) => string
+  filterFn: (item: I, token: T) => boolean
 }
 
-const defaultOperators = [
+// --- Helpers
+
+const defaultOperators: { id: FilterOperator, label: string }[] = [
   {
     id: 'is',
     label: 'is',
@@ -102,13 +118,42 @@ const defaultOperators = [
     label: 'is one of',
   },
 ]
-type FacetFilterToken = {
-  uid: string
+
+export type FilteredSearchContext<I> = {
+  search: Ref<string>
+  step: Ref<TokenStep<FilterTokenBase, unknown> | null>
+  activeStrategy: Ref<FilterTokenStrategy<I, FilterTokenBase> | null>
+  activeToken: Ref<Partial<FilterTokenBase> | TokenData<any>>
+  isOpen: Ref<boolean>
+  searchInputRef: Ref<HTMLInputElement | null>
+  selectableItems: Ref<SelectableItems<unknown> | null>
+
+  keyEvent: Ref<KeyboardEvent | null>
+  emitKey: (e: KeyboardEvent) => void
+
+  setContext: (
+    stratId: string,
+    step?: TokenStep<FilterTokenBase, unknown>,
+    activeToken?: Partial<FilterTokenBase> | TokenData<any>,
+    searchInputRef?: HTMLInputElement,
+    editTokenAtStart?: boolean,
+  ) => void
+  clearContext: () => void
+}
+
+// --- Explicit Implementations
+
+export type FacetFilterToken = FilterTokenBase & {
   operator: FilterOperator
   valueId: string | string[]
   valueLabel: string | string[]
 }
-export function FacetFilterStrategy(): FilterTokenStrategy<FacetFilterToken> {
+
+function filterProductByFacetToken(product: Product, token: FacetFilterToken): boolean {
+  return true
+}
+
+export function getFacetFilterStrategy(): FilterTokenStrategy<Product, FacetFilterToken> {
   return {
     id: 'tags',
     label: 'Tag',
@@ -122,8 +167,7 @@ export function FacetFilterStrategy(): FilterTokenStrategy<FacetFilterToken> {
           anyAllowed: false,
           noneAllowed: false,
         }),
-        onSelect: (value, token) => token,
-        isComplete: token => false,
+        onSelect: (value, token) => ({ ...token, operator: value.id }),
       },
       {
         id: 'value',
@@ -133,12 +177,11 @@ export function FacetFilterStrategy(): FilterTokenStrategy<FacetFilterToken> {
           noneAllowed: token.operator === 'is',
           anyAllowed: token.operator === 'is',
         }),
-        onSelect: (value, token) => token,
-        isComplete: token => false,
+        onSelect: (value, token) => ({ ...token, valueId: value.id, valueLabel: value.label }),
       },
     ],
-    onThisStrategySelected: () => console.log('tags selected!'),
-    buildToken: partial => ({ uid: 'tags', operator: 'is', valueId: 'tags', valueLabel: 'Tags' }),
-    getChipLabel: token => 'Tag',
+    initToken: () => ({ uid: '1' }),
+    buildToken: partial => ({ ...partial } as FacetFilterToken),
+    filterFn: filterProductByFacetToken,
   }
 }

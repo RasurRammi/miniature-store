@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import FilteredSearch from '~/components/filteredSearch/FilteredSearch.vue'
-import type { FilterCategory, FilterToken, ValueGroup } from '~/types/filteredSearch'
+import {
+  type FilterCategory,
+  type FilterToken,
+  type FilterTokens,
+  getFacetFilterStrategy,
+  type ValueGroup,
+} from '~/types/filteredSearch'
 import { useFacets } from '~/composables/admin/useFacets'
 import ProductsSelection from '~/components/tags/ProductsSelection.vue'
 import Facets from '~/components/tags/Facets.vue'
 import { filterProducts } from '~/composables/admin/useFilterProducts'
 import type { Product } from '~/types/fragmentAliases'
+import FilteredSearch2 from '~/components/filteredSearch/FilteredSearch2.vue'
 
 // TODO remove for production
 definePageMeta({
@@ -14,6 +21,7 @@ definePageMeta({
 
 // --- Filter ---
 const activeSearchTokens = ref<FilterToken[]>([])
+const activeSearchTokens2 = ref<{ token: FilterTokens<Product, any>, stratId: string }[]>([])
 const completedTokens = computed(() => activeSearchTokens.value.filter(t => t.isComplete))
 
 const { data: facetsData } = useFacets()
@@ -94,6 +102,11 @@ function updateSelectedProducts(productIds: string[]) {
         <FilteredSearch
           v-model="activeSearchTokens"
           :categories="filterCategories"
+        />
+
+        <FilteredSearch2
+          v-model="activeSearchTokens2"
+          :filter-strategies="[getFacetFilterStrategy()]"
         />
 
         <!-- Product Selection -->
