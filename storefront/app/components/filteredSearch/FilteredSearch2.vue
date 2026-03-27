@@ -1,12 +1,14 @@
 <script setup lang="ts" generic="I">
-import type {
-  FilteredSearchContext,
-  FilterTokenBase,
-  FilterTokenStrategy,
-  FilterValue,
-  SelectableItems,
-  TokenData,
-  TokenStep,
+import {
+  type AnyToken,
+  type FilteredSearchContext,
+  type FilterTokenBase,
+  type FilterTokenStrategy,
+  type FilterValue,
+  isTokenData,
+  type SelectableItems,
+  type TokenData,
+  type TokenStep,
 } from '~/types/filteredSearch'
 
 const { filterStrategies, placeholder = 'Search or filter...' } = defineProps<{
@@ -21,14 +23,14 @@ const searchValue = ref('')
 const isMenuOpen = ref(false)
 const menuStep = ref<TokenStep<FilterTokenBase, unknown>>()
 const activeStrategy = ref<FilterTokenStrategy<I, any>>()
-const selectedToken = ref<Partial<FilterTokenBase> | TokenData<any>>()
+const selectedToken = ref<AnyToken<any>>()
 const editTokenAtStart = ref<boolean>(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 // setters
 const setContext = (
   stratId: string,
   step?: TokenStep<FilterTokenBase, unknown>,
-  activeToken?: Partial<FilterTokenBase> | TokenData<any>,
+  activeToken?: AnyToken<any>,
   sInputRef?: HTMLInputElement,
   eTokenAtStart: boolean = false,
 ) => {
@@ -37,6 +39,7 @@ const setContext = (
   selectedToken.value = activeToken ? activeToken : activeStrategy.value.initToken()
   menuStep.value = step ? step : activeStrategy.value.steps[0]
   searchInputRef.value = sInputRef ? sInputRef : inputRef.value
+  console.log('sinput', sInputRef, inputRef.value)
   editTokenAtStart.value = eTokenAtStart
   isMenuOpen.value = true
 }
@@ -62,7 +65,8 @@ const selectableItems = computed<SelectableItems<any> | null>(() => {
     }
   }
   if (!menuStep.value) return null
-  return menuStep.value.getSelectableItems(searchValue.value, selectedToken.value ?? {})
+  const token = isTokenData(selectedToken.value) ? selectedToken.value.token : selectedToken.value
+  return menuStep.value.getSelectableItems(searchValue.value, token)
 })
 
 function menuItemSelected(fValue: FilterValue<string>) {
@@ -72,18 +76,30 @@ function menuItemSelected(fValue: FilterValue<string>) {
   }
   if (!menuStep.value) throw Error(`Active Strategy, but no steps selected: ${activeStrategy.value}`)
   if (!selectedToken.value) throw Error(`Step is active, but no token was selected: ${menuStep.value}`)
-  selectedToken.value = menuStep.value.onSelect(fValue, selectedToken.value)
+
+  if (isTokenData(selectedToken.value)) {
+    selectedToken.value.token = menuStep.value.onSelect(fValue, selectedToken.value.token)
+  }
+  else {
+    selectedToken.value = menuStep.value.onSelect(fValue, selectedToken.value)
+  }
   const stepIdx = activeStrategy.value.steps.findIndex(s => s.id === menuStep.value!.id)
   if (stepIdx === -1) {
-    console.error(activeStrategy.value, menuStep.value)
     throw Error(`Current Step couldn't be found in the active Strategy: ${activeStrategy.value}, ${menuStep.value}`)
   }
   if (stepIdx < activeStrategy.value.steps.length - 1) {
     menuStep.value = activeStrategy.value.steps[stepIdx + 1]
   }
   else {
-    const completeToken = activeStrategy.value.buildToken(selectedToken.value!)
-    tokens.value = [...tokens.value, { token: completeToken, stratId: activeStrategy.value.id }]
+    if (!isTokenData(selectedToken.value)) {
+      const completeToken = activeStrategy.value.buildToken(selectedToken.value!)
+      tokens.value = [...tokens.value, { token: completeToken, stratId: activeStrategy.value.id }]
+    }
+    else {
+      const idx = tokens.value.findIndex(t => t.token.uid === selectedToken.value?.token.uid)
+      console.log(idx)
+      if (idx !== -1) tokens.value[idx] = selectedToken.value
+    }
     clearContext()
   }
 }
@@ -199,22 +215,24 @@ function onClickOutside(e: MouseEvent) {
 const dropdownLeft = ref(0)
 
 function updateDropdownPosition() {
+  console.log('updatepos', searchInputRef.value)
   if (!searchInputRef.value || !containerRef.value) return
   // TODO dropDownLeft isnt getting calculated correctly when container has a scrollbar
   searchInputRef.value.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   dropdownLeft.value = searchInputRef.value.offsetLeft - containerRef.value.scrollLeft
 }
 
-watch([searchInputRef, tokens, isMenuOpen], (vars) => {
-  if (isMenuOpen.value) nextTick(updateDropdownPosition)
+watch(searchInputRef, (vars) => {
+  nextTick(updateDropdownPosition)
 })
 
-provide('searchMenuContext2', {
+provide('filteredSearchContext', {
   search: searchValue,
   step: menuStep,
   activeStrategy: activeStrategy,
   activeToken: selectedToken,
   isOpen: isMenuOpen,
+  editTokenAtStart: editTokenAtStart,
   searchInputRef: searchInputRef,
   selectableItems: selectableItems,
   keyEvent: keyEvent,

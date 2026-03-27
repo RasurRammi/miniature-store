@@ -65,33 +65,41 @@ export type SelectedTokenContext = {
 export type FilterTokenBase = {
   uid: string
 }
+
+export type AnyToken<T extends FilterTokenBase> = Partial<T> | TokenData<T>
+
 export type TokenData<T extends FilterTokenBase> = {
   token: T
   stratId: string
 }
 
-export type FilterValue<T = string> = {
-  id: T
+export function isTokenData(data?: AnyToken<any>): data is TokenData<any> {
+  return !!data && 'token' in data
+}
+
+export type FilterValue<V extends string = string> = {
+  id: V
   label: string
 }
 
-export type ValueGroup<T = string> = {
+export type ValueGroup<V = string> = {
   id: string
   label: string
-  values: FilterValue<T>[]
+  values: FilterValue<V>[]
 }
 
-export type SelectableItems<T> = {
-  values: ValueGroup<T>[] | FilterValue<T>[]
+export type SelectableItems<V extends string = string> = {
+  values: ValueGroup<V>[] | FilterValue<V>[]
   multiple: boolean
   noneAllowed: boolean
   anyAllowed: boolean
 }
 
-export type TokenStep<T extends FilterTokenBase, V> = {
+export type TokenStep<T extends FilterTokenBase, V extends string = string> = {
   id: string
   getSelectableItems: (search: string, token: Partial<T>) => SelectableItems<V>
-  onSelect: (value: FilterValue<V>, token: Partial<T> | TokenData<T>) => Partial<T> | TokenData<T>
+  onSelect: (value: FilterValue<V>, token: Partial<T>) => Partial<T>
+  getTokenLabel: (token: TokenData<T>) => string
 }
 
 export type FilterTokenStrategy<I, T extends FilterTokenBase> = {
@@ -121,20 +129,21 @@ const defaultOperators: { id: FilterOperator, label: string }[] = [
 
 export type FilteredSearchContext<I> = {
   search: Ref<string>
-  step: Ref<TokenStep<FilterTokenBase, unknown> | null>
+  step: Ref<TokenStep<FilterTokenBase> | null>
   activeStrategy: Ref<FilterTokenStrategy<I, FilterTokenBase> | null>
-  activeToken: Ref<Partial<FilterTokenBase> | TokenData<any>>
+  activeToken: Ref<Partial<FilterTokenBase> | TokenData<never>>
   isOpen: Ref<boolean>
+  editTokenAtStart: Ref<boolean>
   searchInputRef: Ref<HTMLInputElement | null>
-  selectableItems: Ref<SelectableItems<unknown> | null>
+  selectableItems: Ref<SelectableItems | null>
 
   keyEvent: Ref<KeyboardEvent | null>
   emitKey: (e: KeyboardEvent) => void
 
   setContext: (
     stratId: string,
-    step?: TokenStep<FilterTokenBase, unknown>,
-    activeToken?: Partial<FilterTokenBase> | TokenData<any>,
+    step?: TokenStep<FilterTokenBase>,
+    activeToken?: AnyToken<any>,
     searchInputRef?: HTMLInputElement,
     editTokenAtStart?: boolean,
   ) => void
@@ -161,13 +170,14 @@ export function getFacetFilterStrategy(): FilterTokenStrategy<Product, FacetFilt
     steps: [
       {
         id: 'operator',
-        getSelectableItems: (search, token) => ({
+        getSelectableItems: () => ({
           values: defaultOperators,
           multiple: false,
           anyAllowed: false,
           noneAllowed: false,
         }),
         onSelect: (value, token) => ({ ...token, operator: value.id }),
+        getTokenLabel: tokenData => tokenData.token.operator,
       },
       {
         id: 'value',
@@ -176,8 +186,10 @@ export function getFacetFilterStrategy(): FilterTokenStrategy<Product, FacetFilt
           multiple: token.operator !== 'is',
           noneAllowed: token.operator === 'is',
           anyAllowed: token.operator === 'is',
-        }),
+        }
+        ),
         onSelect: (value, token) => ({ ...token, valueId: value.id, valueLabel: value.label }),
+        getTokenLabel: tokenData => tokenData.token.valueLabel as string, // TODO could be multiple
       },
     ],
     initToken: () => ({ uid: '1' }),

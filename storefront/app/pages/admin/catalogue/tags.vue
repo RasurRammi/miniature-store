@@ -99,11 +99,6 @@ function updateSelectedProducts(productIds: string[]) {
       </h2>
 
       <div class="flex flex-col gap-4">
-        <FilteredSearch
-          v-model="activeSearchTokens"
-          :categories="filterCategories"
-        />
-
         <FilteredSearch2
           v-model="activeSearchTokens2"
           :filter-strategies="[getFacetFilterStrategy()]"

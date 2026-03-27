@@ -1,8 +1,8 @@
-<script setup lang="ts">
-import type { FilterValue, SearchMenuContext2, ValueGroup } from '~/types/filteredSearch'
+<script setup lang="ts" generic="I">
+import type { FilteredSearchContext, FilterValue, ValueGroup } from '~/types/filteredSearch'
 import FilterMenuButton from '~/components/filteredSearch/FilterMenuButton.vue'
 
-const { selectableItems, search, step, keyEvent } = inject<SearchMenuContext2>('searchMenuContext2')!
+const { selectableItems, search, step, keyEvent } = inject<FilteredSearchContext<I>>('filteredSearchContext')!
 
 const emit = defineEmits<{
   selectItem: [FilterValue]
