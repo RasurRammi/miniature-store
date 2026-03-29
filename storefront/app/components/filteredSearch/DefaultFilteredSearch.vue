@@ -7,9 +7,10 @@ import ProductsSelection from '~/components/tags/ProductsSelection.vue'
 import { filterProducts } from '~/composables/admin/useFilterProducts'
 
 const selectedProductIds = defineModel<string[]>({ required: true })
-const { startingTokens = [], allProducts } = defineProps<{
+const { startingTokens = [], allProducts, selectionDisabled } = defineProps<{
   startingTokens?: TokenData<any>[]
   allProducts: Product[]
+  selectionDisabled: boolean
 }>()
 const activeSearchTokens = ref<TokenData<any>[]>(startingTokens)
 
@@ -76,6 +77,7 @@ function updateSelectedProducts(productIds: string[]) {
       <ProductsSelection
         v-model="selectedProductIds"
         :products="filteredProducts"
+        :disabled="selectionDisabled"
         @products-selected="updateSelectedProducts"
       />
     </div>

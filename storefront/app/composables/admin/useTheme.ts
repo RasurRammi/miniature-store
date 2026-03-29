@@ -1,7 +1,7 @@
 export type Theme = 'default' | 'nomnom' | 'neko'
 export type ThemeData = { logoSrc: string, logoTitle: string }
 const themeMap = new Map<Theme, ThemeData>([
-  ['default', { logoSrc: '/favicon.png', logoTitle: 'Miniature Store Base' }],
+  ['default', { logoSrc: '/favicon.ico', logoTitle: 'Miniature Store Base' }],
   ['nomnom', { logoSrc: '/nomnom-logo.png', logoTitle: 'NomNom Miniatures' }],
   ['neko', { logoSrc: '/neko-logo.png', logoTitle: 'Neko Figurines' }],
 ])

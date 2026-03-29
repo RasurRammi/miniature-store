@@ -9,6 +9,7 @@ definePageMeta({
   layout: 'admin',
 })
 
+const isEditingFacets = ref<boolean>(false)
 // --- Products ---
 const { data: productsData } = useProducts()
 const allProducts = ref<Product[]>([])
@@ -122,7 +123,7 @@ provide('productSelection', {
   <div class="flex flex-col lg:flex-row gap-2">
     <!-- Facets -->
     <div class="w-full lg:w-1/3 p-2 rounded-lg bg-elevated/25">
-      <Facets />
+      <Facets v-model="isEditingFacets" />
     </div>
 
     <!-- Products -->
@@ -135,6 +136,7 @@ provide('productSelection', {
         v-model="selectedProductIds"
         :all-products="allProducts"
         :starting-tokens="[]"
+        :selection-disabled="isEditingFacets"
       />
     </div>
 

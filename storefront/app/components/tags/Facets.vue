@@ -11,7 +11,7 @@ const dirtyStateStore = useDirtyStateStore()
 const { anySelected } = inject<ProductSelectionContext>('productSelection')!
 const { data: facetsData } = useFacets()
 const facetsCopy = ref<Facet[]>([])
-const isEditingFacets = ref<boolean>(false)
+const isEditingFacets = defineModel<boolean>({ default: () => false })
 
 watch(
   () => facetsData.value?.facets.items,
@@ -111,6 +111,7 @@ function resetChanges() {
 
     <FloatingBar
       :total-changes="dirtyStateStore.totalChanges"
+      :change-text="'Tag/-groups changed'"
       @save="submitChanges()"
       @discard="resetChanges()"
     />
