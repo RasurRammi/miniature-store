@@ -3,7 +3,7 @@ import {
   AssignProductToCollectionDocument,
   CreateProductDocument,
   CreateProductVariantDocument,
-  GetCollectionFiltersDocument,
+  GetCollectionFiltersDocument, LanguageCode,
   UpdateProductDocument,
   UpdateProductVariantDocument,
 } from '~/gql/admin/graphql'
@@ -16,6 +16,7 @@ export type ProductInput = {
   name: string
   description: string
   price: number
+  releaseId?: string
   collectionIds: string[]
   assetIds: string[]
 }
@@ -32,7 +33,7 @@ export function useSubmitProduct() {
       const inputProduct = {
         id: input.productId,
         translations: [{
-          languageCode: 'en',
+          languageCode: LanguageCode.en,
           name: input.name,
           ...(isNew && { slug: slugify(input.name) }),
           description: input.description,
@@ -44,7 +45,7 @@ export function useSubmitProduct() {
         ...(input.variantId && { id: input.variantId }),
         price: input.price,
         translations: [{
-          languageCode: 'en',
+          languageCode: LanguageCode.en,
           name: input.name,
         }],
         ...(isNew && { sku: slugify(input.name) }),
@@ -85,7 +86,7 @@ export function useSubmitProduct() {
         })
 
         await Promise.all(
-          collections.items.map(async (collection: Collection) => {
+          collections.items.map(async (collection) => {
             const existingFilter = collection.filters.find(f => f.code === 'product-id-filter')
             const existingIds: string[] = existingFilter
               ? JSON.parse(existingFilter.args.find(a => a.name === 'productIds')?.value ?? '[]')

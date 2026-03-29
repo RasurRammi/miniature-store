@@ -8,11 +8,4 @@ const nomnomColors = {
   neutral: 'nomnom-background',
 }
 
-export default defineAppConfig({
-  ui: {
-    colors: {
-      ...defaultColors,
-      // ...nomnomColors,
-    },
-  },
-})
+export default defineAppConfig({})

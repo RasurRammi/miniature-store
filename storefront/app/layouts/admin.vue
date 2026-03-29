@@ -1,9 +1,20 @@
 <script setup lang="ts">
-const headerLogo = '/nomnom-logo.png'
-const logoAlt = 'NomNom Miniatures'
+import { type Theme, useTheme } from '~/composables/admin/useTheme'
+
+const { theme, themeData, setTheme } = useTheme()
+useHead({
+  meta: [
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+  ],
+  link: [
+    { rel: 'icon', href: themeData.value.logoSrc },
+  ],
+  htmlAttrs: {
+    lang: 'en',
+  },
+})
 
 const route = useRoute()
-
 const navItems = [
   [
     {
@@ -86,6 +97,25 @@ const navItems = [
     },
   ],
 ]
+
+const themes: { label: string, theme: Theme }[] = [
+  { label: 'Default', theme: 'default' },
+  { label: 'NomNom', theme: 'nomnom' },
+  { label: 'Neko', theme: 'neko' },
+]
+const footerItems = computed(() => themes
+  .map(t => ({
+    label: t.label,
+    chip: 'primary',
+    slot: 'chip',
+    checked: theme.value === t.theme,
+    type: 'checkbox',
+    onSelect: (e) => {
+      e.preventDefault()
+
+      setTheme(t.theme)
+    },
+  })))
 </script>
 
 <template>
@@ -94,11 +124,11 @@ const navItems = [
       <template #header="{ collapsed }">
         <div class="flex flex-row items-center gap-2">
           <img
-            :src="headerLogo"
-            :alt="logoAlt"
+            :src="themeData.logoSrc"
+            :alt="themeData.logoTitle"
             :class="{ 'size-7.75': !collapsed }"
           >
-          <span v-if="!collapsed">Mini Store Base</span>
+          <span v-if="!collapsed">{{ themeData.logoTitle }}</span>
         </div>
       </template>
 
@@ -108,6 +138,23 @@ const navItems = [
           :items="navItems"
           orientation="vertical"
         />
+      </template>
+      <template #footer="{ collapsed }">
+        <UDropdownMenu
+          :items="footerItems"
+          :content="{ align: 'center', collisionPadding: 12 }"
+          :ui="{ content: collapsed ? 'w-48' : 'w-(--reka-dropdown-menu-trigger-width)' }"
+        >
+          <UButton
+            block
+            leading-icon="i-lucide-palette"
+            label="Theme Selection"
+            color="neutral"
+            variant="ghost"
+            :square="collapsed"
+            class="justify-start data-[state=open]:bg-elevated"
+          />
+        </UDropdownMenu>
       </template>
     </UDashboardSidebar>
 

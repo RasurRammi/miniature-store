@@ -1,12 +1,14 @@
 <script setup lang="ts">
-const headerLogo = '/nomnom-logo.png'
-const logoAlt = 'NomNom Miniatures'
+import { useTheme } from '~/composables/admin/useTheme'
+
+const { themeData } = useTheme()
+
 useHead({
   meta: [
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
   ],
   link: [
-    { rel: 'icon', href: headerLogo },
+    { rel: 'icon', href: themeData.value.logoSrc },
   ],
   htmlAttrs: {
     lang: 'en',
@@ -27,8 +29,8 @@ useSeoMeta({
 <template>
   <div class="flex flex-col min-h-screen">
     <HeaderBar
-      :header-logo="headerLogo"
-      :logo-alt="logoAlt"
+      :header-logo="themeData.logoSrc"
+      :logo-alt="themeData.logoTitle"
     />
 
     <UMain>
@@ -37,7 +39,7 @@ useSeoMeta({
 
     <USeparator
       :avatar="{
-        src: headerLogo,
+        src: themeData.logoSrc,
         loading: 'lazy',
       }"
     />

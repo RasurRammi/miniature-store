@@ -2,14 +2,12 @@
 import SelectionGrid from '~/components/common/SelectionGrid.vue'
 import type { Product } from '~/types/fragmentAliases'
 
-const selectedProducts = defineModel<Product[]>()
+const selectedIds = defineModel<string[]>()
 const { products } = defineProps<{ products: Product[] }>()
 
 const emit = defineEmits<{
   productsSelected: [string[]]
 }>()
-
-const selectedIds = computed(() => selectedProducts.value?.map(p => p.id) ?? [])
 </script>
 
 <template>

@@ -1,80 +1,21 @@
-import type { Product } from '~/types/fragmentAliases'
+import type { Ref } from 'vue'
 
-export type FilterOperator = 'is' | 'is one of' | 'is not one of'
-
-export type CategoryId = 'tags' | 'releases' | 'collections' | 'text'
-
-export type FilterCategory = {
-  id: CategoryId
-  label: string
-  icon?: string
-  valueGroups: ValueGroup[]
-}
-
-export type FilterToken = {
-  uid: string
-  categoryId: CategoryId
-  categoryLabel: string
-  categoryIcon?: string
-  operator?: FilterOperator
-  valueId?: string | string[]
-  valueLabel?: string | string[]
-  isComplete: boolean
-}
-
-export type MenuStep = 'category' | 'operator' | 'value'
-const stepOrder: MenuStep[] = ['category', 'operator', 'value']
-
-export function getNextStep(currStep: MenuStep): MenuStep {
-  const currIdx = stepOrder.indexOf(currStep)
-  return stepOrder[currIdx < stepOrder.length - 1 ? currIdx + 1 : 0]!
-}
-export function getPriorStep(currStep: MenuStep): MenuStep {
-  const currIdx = stepOrder.indexOf(currStep)
-  return stepOrder[currIdx === 0 ? stepOrder.length - 1 : currIdx - 1]!
-}
-
-export type SearchMenuContext = {
-  search: Ref<string>
-  setSearch: (val: string) => void
-  step: Ref<MenuStep>
-  setStep: (step: MenuStep) => void
-  activeCategory: Ref<FilterCategory | null>
-  setActiveCategory: (catId: string | null) => void
-  isOpen: Ref<boolean>
-  openMenu: () => void
-  closeMenu: () => void
-  searchInputRef: Ref<HTMLInputElement | null>
-  setInputRef: (ref: HTMLInputElement | null) => void
-  keyEvent: Ref<KeyboardEvent | null>
-  emitKey: (e: KeyboardEvent) => void
-}
-
-export type SelectedTokenContext = {
-  selTokenContext: [Ref<FilterToken | null>, Ref<MenuStep>, Ref<boolean>]
-  setSelectedToken: (token: FilterToken | null, step?: MenuStep, atStart?: boolean) => void
-}
-
-// ------ Test -----
-
-// --- Base Structure ---
-// I stands for "Item": The type of the object to be filtered by the token
-// T stands for "Type": The type of the filtering object
-// V stands for "Value" and defines the types a FilterValue can take (e.g. special operators or any string)
+// ---------------------------------------------------------------------------
+// Core token types
+// I = Item being filtered (e.g. Product)
+// T = Token shape (e.g. FacetFilterToken)
+// V = Value type for a step's selectable items
+// ---------------------------------------------------------------------------
 
 export type FilterTokenBase = {
   uid: string
 }
 
-export type AnyToken<T extends FilterTokenBase> = Partial<T> | TokenData<T>
-
+/** A token fully committed to the filter bar */
 export type TokenData<T extends FilterTokenBase> = {
   token: T
   stratId: string
-}
-
-export function isTokenData(data?: AnyToken<any>): data is TokenData<any> {
-  return !!data && 'token' in data
+  immutable?: boolean
 }
 
 export type FilterValue<V extends string = string> = {
@@ -82,7 +23,7 @@ export type FilterValue<V extends string = string> = {
   label: string
 }
 
-export type ValueGroup<V = string> = {
+export type ValueGroup<V extends string = string> = {
   id: string
   label: string
   values: FilterValue<V>[]
@@ -98,8 +39,15 @@ export type SelectableItems<V extends string = string> = {
 export type TokenStep<T extends FilterTokenBase, V extends string = string> = {
   id: string
   getSelectableItems: (search: string, token: Partial<T>) => SelectableItems<V>
+  /** Single-value selection */
   onSelect: (value: FilterValue<V>, token: Partial<T>) => Partial<T>
-  getTokenLabel: (token: TokenData<T>) => string
+  /** Multi-value confirmation — falls back to onSelect with first value if absent */
+  onMultiSelect?: (values: FilterValue<V>[], token: Partial<T>) => Partial<T>
+  /** Returns '' for unfilled fields. Works on Partial<T> so draft chips can use it too. */
+  getTokenLabel: (token: Partial<T>) => string
+  getLabelClass: (token: Partial<T>) => unknown
+  /** Removes this step's own fields from the token. Run from edited step onward for cascade reset. */
+  resetFromHere?: (token: Partial<T>) => Partial<T>
 }
 
 export type FilterTokenStrategy<I, T extends FilterTokenBase> = {
@@ -109,91 +57,73 @@ export type FilterTokenStrategy<I, T extends FilterTokenBase> = {
   steps: TokenStep<T, any>[]
   initToken: () => Partial<T>
   buildToken: (partial: Partial<T>) => T
-  filterFn: (item: I, token: T) => boolean
+  filterFn: (item: I, token: T) => boolean | Promise<boolean>
 }
 
-// --- Helpers
+// ---------------------------------------------------------------------------
+// Context
+// ---------------------------------------------------------------------------
 
-const defaultOperators: { id: FilterOperator, label: string }[] = [
-  {
-    id: 'is',
-    label: 'is',
-  }, {
-    id: 'is one of',
-    label: 'is one of',
-  }, {
-    id: 'is not one of',
-    label: 'is one of',
-  },
-]
+/**
+ * Token chips register a focus handler with the parent via registerChip.
+ * The parent calls requestChipFocus to imperatively focus a chip's input.
+ * stepId=null → focus the strategy-label segment
+ * stepId='first' | 'last' → resolved by the chip to its first/last step
+ */
+export type ChipFocusHandler = (stepId: string | null, atStart: boolean) => void
 
 export type FilteredSearchContext<I> = {
+  // ---- Reactive state (read-only for children) ----
   search: Ref<string>
-  step: Ref<TokenStep<FilterTokenBase> | null>
+  step: Ref<TokenStep<FilterTokenBase, any> | null>
   activeStrategy: Ref<FilterTokenStrategy<I, FilterTokenBase> | null>
-  activeToken: Ref<Partial<FilterTokenBase> | TokenData<never>>
+  /** Always the raw Partial<T> being operated on — no draft/edit union needed by children */
+  activeToken: Ref<Partial<FilterTokenBase> | null>
   isOpen: Ref<boolean>
-  editTokenAtStart: Ref<boolean>
+  /** Points at the input currently anchoring the dropdown for positioning */
   searchInputRef: Ref<HTMLInputElement | null>
   selectableItems: Ref<SelectableItems | null>
-
   keyEvent: Ref<KeyboardEvent | null>
+
+  // ---- Chip registration — replaces the focusRequest ref event-bus ----
+  registerChip: (uid: string, handler: ChipFocusHandler) => void
+  unregisterChip: (uid: string) => void
+
+  // ---- Actions ----
+  setSearch: (val: string) => void
   emitKey: (e: KeyboardEvent) => void
+  setActiveInput: (el: HTMLInputElement | null) => void
 
-  setContext: (
-    stratId: string,
-    step?: TokenStep<FilterTokenBase>,
-    activeToken?: AnyToken<any>,
-    searchInputRef?: HTMLInputElement,
-    editTokenAtStart?: boolean,
-  ) => void
+  /**
+   * Begin editing a committed token at a specific step.
+   * Cascades resetFromHere for that step and all subsequent ones.
+   */
+  editTokenStep: (tokenData: TokenData<any>, step: TokenStep<FilterTokenBase, any>) => void
+
+  /**
+   * Move focus to a different step within the currently-editing token.
+   * Does NOT reset — used only for arrow-key traversal.
+   * Pass null to navigate to the strategy-label segment.
+   */
+  navigateToStep: (step: TokenStep<FilterTokenBase, any> | null, atStart?: boolean) => void
+
+  /** Enters strategy-selection mode for a committed token; replaces it in-place on completion. */
+  editTokenStrategy: (tokenData: TokenData<any>) => void
+
   clearContext: () => void
+
+  /** Called by the menu for single-value steps or None/Any instant-selects */
+  confirmSingleSelection: (value: FilterValue) => void
+  /** Called by the menu's Apply button for multi-select confirmation */
+  confirmMultiSelection: (values: FilterValue[]) => void
 }
 
-// --- Explicit Implementations
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-export type FacetFilterToken = FilterTokenBase & {
-  operator: FilterOperator
-  valueId: string | string[]
-  valueLabel: string | string[]
-}
-
-function filterProductByFacetToken(product: Product, token: FacetFilterToken): boolean {
-  return true
-}
-
-export function getFacetFilterStrategy(): FilterTokenStrategy<Product, FacetFilterToken> {
-  return {
-    id: 'tags',
-    label: 'Tag',
-    icon: 'i-lucide-tag',
-    steps: [
-      {
-        id: 'operator',
-        getSelectableItems: () => ({
-          values: defaultOperators,
-          multiple: false,
-          anyAllowed: false,
-          noneAllowed: false,
-        }),
-        onSelect: (value, token) => ({ ...token, operator: value.id }),
-        getTokenLabel: tokenData => tokenData.token.operator,
-      },
-      {
-        id: 'value',
-        getSelectableItems: (search, token) => ({
-          values: [],
-          multiple: token.operator !== 'is',
-          noneAllowed: token.operator === 'is',
-          anyAllowed: token.operator === 'is',
-        }
-        ),
-        onSelect: (value, token) => ({ ...token, valueId: value.id, valueLabel: value.label }),
-        getTokenLabel: tokenData => tokenData.token.valueLabel as string, // TODO could be multiple
-      },
-    ],
-    initToken: () => ({ uid: '1' }),
-    buildToken: partial => ({ ...partial } as FacetFilterToken),
-    filterFn: filterProductByFacetToken,
-  }
+export function isValueGroupArray<V extends string>(
+  values: ValueGroup<V>[] | FilterValue<V>[],
+): values is ValueGroup<V>[] {
+  return values.length > 0 && 'values' in values[0]!
 }

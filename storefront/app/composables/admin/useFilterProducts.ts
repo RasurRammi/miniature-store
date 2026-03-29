@@ -1,20 +1,17 @@
-import type { FilterToken } from '~/types/filteredSearch'
+import type { FilterTokenStrategy, TokenData } from '~/types/filteredSearch'
 import type { Product } from '~/types/fragmentAliases'
 
-export function filterProducts(products: Product[], filterTokens: FilterToken[]): Product[] {
-  const groupedTokens = Object.groupBy(filterTokens, token => token.categoryId)
-  let filtered = products
-
-  if (groupedTokens['tags']?.length) {
-    filtered = filtered.filter((product: Product) => {
-      console.log(product.facetValues)
-    })
-  }
-  if (groupedTokens['releases']?.length) {
-
-  }
-  if (groupedTokens['collections']?.length) {
-
-  }
-  return filtered
+export function filterProducts(
+  products: Product[],
+  filterTokens: TokenData<any>[],
+  strategies: FilterTokenStrategy<Product, any>[],
+): Product[] {
+  return products.filter((product) => {
+    for (const token of filterTokens) {
+      const strategy = strategies.find(strat => strat.id === token.stratId)
+      const res = strategy?.filterFn(product, token.token)
+      if (!res) return false
+    }
+    return true
+  })
 }

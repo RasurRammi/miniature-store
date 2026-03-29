@@ -2,12 +2,13 @@
 import { useFacets } from '~/composables/admin/useFacets'
 import { useSubmitFacets } from '~/composables/admin/useSubmitFacets'
 import { getFacetId } from '~/composables/useDirtyList'
-import type { Facet } from '~/gql/admin/graphql'
 import FacetsTable from '~/components/tags/FacetsTable.vue'
+import type { Facet } from '~/types/fragmentAliases'
+import type { ProductSelectionContext } from '~/pages/admin/catalogue/tags.vue'
 
 const toast = useToast()
 const dirtyStateStore = useDirtyStateStore()
-
+const { anySelected } = inject<ProductSelectionContext>('productSelection')!
 const { data: facetsData } = useFacets()
 const facetsCopy = ref<Facet[]>([])
 const isEditingFacets = ref<boolean>(false)
@@ -99,7 +100,7 @@ function resetChanges() {
         variant="ghost"
         color="neutral"
         class="aspect-square"
-        :disabled="dirtyStateStore.totalChanges > 0"
+        :disabled="anySelected || dirtyStateStore.totalChanges > 0"
         @click.prevent="isEditingFacets = !isEditingFacets"
       />
     </div>
@@ -109,6 +110,7 @@ function resetChanges() {
     />
 
     <FloatingBar
+      :total-changes="dirtyStateStore.totalChanges"
       @save="submitChanges()"
       @discard="resetChanges()"
     />

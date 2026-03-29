@@ -13,4 +13,11 @@ fragment SimpleCollectionFields on Collection {
       ... SimpleProductVariantFields
     }
   }
+  filters {
+    code
+    args {
+      name
+      value
+    }
+  }
 }

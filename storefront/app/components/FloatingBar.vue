@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const store = useDirtyStateStore()
+const { totalChanges, changeText } = defineProps<{ totalChanges: number, changeText?: string }>()
 
 const emit = defineEmits<{
   save: []
@@ -18,14 +18,20 @@ const emit = defineEmits<{
       leave-to-class="opacity-0 translate-y-2"
     >
       <div
-        v-if="store.totalChanges > 0"
+        v-if="totalChanges > 0"
         class="fixed bottom-12 left-1/2 -translate-x-1/2 z-99
                flex flex-1 items-center justify-between gap-6 px-4 py-3
                bg-elevated border border-primary rounded-lg shadow-xl
                whitespace-nowrap"
       >
         <span class="text-muted text-sm">
-          {{ store.totalChanges }} unsaved change{{ store.totalChanges === 1 ? '' : 's' }}
+          {{ totalChanges }}
+          <template v-if="changeText">
+            {{ changeText }}
+          </template>
+          <template v-else>
+            unsaved change{{ totalChanges === 1 ? '' : 's' }}
+          </template>
         </span>
 
         <div class="flex flex-row items-center justify-end gap-2">

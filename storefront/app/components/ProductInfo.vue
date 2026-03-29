@@ -8,6 +8,7 @@ import { useAssetSelectionDrawerStore } from '~/stores/assetSelectionDrawer'
 import DrawerLayout from '~/components/common/DrawerLayout.vue'
 import { useAssets } from '~/composables/admin/useAssets'
 import { useAdminUser } from '~/composables/admin/useAdminUser'
+import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
 
 const adminUser = useAdminUser()
 const productDrawer = useProductDrawerStore()
@@ -16,11 +17,40 @@ const assetSelectionDrawer = useAssetSelectionDrawerStore()
 const { productV } = defineProps<{
   productV?: ProductVariant
 }>()
+
+const { data: rootReleaseCol } = await useRootReleaseBundle()
+const { data: bundleData } = useBundles()
+const selectedRelease = computed(() => productV?.product.collections.find(c => c.parentId === rootReleaseCol.value?.id))
+const viableBundles = computed(() => {
+  if (!bundleData.value) {
+    return []
+  }
+  return bundleData.value.collections.items.map((bundle: Collection) => {
+    return {
+      id: bundle.id,
+      label: bundle.name,
+    }
+  })
+})
+
+const { data: assetsData } = useAssets()
+const selectedAssets = computed<Asset[]>(() => {
+  if (!assetsData.value) {
+    return []
+  }
+  return form.assetIds.map((assetId: string) => assetsData.value.assets.items.find((asset: Asset) => asset.id === assetId))
+})
+
+// ---- Form and Editing
 const isNew = computed(() => !productV?.id)
 const mayEdit = computed(() => !!adminUser.data.value)
 const isEditing = ref(isNew.value || mayEdit.value)
-
 const form = reactive<ProductInput>(productVToForm())
+
+watch(() => productV, () => {
+  Object.assign(form, productVToForm())
+  isEditing.value = isNew.value || mayEdit.value
+}, { immediate: true })
 
 function startEditing() {
   Object.assign(form, productVToForm())
@@ -39,39 +69,19 @@ function productVToForm(): ProductInput {
     name: productV?.product.name ?? '',
     description: productV?.product.description ?? '',
     price: productV?.price ?? 0,
+    releaseId: selectedRelease.value?.id,
     collectionIds: productV?.product.collections.map(c => c.id) ?? [],
     assetIds: productV?.product.assets.map(asset => asset.id) ?? [],
   }
 }
 
-const { data: bundleData } = useBundles()
-const viableBundles = computed(() => {
-  if (!bundleData.value) {
-    return []
-  }
-  return bundleData.value.collections.items.map((bundle: Collection) => {
-    return {
-      id: bundle.id,
-      label: bundle.name,
-    }
-  })
-})
-const { data: assetsData } = useAssets()
-const selectedAssets = computed<Asset[]>(() => {
-  if (!assetsData.value) {
-    return []
-  }
-  return form.assetIds.map((assetId: string) => assetsData.value.assets.items.find((asset: Asset) => asset.id === assetId))
-})
-
 const toast = useToast()
 const submitProduct = useSubmitProduct()
-
 async function submitForm() {
   submitProduct.mutate(form, {
     onSuccess: (data) => {
       cancelEditing()
-      productDrawer.open(data.variant)
+      productDrawer.open(data.variant!)
       toast.add({
         title: 'Product successfully updated',
         description: 'The product was successfully updated',
@@ -133,10 +143,9 @@ async function submitForm() {
       />
     </template>
     <template #header>
-      <UInputMenu
+      <USelectMenu
         v-if="isEditing"
-        v-model="form.collectionIds"
-        multiple
+        v-model="form.releaseId"
         size="xl"
         icon="i-lucide-package-2"
         value-key="id"
@@ -144,10 +153,15 @@ async function submitForm() {
       />
 
       <!-- Tags -->
-      <!--
       <div class="flex gap-1">
-        <USelectMenu v-if="editing" v-model="product.tags" multiple :items="viableTags" trailing-icon="" size="size-4"
-                     :ui="{ content: 'w-40 p-2' }">
+        <USelectMenu
+          v-if="isEditing"
+          v-model="form.tags"
+          multiple
+          :items="viableTags"
+          size="size-4"
+          :ui="{ content: 'w-40 p-2' }"
+        >
           <template #default>
             <UButton
               icon="i-lucide-plus"
@@ -156,9 +170,22 @@ async function submitForm() {
             />
           </template>
         </USelectMenu>
-        <UBadge v-for="tag in product.tags" :key="tag" :label="tag" variant="subtle" color="neutral"/>
+        <UBadge
+          v-if="selectedRelease && !isEditing"
+          :label="selectedRelease.name"
+          variant="subtle"
+          color="primary"
+          size="lg"
+        />
+        <UBadge
+          v-for="tag in productV?.product.facetValues"
+          :key="tag.id"
+          :label="tag.name"
+          variant="subtle"
+          color="neutral"
+          size="lg"
+        />
       </div>
-      -->
     </template>
 
     <ImageCarousel

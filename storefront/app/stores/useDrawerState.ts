@@ -12,12 +12,13 @@ export function useDrawerStack() {
   }
 }
 
-export function useDrawerState<T>() {
+export function useDrawerState<T extends { id: string }>() {
   const drawerStack = useDrawerStack()
   const isOpen = ref(false)
   const data = ref<T | null>(null)
 
   function open(payload?: T) {
+    if (data.value && payload && data.value.id === payload.id) return
     data.value = payload ?? null
     isOpen.value = true
     drawerStack.push(close)

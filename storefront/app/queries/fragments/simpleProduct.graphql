@@ -6,6 +6,7 @@ fragment SimpleProductFields on Product {
   facetValues {
     id
     facetId
+    name
   }
   featuredAsset {
     ...SimpleAsset
@@ -15,6 +16,7 @@ fragment SimpleProductFields on Product {
   }
   collections {
     id
+    parentId
     name
     slug
   }

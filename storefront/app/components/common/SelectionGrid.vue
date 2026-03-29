@@ -44,7 +44,7 @@ function toggle(id: string) {
       <!-- Selection overlay -->
       <div
         v-if="selectedSet.has(item.id)"
-        class="absolute inset-0 bg-primary/20"
+        class="absolute inset-0 bg-primary/10"
       />
     </template>
     <template #empty>

@@ -1,19 +1,25 @@
 <script setup lang="ts" generic="T extends {id: string}">
-import { UButton } from '#components'
-
 const { items, itemClass } = defineProps<{
   items: T[]
   itemClass?: (item: T) => unknown
 }>()
 
-const expandedIds = reactive(new Set<string>())
+defineSlots<{
+  'default': (props: { item: T }) => unknown
+  'actions': (props: { item: T }) => unknown
+  'expanded-content': (props: { item: T }) => unknown
+  'add-row': () => unknown
+  'empty': () => unknown
+}>()
+
+const collapsedIds = reactive(new Set<string>())
 
 function toggleExpanded(id: string) {
-  if (expandedIds.has(id)) {
-    expandedIds.delete(id)
+  if (collapsedIds.has(id)) {
+    collapsedIds.delete(id)
   }
   else {
-    expandedIds.add(id)
+    collapsedIds.add(id)
   }
 }
 </script>
@@ -26,7 +32,7 @@ function toggleExpanded(id: string) {
     >
       <div
         class="flex flex-row gap-2 justify-between rounded-lg p-2"
-        :class="[expandedIds.has(item.id) ? 'bg-elevated/75' : 'bg-elevated/50', itemClass?.(item)]"
+        :class="[collapsedIds.has(item.id) ? 'bg-elevated/50' : 'bg-elevated/75', itemClass?.(item)]"
       >
         <div class="flex flex-row flex-1 items-center gap-1">
           <UButton
@@ -34,7 +40,7 @@ function toggleExpanded(id: string) {
             icon="i-lucide-chevron-down"
             variant="ghost"
             color="neutral"
-            :class="{ 'duration-200 rotate-180': expandedIds.has(item.id) }"
+            :class="{ 'duration-200 rotate-180': !collapsedIds.has(item.id) }"
             @click="toggleExpanded(item.id)"
           />
           <slot :item="item" />
@@ -48,7 +54,7 @@ function toggleExpanded(id: string) {
       </div>
       <div
         v-if="$slots['expanded-content']"
-        v-show="expandedIds.has(item.id)"
+        v-show="!collapsedIds.has(item.id)"
         class="ml-4"
       >
         <slot

@@ -7,6 +7,8 @@ import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
 import SelectionGrid from '~/components/common/SelectionGrid.vue'
 import FlexibleGrid from '~/components/common/FlexibleGrid.vue'
 import DrawerLayout from '~/components/common/DrawerLayout.vue'
+import DefaultFilteredSearch from '~/components/filteredSearch/DefaultFilteredSearch.vue'
+import type { TokenData } from '~/types/filteredSearch'
 
 const adminUser = useAdminUser()
 const releaseDrawer = useReleaseDrawerStore()
@@ -17,16 +19,15 @@ const { release } = defineProps<{
 }>()
 
 // ----- Product Selection -----
-const { data: productsData } = useProducts()
-const products = computed(() => productsData.value?.products.items ?? [])
-const selectedCopy = ref<string[]>(release?.productVariants.items.map(pV => pV.product.id) ?? [])
-const selectedProductsCopy = computed<Product[]>(() => {
-  const pMap = new Map(products.value.map((p: Product) => [p.id, p]))
-  return selectedCopy.value.flatMap((id) => {
-    const product = pMap.get(id)
-    return product ? [product] : []
-  })
-})
+const selectedProducts = ref<Product[]>(release?.productVariants.items.map(pV => pV.product) ?? [])
+const selectedProductIds = computed(() => selectedProducts.value?.map(product => product.id) ?? [])
+const startingTokens: TokenData<any>[] = [{
+  stratId: 'releases',
+  token: release
+    ? { uid: '1', operator: 'is one of', valueId: ['none', release.id], valueLabel: ['None', release.name] } satisfies OperatorValueToken
+    : { uid: '1', operator: 'is', valueId: 'none', valueLabel: 'None' } satisfies OperatorValueToken,
+  immutable: true,
+}]
 
 // ----- Creating/Editing Variables -----
 const isNew = computed(() => !release?.id)
@@ -47,7 +48,7 @@ function releaseToForm(): CollectionInput {
     collectionId: release?.id,
     name: release?.name ?? '',
     description: release?.description ?? '',
-    selectedProductIds: selectedCopy.value,
+    selectedProductIds: selectedProductIds.value,
   }
 }
 
@@ -57,7 +58,7 @@ const submitCollection = useSubmitCollection()
 async function submitForm() {
   if (!rootBundleCol.value) return
   form.parentId = rootBundleCol.value.id
-  form.selectedProductIds = selectedCopy.value // set it again in case it changed
+  form.selectedProductIds = selectedProductIds.value // set it again in case it changed
   submitCollection.mutate(form, {
     onSuccess: (data) => {
       toast.add({
@@ -133,39 +134,22 @@ async function submitForm() {
     <!-- Product selection -->
     <span class="text-lg font-bold">Assign Products</span>
 
-    <FlexibleGrid :items="selectedProductsCopy">
-      <template #default="{ item }">
+    <FlexibleGrid :items="selectedProducts">
+      <template #default="{ item: product }">
         <img
-          :src="item.featuredAsset?.preview"
+          :src="product.featuredAsset?.preview"
           class="w-full h-full object-cover bg-muted"
-          :alt="item.name"
+          :alt="product.name"
         >
       </template>
     </FlexibleGrid>
 
     <USeparator />
 
-    <div class="flex flex-row gap-1">
-      <UInput
-        trailing-icon="i-lucide-search"
-        placeholder="Search..."
-        size="xl"
-        class="w-full flex-1"
-      />
-    </div>
-
-    <SelectionGrid
-      v-model="selectedCopy"
-      :items="products"
-    >
-      <template #default="{ item }">
-        <img
-          :src="item.featuredAsset?.preview"
-          class="w-full h-full object-cover bg-muted"
-          :alt="item.name"
-        >
-      </template>
-    </SelectionGrid>
+    <DefaultFilteredSearch
+      v-model="selectedProducts"
+      :starting-tokens="startingTokens"
+    />
 
     <USeparator />
 

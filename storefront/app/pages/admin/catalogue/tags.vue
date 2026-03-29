@@ -1,88 +1,121 @@
 <script setup lang="ts">
-import FilteredSearch from '~/components/filteredSearch/FilteredSearch.vue'
-import {
-  type FilterCategory,
-  type FilterToken,
-  type FilterTokens,
-  getFacetFilterStrategy,
-  type ValueGroup,
-} from '~/types/filteredSearch'
-import { useFacets } from '~/composables/admin/useFacets'
-import ProductsSelection from '~/components/tags/ProductsSelection.vue'
 import Facets from '~/components/tags/Facets.vue'
-import { filterProducts } from '~/composables/admin/useFilterProducts'
-import type { Product } from '~/types/fragmentAliases'
-import FilteredSearch2 from '~/components/filteredSearch/FilteredSearch2.vue'
+import DefaultFilteredSearch from '~/components/filteredSearch/DefaultFilteredSearch.vue'
+import type { FacetValue, Product } from '~/types/fragmentAliases'
+import { useSubmitProductTags } from '~/composables/admin/useSubmitProductTags'
 
 // TODO remove for production
 definePageMeta({
   layout: 'admin',
 })
 
-// --- Filter ---
-const activeSearchTokens = ref<FilterToken[]>([])
-const activeSearchTokens2 = ref<{ token: FilterTokens<Product, any>, stratId: string }[]>([])
-const completedTokens = computed(() => activeSearchTokens.value.filter(t => t.isComplete))
-
-const { data: facetsData } = useFacets()
-const tagFilters = computed<ValueGroup[]>(() => {
-  if (!facetsData.value?.facets.items) return []
-  return facetsData.value.facets.items
-    .map(f => (
-      {
-        id: f.id,
-        label: f.name,
-        values: f.values.map(fV => ({ id: fV.id, label: `${fV.name}` })),
-      }
-    ))
+// --- Products ---
+const { data: productsData } = useProducts()
+const allProducts = ref<Product[]>([])
+watch(
+  productsData,
+  () => allProducts.value = structuredClone(toRaw(productsData.value?.products.items ?? [])),
+  { immediate: true },
+)
+const selectedProductIds = ref<string[]>([])
+const selectedProducts = computed(() => {
+  if (!selectedProductIds.value) return []
+  return selectedProductIds.value
+    .map(id => allProducts.value.find(p => p.id === id)!)
 })
 
-const filterCategories = computed<FilterCategory[]>(() => [
-  {
-    id: 'tags',
-    label: 'Tag',
-    icon: 'i-lucide-tag',
-    valueGroups: tagFilters.value,
-  },
-  {
-    id: 'releases',
-    label: 'Releases',
-    icon: 'i-lucide-package-2',
-    valueGroups: [
-      { id: '1', label: '', values: [{ id: '1', label: 'Feb 2026' }, { id: '2', label: 'Jan 2026' }] },
-      { id: '2', label: '2025', values: [{ id: '3', label: 'Dec 2025' }, { id: '4', label: 'Nov 2025' }] },
-    ],
-  },
-  {
-    id: 'collections',
-    label: 'Collection',
-    icon: 'i-lucide-book-copy',
-    valueGroups: [
-      { id: '1', label: 'Dragons', values: [{ id: '1', label: 'Red Dragons' }, { id: '2', label: 'Blue Dragons' }] },
-      { id: '2', label: 'Animals', values: [{ id: '3', label: 'Mice' }, { id: '4', label: 'Rabbits' }] },
-    ],
-  },
-  {
-    id: 'text',
-    label: 'Text Search',
-    icon: 'i-lucide-text-cursor-input',
-    valueGroups: [
-      { id: '1', label: 'Dragons', values: [{ id: '1', label: 'Red Dragons' }, { id: '2', label: 'Blue Dragons' }] },
-      { id: '2', label: 'Animals', values: [{ id: '3', label: 'Mice' }, { id: '4', label: 'Rabbits' }] },
-    ],
-  },
-])
+// --- FacetValues ---
+export type SelectionStateMap = Map<string, 'some' | 'every'>
+const selectedFacetValueIds = computed<SelectionStateMap>(() => {
+  const valueMap = new Map()
+  if (!selectedProductIds.value) return valueMap
+  const ids = selectedProducts.value.flatMap((product: Product) => product.facetValues.map(fV => fV.id))
+  const uniqIds = [...new Set(ids)]
+  uniqIds.forEach((id) => {
+    valueMap.set(
+      id,
+      selectedProducts.value.every(p => p.facetValues.map(fV => fV.id).includes(id))
+        ? 'every'
+        : 'some',
+    )
+  })
+  return valueMap
+})
+const anyProductSelected = computed(() => !!selectedProductIds.value?.length)
 
-// --- Products
-const { data: productsData } = useProducts()
-const filteredProducts = computed(() =>
-  filterProducts(productsData.value?.products.items ?? [], completedTokens.value),
-)
-const selectedProducts = ref<Product[]>([])
-function updateSelectedProducts(productIds: string[]) {
-  const products = productsData.value?.products.items ?? []
-  selectedProducts.value = products.filter(p => productIds.includes(p.id))
+function toggleValueState(facetValue: FacetValue, oldState: 'none' | 'some' | 'every') {
+  if (!selectedProductIds.value) return
+  if (oldState === 'none') {
+    selectedProducts.value.forEach((sP: Product) => {
+      sP.facetValues.push(facetValue)
+    })
+  }
+  else if (oldState === 'every') {
+    selectedProducts.value.forEach((sP: Product) => {
+      sP.facetValues = sP.facetValues.filter(fV => fV.id !== facetValue.id)
+    })
+  }
+  else if (oldState === 'some') {
+    selectedProducts.value.forEach((sP: Product) => {
+      const hasFacet = sP.facetValues.find(fV => fV.id === facetValue.id)
+      if (!hasFacet) {
+        sP.facetValues.push(facetValue)
+      }
+    })
+  }
 }
+
+const changedProducts = computed(() => {
+  if (!productsData.value) return []
+  return allProducts.value.filter((product) => {
+    const ogProduct = productsData.value.products.items.find(p => p.id === product.id)!
+    const ids = product.facetValues.map(fV => fV.id).sort().join(',')
+    const ogIds = ogProduct.facetValues.map(fV => fV.id).sort().join(',')
+    return ids !== ogIds
+  })
+})
+function resetProductChanges() {
+  allProducts.value = structuredClone(toRaw(productsData.value?.products.items ?? []))
+}
+
+const toast = useToast()
+const submitProductTags = useSubmitProductTags()
+function submitProductChanges() {
+  const productInputs = changedProducts.value.map((product: Product) => ({
+    productId: product.id,
+    tagIds: product.facetValues.map(fV => fV.id),
+  }))
+  const count = productInputs.length
+  submitProductTags.mutate(productInputs, {
+    onSuccess: () => {
+      toast.add({
+        title: `${count} Products successfully updated`,
+        icon: 'i-lucide-check',
+        color: 'success',
+      })
+    },
+    onError: (err) => {
+      console.log(err)
+      toast.add({
+        title: 'An error occurred when trying to update the products',
+        description: err.name + ': ' + err.message,
+        icon: 'i-lucide-x',
+        color: 'error',
+      })
+    },
+  })
+}
+
+export type ProductSelectionContext = {
+  selectedValueIds: Ref<SelectionStateMap>
+  anySelected: Ref<boolean>
+  toggleValueState: (facetValue: FacetValue, oldState: 'none' | 'some' | 'every') => void
+}
+provide('productSelection', {
+  selectedValueIds: selectedFacetValueIds,
+  anySelected: anyProductSelected,
+  toggleValueState: toggleValueState,
+} satisfies ProductSelectionContext)
 </script>
 
 <template>
@@ -98,22 +131,19 @@ function updateSelectedProducts(productIds: string[]) {
         Products
       </h2>
 
-      <div class="flex flex-col gap-4">
-        <FilteredSearch2
-          v-model="activeSearchTokens2"
-          :filter-strategies="[getFacetFilterStrategy()]"
-        />
-
-        <!-- Product Selection -->
-        <div class="p-2 rounded-lg bg-elevated/50">
-          <ProductsSelection
-            v-model="selectedProducts"
-            :products="filteredProducts"
-            @products-selected="updateSelectedProducts"
-          />
-        </div>
-      </div>
+      <DefaultFilteredSearch
+        v-model="selectedProductIds"
+        :all-products="allProducts"
+        :starting-tokens="[]"
+      />
     </div>
+
+    <FloatingBar
+      :total-changes="changedProducts.length"
+      :change-text="'Products changed'"
+      @save="submitProductChanges()"
+      @discard="resetProductChanges()"
+    />
   </div>
 </template>
 

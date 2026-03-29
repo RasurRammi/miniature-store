@@ -3,14 +3,29 @@ import { UButton, UInput } from '#components'
 import List from '~/components/common/List.vue'
 import type { Facet, FacetValue } from '~/gql/admin/graphql'
 import { getFacetId, getValueId, useDirtyList } from '~/composables/useDirtyList'
+import type { ProductSelectionContext } from '~/pages/admin/catalogue/tags.vue'
 
 const facetValues = defineModel<FacetValue[]>({ required: true })
-const { facetId, isEditing } = defineProps<{ facetId: string, isEditing: boolean }>()
-
+const { facetId, isEditing } = defineProps<{
+  facetId: string
+  isEditing: boolean
+}>()
+const { selectedValueIds: selectionState, anySelected, toggleValueState } = inject<ProductSelectionContext>('productSelection')!
 const dirtyFacetVList = useDirtyList(facetValues, getValueId)
 const isFacetDeleted = () => dirtyFacetVList.getValueMeta(getFacetId({ id: facetId } as Facet))?.isDeleted
 
 const newValueName = ref('')
+const valueStates = computed(() => {
+  return new Map(facetValues.value.map(fV => [
+    fV.id,
+    selectionState.value.has(fV.id) ? selectionState.value.get(fV.id) : 'none'],
+  ))
+})
+const stateToColorMap = new Map([
+  ['every', 'success'],
+  ['some', 'warning'],
+  ['none', 'neutral'],
+])
 
 function onAddValue() {
   if (!newValueName.value?.trim()) return
@@ -69,10 +84,12 @@ function onAddValue() {
       <UButton
         v-if="!isEditing"
         icon="i-lucide-book-check"
-        color="neutral"
-        variant="ghost"
-        aria-label="Assign to selected Products"
-        @click="console.debug('test')"
+        :color="stateToColorMap.get(valueStates.get(facetV.id))"
+        :variant="selectionState.has(facetV.id) ? 'outline' : 'ghost'"
+        title="(De-)Assign to selected products"
+        aria-label="(De-)Assign to selected products"
+        :disabled="!anySelected"
+        @click="toggleValueState(facetV, valueStates.get(facetV.id))"
       />
     </template>
     <template
