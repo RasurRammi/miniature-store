@@ -17,7 +17,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { $adminGqlClient } = useNuxtApp()
   const toast = useToast()
   const loginNeededMsg: Partial<Toast> = {
-    title: 'Login',
+    title: 'Not logged in',
     description: 'Login to your account',
     color: 'error',
   }
@@ -26,7 +26,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const data = await $adminGqlClient.request(AdminMeDocument)
 
     if (data.me && to.path === '/admin/login') {
-      return navigateTo('/admin/catalogue/releases')
+      return navigateTo('/admin/catalogue/releases', { replace: true })
     }
     if (!data.me && to.path !== '/admin/login') {
       toast.add(loginNeededMsg)

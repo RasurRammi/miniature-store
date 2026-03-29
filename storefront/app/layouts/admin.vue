@@ -127,13 +127,16 @@ const footerItems = computed(() => themes
             :src="themeData.logoSrc"
             :alt="themeData.logoTitle"
             :class="{ 'size-7.75': !collapsed }"
+            loading="lazy"
           >
           <span v-if="!collapsed">{{ themeData.logoTitle }}</span>
         </div>
       </template>
 
       <template #default="{ collapsed }">
+        <!--  Remount with :key so open-state is correct -->
         <UNavigationMenu
+          :key="route.path.split('/')[2] ?? ''"
           :collapsed="collapsed"
           :items="navItems"
           orientation="vertical"

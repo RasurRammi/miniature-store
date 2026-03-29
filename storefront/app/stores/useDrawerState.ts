@@ -3,14 +3,12 @@ const stack: Array<() => void> = []
 export function useDrawerStack() {
   return {
     push: (closeFn: () => void) => {
-      console.log('pushed', closeFn)
       stack.push(closeFn)
     },
     pop: () => stack.pop(),
     peek: () => stack[stack.length - 1],
     remove: (closeFn: () => void) => {
       const index = stack.indexOf(closeFn)
-      console.log('removed', closeFn, index)
       if (index > -1) stack.splice(index, 1)
     },
   }

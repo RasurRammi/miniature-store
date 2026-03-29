@@ -21,8 +21,9 @@ const emit = defineEmits<{
     <template #default="{ item }">
       <img
         :src="item.featuredAsset?.preview"
-        :aria-label="item.name"
+        :alt="item.name"
         class="bg-muted"
+        loading="lazy"
       >
     </template>
     <template #empty>

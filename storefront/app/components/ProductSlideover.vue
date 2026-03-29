@@ -23,6 +23,7 @@ const isEditingLocked = ref<boolean>(false)
   >
     <template #content>
       <ProductInfo
+        :key="productV?.id ?? 'new'"
         :product-v="productV ?? undefined"
         @editing-state-changed="(val: boolean) => isEditingLocked = val"
       />

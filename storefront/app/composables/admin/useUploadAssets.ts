@@ -45,7 +45,6 @@ export function useUploadAssets() {
       return json.data.createAssets
     },
     onSuccess: (result: File[]) => {
-      console.log(result)
       toast.add({
         title: 'Files successfully uploaded',
         description: `Successfully uploaded ${result.length} files`,

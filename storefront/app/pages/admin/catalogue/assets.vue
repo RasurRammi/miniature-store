@@ -46,7 +46,8 @@ const selectedAssetIds = ref<string[]>([])
       <template #default="{ item: asset }: {item: Asset}">
         <img
           :src="asset.preview"
-          :aria-label="asset.name"
+          :alt="asset.name"
+          loading="lazy"
           class="bg-muted"
         >
       </template>

@@ -3,7 +3,6 @@ export default defineNuxtPlugin(() => {
   const drawerStack = useDrawerStack()
 
   router.beforeEach(() => {
-    console.log(drawerStack)
     const topDrawer = drawerStack.peek()
     if (topDrawer) {
       topDrawer()

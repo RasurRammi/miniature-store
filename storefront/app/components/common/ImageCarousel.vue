@@ -39,6 +39,7 @@ function select(index: number) {
       <img
         v-if="images.length > 0 && images[activeIndex]?.source"
         :src="images[activeIndex]!.source"
+        :alt="images[activeIndex]!.name"
         class="w-full h-full object-cover"
       >
       <span
@@ -85,7 +86,6 @@ function select(index: number) {
             :src="item.preview"
             class="object-cover"
             loading="lazy"
-            :aria-label="item.name"
             :alt="item.name"
           >
         </div>
@@ -133,7 +133,6 @@ function select(index: number) {
             :src="item.preview"
             class="object-cover"
             loading="lazy"
-            :aria-label="item.name"
             :alt="item.name"
           >
         </div>
