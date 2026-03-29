@@ -4,7 +4,6 @@ import { useAdminUser } from '~/composables/admin/useAdminUser'
 import { useReleaseDrawerStore } from '~/stores/releaseDrawer'
 import { type CollectionInput, useSubmitCollection } from '~/composables/admin/useSubmitCollection'
 import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
-import SelectionGrid from '~/components/common/SelectionGrid.vue'
 import FlexibleGrid from '~/components/common/FlexibleGrid.vue'
 import DrawerLayout from '~/components/common/DrawerLayout.vue'
 import DefaultFilteredSearch from '~/components/filteredSearch/DefaultFilteredSearch.vue'
@@ -19,8 +18,15 @@ const { release } = defineProps<{
 }>()
 
 // ----- Product Selection -----
-const selectedProducts = ref<Product[]>(release?.productVariants.items.map(pV => pV.product) ?? [])
-const selectedProductIds = computed(() => selectedProducts.value?.map(product => product.id) ?? [])
+const { data: productsData } = useProducts()
+const allProducts = computed(() => productsData.value?.products.items ?? [])
+const selectedProductIds = ref<string[]>(release?.productVariants.items.map(pV => pV.product.id) ?? [])
+const selectedProducts = computed(() => {
+  return selectedProductIds.value
+    .map(pId => allProducts.value.find(p => p.id === pId))
+    .filter(p => !!p)
+})
+
 const startingTokens: TokenData<any>[] = [{
   stratId: 'releases',
   token: release
@@ -135,11 +141,12 @@ async function submitForm() {
     <span class="text-lg font-bold">Assign Products</span>
 
     <FlexibleGrid :items="selectedProducts">
-      <template #default="{ item: product }">
+      <template #default="{ item: product }: {item: Product}">
         <img
           :src="product.featuredAsset?.preview"
-          class="w-full h-full object-cover bg-muted"
           :alt="product.name"
+          loading="lazy"
+          class="w-full h-full object-cover bg-muted"
         >
       </template>
     </FlexibleGrid>
@@ -147,7 +154,8 @@ async function submitForm() {
     <USeparator />
 
     <DefaultFilteredSearch
-      v-model="selectedProducts"
+      v-model="selectedProductIds"
+      :all-products="allProducts"
       :starting-tokens="startingTokens"
     />
 

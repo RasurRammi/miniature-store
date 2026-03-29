@@ -3,12 +3,12 @@ import {
   AssignProductToCollectionDocument,
   CreateProductDocument,
   CreateProductVariantDocument,
-  GetCollectionFiltersDocument, LanguageCode,
+  GetCollectionFiltersDocument,
+  LanguageCode,
   UpdateProductDocument,
   UpdateProductVariantDocument,
 } from '~/gql/admin/graphql'
 import { slugify } from '~/utils/slugify'
-import type { Collection } from '~/types/fragmentAliases'
 
 export type ProductInput = {
   productId?: string
@@ -17,6 +17,7 @@ export type ProductInput = {
   description: string
   price: number
   releaseId?: string
+  tagIds: string[]
   collectionIds: string[]
   assetIds: string[]
 }
@@ -30,54 +31,61 @@ export function useSubmitProduct() {
       const isNew = !input.productId
       let product, productVariants
 
-      const inputProduct = {
-        id: input.productId,
-        translations: [{
-          languageCode: LanguageCode.en,
-          name: input.name,
-          ...(isNew && { slug: slugify(input.name) }),
-          description: input.description,
-        }],
-        featuredAssetId: input.assetIds.length ? input.assetIds[0] : undefined,
-        assetIds: input.assetIds,
-      }
-      const inputProductVariant = {
-        ...(input.variantId && { id: input.variantId }),
-        price: input.price,
-        translations: [{
-          languageCode: LanguageCode.en,
-          name: input.name,
-        }],
-        ...(isNew && { sku: slugify(input.name) }),
-      }
-
+      // ---- Product & Variant -----
       if (isNew) {
-        const { createProduct } = await $adminGqlClient.request(CreateProductDocument, {
+        // Create Product and 1 Variant
+        const inputProduct = {
+          translations: [{
+            languageCode: LanguageCode.en,
+            name: input.name,
+            slug: slugify(input.name), // Set slug for new products
+            description: input.description,
+          }],
+          facetValueIds: input.tagIds,
+          featuredAssetId: input.assetIds[0],
+          assetIds: input.assetIds,
+        }
+        const inputProductVariant = {
+          sku: slugify(input.name), // Set sku for new products
+          price: input.price,
+          translations: [{ languageCode: LanguageCode.en, name: input.name }],
+        }
+        product = (await $adminGqlClient.request(CreateProductDocument, {
           input: inputProduct,
-        })
-
-        // create variant
-        const { createProductVariants } = await $adminGqlClient.request(CreateProductVariantDocument, {
-          input: [{ ...inputProductVariant, productId: createProduct.id }],
-        })
-        product = createProduct
-        productVariants = createProductVariants
+        })).createProduct
+        productVariants = (await $adminGqlClient.request(CreateProductVariantDocument, {
+          input: [{ ...inputProductVariant, productId: product.id }],
+        })).createProductVariants
       }
       else {
-        // update product
-        const { updateProduct } = await $adminGqlClient.request(UpdateProductDocument, {
+        // Update Product & Variant
+        const inputProduct = {
+          id: input.productId!, // Set id for existing products
+          translations: [{
+            languageCode: LanguageCode.en,
+            name: input.name,
+            description: input.description,
+          }],
+          facetValueIds: input.tagIds,
+          featuredAssetId: input.assetIds[0],
+          assetIds: input.assetIds,
+        }
+        const inputProductVariant = {
+          id: input.variantId!, // Set id for existing variants
+          price: input.price,
+          translations: [{ languageCode: LanguageCode.en, name: input.name }],
+        }
+        product = (await $adminGqlClient.request(UpdateProductDocument, {
           input: inputProduct,
-        })
+        })).updateProduct
 
-        // update variant
-        const { updateProductVariants } = await $adminGqlClient.request(UpdateProductVariantDocument, {
+        productVariants = (await $adminGqlClient.request(UpdateProductVariantDocument, {
           input: [inputProductVariant],
-        })
-
-        product = updateProduct
-        productVariants = updateProductVariants
+        })).updateProductVariants
       }
 
+      // ---- Collections -----
+      // const allCollections = [...new Set(input.releaseId ? [...input.collectionIds, input.releaseId] : input.collectionIds)]
       if (!isNew || input.collectionIds.length) {
         const { collections } = await $adminGqlClient.request(GetCollectionFiltersDocument, {
           options: isNew
@@ -109,11 +117,14 @@ export function useSubmitProduct() {
           }),
         )
       }
-      return { product: product, variant: productVariants[0] }
+
+      // ---- Done ----
+      return productVariants[0]
     },
-    onSuccess: () => {
-      console.log('useSubmitProduct: invalidate queries!')
-      queryClient.invalidateQueries({ queryKey: ['bundles'] })
+    onSuccess: async () => {
+      await new Promise(resolve => setTimeout(resolve, 200))
+      queryClient.invalidateQueries({ queryKey: ['releases'] })
+      queryClient.invalidateQueries({ queryKey: ['collections'] })
     },
   })
 }

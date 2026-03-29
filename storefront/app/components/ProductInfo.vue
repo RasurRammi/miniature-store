@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useProductDrawerStore } from '~/stores/productDrawer'
 import { useBundles } from '~/composables/useBundles'
-import type { Asset, Collection, ProductVariant } from '~/types/fragmentAliases'
+import type { Asset, Collection, Facet, ProductVariant } from '~/types/fragmentAliases'
 import { type ProductInput, useSubmitProduct } from '~/composables/admin/useSubmitProduct'
 import ImageCarousel from '~/components/common/ImageCarousel.vue'
 import { useAssetSelectionDrawerStore } from '~/stores/assetSelectionDrawer'
@@ -9,6 +9,7 @@ import DrawerLayout from '~/components/common/DrawerLayout.vue'
 import { useAssets } from '~/composables/admin/useAssets'
 import { useAdminUser } from '~/composables/admin/useAdminUser'
 import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
+import { useFacets } from '~/composables/admin/useFacets'
 
 const adminUser = useAdminUser()
 const productDrawer = useProductDrawerStore()
@@ -35,22 +36,35 @@ const viableBundles = computed(() => {
 
 const { data: assetsData } = useAssets()
 const selectedAssets = computed<Asset[]>(() => {
-  if (!assetsData.value) {
-    return []
-  }
-  return form.assetIds.map((assetId: string) => assetsData.value.assets.items.find((asset: Asset) => asset.id === assetId))
+  if (!assetsData.value) return []
+  return form.assetIds.map((assetId: string) => assetsData.value.assets.items.find((asset: Asset) => asset.id === assetId)!)
+})
+
+const { data: facetsData } = useFacets()
+const viableTags = computed(() => {
+  const facets = facetsData.value?.facets.items ?? []
+  return facets.flatMap((facet: Facet) => {
+    return [
+      { type: 'label', name: facet.name },
+      ...facet.values,
+      { type: 'separator' },
+    ]
+  })
 })
 
 // ---- Form and Editing
 const isNew = computed(() => !productV?.id)
 const mayEdit = computed(() => !!adminUser.data.value)
-const isEditing = ref(isNew.value || mayEdit.value)
+const isEditing = ref(isNew.value)
 const form = reactive<ProductInput>(productVToForm())
 
 watch(() => productV, () => {
   Object.assign(form, productVToForm())
-  isEditing.value = isNew.value || mayEdit.value
+  isEditing.value = isNew.value
 }, { immediate: true })
+
+const emit = defineEmits<{ editingStateChanged: [boolean] }>()
+watch(isEditing, val => emit('editingStateChanged', val))
 
 function startEditing() {
   Object.assign(form, productVToForm())
@@ -71,6 +85,7 @@ function productVToForm(): ProductInput {
     price: productV?.price ?? 0,
     releaseId: selectedRelease.value?.id,
     collectionIds: productV?.product.collections.map(c => c.id) ?? [],
+    tagIds: productV?.product.facetValues.map(fV => fV.id) ?? [],
     assetIds: productV?.product.assets.map(asset => asset.id) ?? [],
   }
 }
@@ -80,8 +95,8 @@ const submitProduct = useSubmitProduct()
 async function submitForm() {
   submitProduct.mutate(form, {
     onSuccess: (data) => {
+      productDrawer.updateData(data!)
       cancelEditing()
-      productDrawer.open(data.variant!)
       toast.add({
         title: 'Product successfully updated',
         description: 'The product was successfully updated',
@@ -146,7 +161,7 @@ async function submitForm() {
       <USelectMenu
         v-if="isEditing"
         v-model="form.releaseId"
-        size="xl"
+        size="lg"
         icon="i-lucide-package-2"
         value-key="id"
         :items="viableBundles"
@@ -154,37 +169,36 @@ async function submitForm() {
 
       <!-- Tags -->
       <div class="flex gap-1">
-        <USelectMenu
+        <UInputMenu
           v-if="isEditing"
-          v-model="form.tags"
-          multiple
+          v-model="form.tagIds"
           :items="viableTags"
-          size="size-4"
-          :ui="{ content: 'w-40 p-2' }"
-        >
-          <template #default>
-            <UButton
-              icon="i-lucide-plus"
-              variant="ghost"
-              color="neutral"
-            />
-          </template>
-        </USelectMenu>
-        <UBadge
-          v-if="selectedRelease && !isEditing"
-          :label="selectedRelease.name"
-          variant="subtle"
-          color="primary"
+          multiple
+          value-key="id"
+          label-key="name"
+          icon="i-lucide-tag"
+          open-on-focus
+          class="flex-1"
           size="lg"
+          :ui="{ label: 'text-muted', tagsItem: 'text-md' }"
         />
-        <UBadge
-          v-for="tag in productV?.product.facetValues"
-          :key="tag.id"
-          :label="tag.name"
-          variant="subtle"
-          color="neutral"
-          size="lg"
-        />
+        <template v-else>
+          <UBadge
+            v-if="selectedRelease"
+            :label="selectedRelease.name"
+            variant="subtle"
+            color="primary"
+            size="lg"
+          />
+          <UBadge
+            v-for="tag in productV?.product.facetValues"
+            :key="tag.id"
+            :label="tag.name"
+            variant="subtle"
+            color="neutral"
+            size="lg"
+          />
+        </template>
       </div>
     </template>
 

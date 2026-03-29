@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import GridArea from '~/components/common/GridArea.vue'
-import { type CollectionInput, useSubmitCollection } from '~/composables/admin/useSubmitCollection'
-import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
 import { useBundles } from '~/composables/useBundles'
 import BundleArea from '~/components/BundleArea.vue'
-import { useAssets } from '~/composables/admin/useAssets'
 
 // TODO remove for production
 definePageMeta({

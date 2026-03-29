@@ -15,24 +15,25 @@ const { release } = defineProps<{ release: Collection }>()
     :initial-state="true"
   >
     <template #actions>
-      <div class="flex gap-2">
-        <UButton
-          variant="solid"
-          color="secondary"
-          icon="i-lucide-plus"
-          label="Create Product"
-          size="lg"
-          @click.stop="productDrawer.open()"
-        />
-        <UButton
-          variant="solid"
-          color="primary"
-          icon="i-lucide-pencil"
-          label="Edit Release"
-          size="lg"
-          @click.stop="releaseDrawer.open(release)"
-        />
-      </div>
+      <UButton
+        block
+        variant="solid"
+        color="secondary"
+        icon="i-lucide-plus"
+        label="Create Product"
+        size="lg"
+        :ui="{ label: 'hidden sm:block' }"
+        @click.stop="productDrawer.open()"
+      />
+      <UButton
+        variant="solid"
+        color="primary"
+        icon="i-lucide-pencil"
+        label="Edit Release"
+        size="lg"
+        :ui="{ label: 'hidden sm:block' }"
+        @click.stop="releaseDrawer.open(release)"
+      />
     </template>
     <template
       v-if="release.productVariants?.items.length"

@@ -55,9 +55,11 @@ function submitSelection() {
 
         <span class="text-lg font-bold">Selected Images</span>
         <FlexibleGrid :items="selectedAssetsCopy">
-          <template #default="{ item }">
+          <template #default="{ item }: {item: Asset}">
             <img
               :src="item.preview"
+              :alt="item.name"
+              loading="lazy"
               class="w-full h-full object-cover bg-muted"
             >
           </template>
@@ -92,11 +94,12 @@ function submitSelection() {
           v-model="selectedCopy"
           :items="assets"
         >
-          <template #default="{ item }">
+          <template #default="{ item }: {item: Asset}">
             <img
               :src="item.preview"
-              class="w-full h-full object-cover bg-muted"
               :alt="item.name"
+              loading="lazy"
+              class="w-full h-full object-cover bg-muted"
             >
           </template>
         </SelectionGrid>

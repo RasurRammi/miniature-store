@@ -1,15 +1,8 @@
 ### Tags
 - Text Suche bei FilteredSearch
-- Produkte mit Tags versehen 
-  - 3 Status: keine, einige, alle
-  - Explizites Speichern nötig
+- Menu muss scrollable für mobile
 
 ### Releases
-- Erstellen: Releases Slideover
-  - Produkte auswählen
-  - Filtern nach Produkten
-  - Standardfilter ist nicht zugewiesene
-  - Von da erstmal keine Produkte erstellen
 - Ändern
   - Assign Products
   - Add Product mit direkter zuweisung zum Release

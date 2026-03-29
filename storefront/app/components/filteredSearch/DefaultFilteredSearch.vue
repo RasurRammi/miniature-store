@@ -7,10 +7,10 @@ import ProductsSelection from '~/components/tags/ProductsSelection.vue'
 import { filterProducts } from '~/composables/admin/useFilterProducts'
 
 const selectedProductIds = defineModel<string[]>({ required: true })
-const { startingTokens = [], allProducts, selectionDisabled } = defineProps<{
+const { startingTokens = [], allProducts, selectionDisabled = false } = defineProps<{
   startingTokens?: TokenData<any>[]
   allProducts: Product[]
-  selectionDisabled: boolean
+  selectionDisabled?: boolean
 }>()
 const activeSearchTokens = ref<TokenData<any>[]>(startingTokens)
 

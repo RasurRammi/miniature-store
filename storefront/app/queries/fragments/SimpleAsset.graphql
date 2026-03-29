@@ -1,5 +1,8 @@
 fragment SimpleAsset on Asset {
   id
+  name
   preview
   source
+  type
+  mimeType
 }

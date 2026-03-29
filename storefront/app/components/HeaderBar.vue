@@ -18,7 +18,7 @@ function getNavItems() {
       {
         label: 'To Admin Dashboard',
         icon: 'i-lucide-shield',
-        to: '/admin/dashboard',
+        to: '/admin/catalogue/releases',
       },
     )
   }
@@ -31,8 +31,9 @@ function getNavItems() {
     <template #left>
       <NuxtLink to="/">
         <img
-          :alt="logoAlt"
           :src="headerLogo"
+          :alt="logoAlt"
+          loading="lazy"
           class="size-12"
         >
       </NuxtLink>

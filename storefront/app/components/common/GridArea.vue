@@ -12,10 +12,10 @@ const isOpen = ref(initialState)
     :disabled="!collapsible"
   >
     <div
-      class="flex justify-between items-center rounded-lg h-16 bg-muted transition-colors px-4"
+      class="flex items-center px-4 h-16 rounded-lg bg-muted transition-colors"
       :class="collapsible ? 'cursor-pointer ' : ''"
     >
-      <div class="flex items-center gap-2 h-6 ">
+      <div class="flex-1 truncate min-w-0 flex items-center gap-2 h-6 ">
         <UIcon
           v-if="collapsible"
           :name="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
@@ -25,7 +25,7 @@ const isOpen = ref(initialState)
           <span class="font-bold">{{ title }}</span>
         </slot>
       </div>
-      <div>
+      <div class="flex gap-2 shrink-0">
         <slot name="actions" />
       </div>
     </div>

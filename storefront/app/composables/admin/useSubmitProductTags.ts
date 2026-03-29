@@ -23,7 +23,6 @@ export function useSubmitProductTags() {
       })).updateProducts
     },
     onSuccess: () => {
-      console.log('useSubmitProduct: invalidate queries!')
       queryClient.invalidateQueries({ queryKey: ['products'] })
     },
   })

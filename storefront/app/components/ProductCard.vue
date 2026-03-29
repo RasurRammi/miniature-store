@@ -19,6 +19,7 @@ const productDrawer = useProductDrawerStore()
         v-if="productV.product.featuredAsset?.preview"
         :src="productV.product.featuredAsset.preview"
         :alt="productV.name"
+        loading="lazy"
         class="w-full h-full object-cover"
       >
       <span

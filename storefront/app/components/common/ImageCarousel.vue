@@ -33,7 +33,25 @@ function select(index: number) {
 </script>
 
 <template>
-  <div class="@container flex flex-col-reverse @lg:flex-row gap-2">
+  <div class="@container flex flex-col @lg:flex-row gap-2">
+    <!-- Main Image -->
+    <div class="aspect-square self-center w-full rounded-xl overflow-hidden bg-muted border border-default">
+      <img
+        v-if="images.length > 0 && images[activeIndex]?.source"
+        :src="images[activeIndex]!.source"
+        class="w-full h-full object-cover"
+      >
+      <span
+        v-else
+        class="aspect-square w-full flex items-center justify-center"
+      >
+        <UIcon
+          name="i-lucide-image"
+          class="size-32 text-muted"
+        />
+      </span>
+    </div>
+
     <!-- Horizontal carousel — visible only when narrow -->
     <div
       v-if="images.length > 1"
@@ -67,6 +85,8 @@ function select(index: number) {
             :src="item.preview"
             class="object-cover"
             loading="lazy"
+            :aria-label="item.name"
+            :alt="item.name"
           >
         </div>
       </UCarousel>
@@ -113,6 +133,8 @@ function select(index: number) {
             :src="item.preview"
             class="object-cover"
             loading="lazy"
+            :aria-label="item.name"
+            :alt="item.name"
           >
         </div>
       </UCarousel>
@@ -123,24 +145,6 @@ function select(index: number) {
         :disabled="activeIndex >= images.length - 1"
         @click="onClickNext"
       />
-    </div>
-
-    <!-- Main Image -->
-    <div class="aspect-square self-center w-full rounded-xl overflow-hidden bg-muted border border-default">
-      <img
-        v-if="images.length > 0 && images[activeIndex]?.source"
-        :src="images[activeIndex].source"
-        class="w-full h-full object-cover"
-      >
-      <span
-        v-else
-        class="aspect-square w-full flex items-center justify-center"
-      >
-        <UIcon
-          name="i-lucide-image"
-          class="size-32 text-muted"
-        />
-      </span>
     </div>
   </div>
 </template>
