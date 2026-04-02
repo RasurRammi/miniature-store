@@ -1,0 +1,174 @@
+/* ============================================================
+   Color scales — generated from logo sampling
+   Both scales follow a perceptual lightness curve so that
+   the 500 step is the "brand" color, 50 is near-white,
+   950 is near-black, usable as a complete design system.
+   ============================================================ */
+
+@theme {
+  --font-sans: 'Public Sans', sans-serif;
+
+  /* NonNom */
+  /* Amber-orange  */
+  --color-nomnom-primary-50:  #FFFBF0;
+  --color-nomnom-primary-100: #FEF3D0;
+  --color-nomnom-primary-200: #FCE49D;
+  --color-nomnom-primary-300: #F9CE62;
+  --color-nomnom-primary-400: #F5A020; /* this */
+  --color-nomnom-primary-500: #E08010;
+  --color-nomnom-primary-600: #C4620A;
+  --color-nomnom-primary-700: #A34B0C;
+  --color-nomnom-primary-800: #853B10;
+  --color-nomnom-primary-900: #6D3112;
+  --color-nomnom-primary-950: #3B1706;
+
+  /* Warm cream */
+  --color-nomnom-sand-50:  #FDFAF7;
+  --color-nomnom-sand-100: #F5EDE3; /* this */
+  --color-nomnom-sand-200: #EAD9C6;
+  --color-nomnom-sand-300: #D9C0A4;
+  --color-nomnom-sand-400: #C4A07E;
+  --color-nomnom-sand-500: #AD8260;
+  --color-nomnom-sand-600: #916848;
+  --color-nomnom-sand-700: #775238;
+  --color-nomnom-sand-800: #60412E;
+  --color-nomnom-sand-900: #4F3526;
+  --color-nomnom-sand-950: #2A1B12;
+
+  /* Reddish accent */
+  --color-nomnom-accent-50: #fff7ec;
+  --color-nomnom-accent-100: #ffecd3;
+  --color-nomnom-accent-200: #ffd5a5;
+  --color-nomnom-accent-300: #ffb76d;
+  --color-nomnom-accent-400: #ff8c32;
+  --color-nomnom-accent-500: #ff6c0a;
+  --color-nomnom-accent-600: #fd5100; /* this */
+  --color-nomnom-accent-700: #cc3902;
+  --color-nomnom-accent-800: #a12d0b;
+  --color-nomnom-accent-900: #82270c;
+  --color-nomnom-accent-950: #461104;
+
+  /* Cornflower blue — sampled from the cat */
+  --color-neko-primary-50:  #EEF6FF;
+  --color-neko-primary-100: #DAECFE;
+  --color-neko-primary-200: #BDDCFD;
+  --color-neko-primary-300: #90C4FB;
+  --color-neko-primary-400: #4A9AE8; /* this */
+  --color-neko-primary-500: #2E7FD1;
+  --color-neko-primary-600: #2064B0;
+  --color-neko-primary-700: #1C508E;
+  --color-neko-primary-800: #1C4475;
+  --color-neko-primary-900: #1C3A60;
+  --color-neko-primary-950: #112440;
+
+  /* Neko */
+  /* Cool gray — sampled from the background */
+  --color-neko-gray-50:  #F6F7F8;
+  --color-neko-gray-100: #ECEEF0;
+  --color-neko-gray-200: #D8DCE0;
+  --color-neko-gray-300: #BDC2C8;
+  --color-neko-gray-400: #9EA5AD;
+  --color-neko-gray-500: #8A9099; /* this */
+  --color-neko-gray-600: #6E757E;
+  --color-neko-gray-700: #5A6068;
+  --color-neko-gray-800: #4C5158;
+  --color-neko-gray-900: #41464C;
+  --color-neko-gray-950: #2A2E33;
+
+  /* Ink — from the black coffee cup, for dark accents */
+  --color-neko-ink-50:  #F4F5F6;
+  --color-neko-ink-100: #E5E7EA;
+  --color-neko-ink-200: #CDD1D6;
+  --color-neko-ink-300: #AAB0B8;
+  --color-neko-ink-400: #838B95;
+  --color-neko-ink-500: #636C77;
+  --color-neko-ink-600: #4E5660;
+  --color-neko-ink-700: #3D444E;
+  --color-neko-ink-800: #2C3038;
+  --color-neko-ink-900: #1E2128;
+  --color-neko-ink-950: #0E1015;
+}
+
+/* ---- Nomnom ---- */
+[data-theme="nomnom"] {
+  --ui-color-primary-50:  var(--color-nomnom-primary-50);
+  --ui-color-primary-100: var(--color-nomnom-primary-100);
+  --ui-color-primary-200: var(--color-nomnom-primary-200);
+  --ui-color-primary-300: var(--color-nomnom-primary-300);
+  --ui-color-primary-400: var(--color-nomnom-primary-400);
+  --ui-color-primary-500: var(--color-nomnom-primary-500);
+  --ui-color-primary-600: var(--color-nomnom-primary-600);
+  --ui-color-primary-700: var(--color-nomnom-primary-700);
+  --ui-color-primary-800: var(--color-nomnom-primary-800);
+  --ui-color-primary-900: var(--color-nomnom-primary-900);
+  --ui-color-primary-950: var(--color-nomnom-primary-950);
+
+  /*
+  --ui-color-secondary-50:  var(--color-nomnom-accent-50);
+  --ui-color-secondary-100: var(--color-nomnom-accent-100);
+  --ui-color-secondary-200: var(--color-nomnom-accent-200);
+  --ui-color-secondary-300: var(--color-nomnom-accent-300);
+  --ui-color-secondary-400: var(--color-nomnom-accent-400);
+  --ui-color-secondary-500: var(--color-nomnom-accent-500);
+  --ui-color-secondary-600: var(--color-nomnom-accent-600);
+  --ui-color-secondary-700: var(--color-nomnom-accent-700);
+  --ui-color-secondary-800: var(--color-nomnom-accent-800);
+  --ui-color-secondary-900: var(--color-nomnom-accent-900);
+  --ui-color-secondary-950: var(--color-nomnom-accent-950);
+  */
+
+  --ui-bg:          var(--color-nomnom-sand-100);
+  --ui-bg-muted:    var(--color-nomnom-sand-200);
+  --ui-bg-elevated: var(--color-nomnom-sand-50);
+  --ui-bg-accented: var(--color-nomnom-sand-300);
+  --ui-bg-inverted: var(--color-nomnom-sand-900);
+
+  --ui-text:            var(--color-nomnom-sand-950);
+  --ui-text-muted:      var(--color-nomnom-sand-700);
+  --ui-text-toned:      var(--color-nomnom-sand-600);
+  --ui-text-dimmed:     var(--color-nomnom-sand-500);
+  --ui-text-highlighted:var(--color-nomnom-sand-950);
+  --ui-text-inverted:   var(--color-nomnom-sand-50);
+
+  --ui-border:          var(--color-nomnom-sand-300);
+  --ui-border-muted:    var(--color-nomnom-sand-200);
+  --ui-border-accented: var(--color-nomnom-sand-400);
+  --ui-border-inverted: var(--color-nomnom-sand-950);
+}
+
+/* ---- Neko ---- */
+[data-theme="neko"] {
+  /* Remap Nuxt UI primary scale → neko cornflower blue */
+  --ui-color-primary-50:  var(--color-neko-primary-50);
+  --ui-color-primary-100: var(--color-neko-primary-100);
+  --ui-color-primary-200: var(--color-neko-primary-200);
+  --ui-color-primary-300: var(--color-neko-primary-300);
+  --ui-color-primary-400: var(--color-neko-primary-400);
+  --ui-color-primary-500: var(--color-neko-primary-500);
+  --ui-color-primary-600: var(--color-neko-primary-600);
+  --ui-color-primary-700: var(--color-neko-primary-700);
+  --ui-color-primary-800: var(--color-neko-primary-800);
+  --ui-color-primary-900: var(--color-neko-primary-900);
+  --ui-color-primary-950: var(--color-neko-primary-950);
+
+  /* Surface — dark ink, lifted slightly for elevated/muted layers */
+  --ui-bg:          var(--color-neko-ink-900);  /* main bg: near-black */
+  --ui-bg-muted:    var(--color-neko-ink-800);  /* slightly lighter for muted areas */
+  --ui-bg-elevated: var(--color-neko-ink-700);  /* cards, popovers sit above the base */
+  --ui-bg-accented: var(--color-neko-ink-600);  /* hover states, selected rows */
+  --ui-bg-inverted: var(--color-neko-gray-50);  /* inverted = near-white */
+
+  /* Text — near-white gray tones for readability on dark */
+  --ui-text:            var(--color-neko-gray-50);   /* primary text: near-white */
+  --ui-text-muted:      var(--color-neko-gray-300);  /* secondary/placeholder */
+  --ui-text-toned:      var(--color-neko-gray-400);  /* tertiary */
+  --ui-text-dimmed:     var(--color-neko-gray-500);  /* disabled */
+  --ui-text-highlighted:var(--color-neko-gray-50);   /* emphasis = same as primary */
+  --ui-text-inverted:   var(--color-neko-ink-950);   /* text on light surfaces */
+
+  /* Border — subtle separators that don't compete with content on dark bg */
+  --ui-border:          var(--color-neko-ink-600);
+  --ui-border-muted:    var(--color-neko-ink-700);
+  --ui-border-accented: var(--color-neko-ink-500);
+  --ui-border-inverted: var(--color-neko-gray-200);
+}
