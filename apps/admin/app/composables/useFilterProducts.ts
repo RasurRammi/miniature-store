@@ -1,5 +1,5 @@
 import type { FilterTokenStrategy, TokenData } from '~/types/filteredSearch'
-import type { Product } from '~/types/fragmentAliases'
+import type {Product} from "~/types/fragmentAliases";
 
 export function filterProducts(
   products: Product[],

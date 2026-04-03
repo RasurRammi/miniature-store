@@ -1,20 +1,13 @@
-import { AdminMeDocument } from '~/gql/admin/graphql'
+import { AdminMeDocument } from '~/gql/graphql'
 import { type Toast, useToast } from '#ui/composables'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path.startsWith('/admin')) {
-    setPageLayout('admin')
-  }
-
-  if (
-    !to.path.startsWith('/admin')
-    || import.meta.server
-  ) {
+  if (import.meta.server) {
     return
   }
 
   // Check for admin rights, otherwise redirect to admin login
-  const { $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const toast = useToast()
   const loginNeededMsg: Partial<Toast> = {
     title: 'Not logged in',
@@ -23,20 +16,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   try {
-    const data = await $adminGqlClient.request(AdminMeDocument)
+    const data = await $gqlClient.request(AdminMeDocument)
 
-    if (data.me && to.path === '/admin/login') {
-      return navigateTo('/admin/catalogue/releases', { replace: true })
+    if (data.me && (to.path === '/login' || to.path === '/')) {
+      return navigateTo('/catalogue/releases', { replace: true })
     }
-    if (!data.me && to.path !== '/admin/login') {
+    if (!data.me && to.path !== '/login') {
       toast.add(loginNeededMsg)
-      return navigateTo('/admin/login')
+      return navigateTo('/login')
     }
   }
   catch {
-    if (to.path !== '/admin/login') {
+    if (to.path !== '/login') {
       toast.add(loginNeededMsg)
-      return navigateTo('/admin/login')
+      return navigateTo('/login')
     }
   }
 })

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { UpdateProductsDocument } from '~/gql/admin/graphql'
+import { UpdateProductsDocument } from '~/gql/graphql'
 
 export type ProductTagsInput = {
   productId: string
@@ -7,7 +7,7 @@ export type ProductTagsInput = {
 }
 
 export function useSubmitProductTags() {
-  const { $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -18,7 +18,7 @@ export function useSubmitProductTags() {
       }))
 
       // update product
-      return (await $adminGqlClient.request(UpdateProductsDocument, {
+      return (await $gqlClient.request(UpdateProductsDocument, {
         input: inputProduct,
       })).updateProducts
     },

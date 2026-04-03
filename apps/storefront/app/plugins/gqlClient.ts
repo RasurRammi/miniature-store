@@ -15,9 +15,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   const gqlClient = new GraphQLClient(`${origin}${config.public.shopApiUrl}`, { headers })
-  const adminGqlClient = new GraphQLClient(`${origin}${config.public.adminApiUrl}`, { headers })
 
   return {
-    provide: { gqlClient, adminGqlClient },
+    provide: { gqlClient },
   }
 })

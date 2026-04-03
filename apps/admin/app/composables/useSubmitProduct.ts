@@ -7,7 +7,7 @@ import {
   LanguageCode,
   UpdateProductDocument,
   UpdateProductVariantDocument,
-} from '~/gql/admin/graphql'
+} from '~/gql/graphql'
 import { slugify } from '~/utils/slugify'
 
 export type ProductInput = {
@@ -23,7 +23,7 @@ export type ProductInput = {
 }
 
 export function useSubmitProduct() {
-  const { $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -50,10 +50,10 @@ export function useSubmitProduct() {
           price: input.price,
           translations: [{ languageCode: LanguageCode.en, name: input.name }],
         }
-        product = (await $adminGqlClient.request(CreateProductDocument, {
+        product = (await $gqlClient.request(CreateProductDocument, {
           input: inputProduct,
         })).createProduct
-        productVariants = (await $adminGqlClient.request(CreateProductVariantDocument, {
+        productVariants = (await $gqlClient.request(CreateProductVariantDocument, {
           input: [{ ...inputProductVariant, productId: product.id }],
         })).createProductVariants
       }
@@ -75,11 +75,11 @@ export function useSubmitProduct() {
           price: input.price,
           translations: [{ languageCode: LanguageCode.en, name: input.name }],
         }
-        product = (await $adminGqlClient.request(UpdateProductDocument, {
+        product = (await $gqlClient.request(UpdateProductDocument, {
           input: inputProduct,
         })).updateProduct
 
-        productVariants = (await $adminGqlClient.request(UpdateProductVariantDocument, {
+        productVariants = (await $gqlClient.request(UpdateProductVariantDocument, {
           input: [inputProductVariant],
         })).updateProductVariants
       }
@@ -87,7 +87,7 @@ export function useSubmitProduct() {
       // ---- Collections -----
       // const allCollections = [...new Set(input.releaseId ? [...input.collectionIds, input.releaseId] : input.collectionIds)]
       if (!isNew || input.collectionIds.length) {
-        const { collections } = await $adminGqlClient.request(GetCollectionFiltersDocument, {
+        const { collections } = await $gqlClient.request(GetCollectionFiltersDocument, {
           options: isNew
             ? { filter: { id: { in: input.collectionIds } } } // create: fetch only selected
             : {}, // update: fetch all to remove from prior-ly included
@@ -110,7 +110,7 @@ export function useSubmitProduct() {
               ? [...new Set([...existingIds, product.id])]
               : existingIds.filter(id => id !== product.id)
 
-            await $adminGqlClient.request(AssignProductToCollectionDocument, {
+            await $gqlClient.request(AssignProductToCollectionDocument, {
               collectionId: collection.id,
               productIds: JSON.stringify(mergedIds),
             })

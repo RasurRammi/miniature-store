@@ -1,6 +1,5 @@
-<!-- app/pages/admin/login.vue -->
 <script setup lang="ts">
-import { useAdminLogin } from '~/composables/admin/useAdminLogin'
+import { useAdminLogin } from '~/composables/useLogin'
 
 const form = reactive({
   username: '',

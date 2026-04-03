@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/vue-query'
-import { LoginDocument } from '~/gql/shop/graphql'
+import { LoginDocument } from '~/gql/graphql'
 
 export function useCustomerLogin() {
   const { $gqlClient } = useNuxtApp()

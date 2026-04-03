@@ -20,15 +20,15 @@ type Documents = {
     "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}": typeof types.SimpleFacetValueFieldsFragmentDoc,
     "fragment SimpleProductFields on Product {\n  id\n  name\n  slug\n  description\n  facetValues {\n    id\n    facetId\n    name\n  }\n  featuredAsset {\n    ...SimpleAsset\n  }\n  assets {\n    ...SimpleAsset\n  }\n  collections {\n    id\n    parentId\n    name\n    slug\n  }\n}": typeof types.SimpleProductFieldsFragmentDoc,
     "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}": typeof types.SimpleProductVariantFieldsFragmentDoc,
-    "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": typeof types.GetBundleDocument,
-    "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}": typeof types.GetBundlesDocument,
     "mutation Login($username: String!, $password: String!) {\n  login(username: $username, password: $password) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}": typeof types.LoginDocument,
     "mutation ShopLogout {\n  logout {\n    success\n  }\n}": typeof types.ShopLogoutDocument,
     "query ShopMe {\n  me {\n    id\n    identifier\n  }\n}": typeof types.ShopMeDocument,
-    "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}": typeof types.GetProductDocument,
-    "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}": typeof types.GetProductsDocument,
     "mutation Register($input: RegisterCustomerInput!) {\n  registerCustomerAccount(input: $input) {\n    ... on Success {\n      success\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}": typeof types.RegisterDocument,
     "mutation VerifyCustomerAccount($token: String!) {\n  verifyCustomerAccount(token: $token) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}": typeof types.VerifyCustomerAccountDocument,
+    "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": typeof types.GetBundleDocument,
+    "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}": typeof types.GetBundlesDocument,
+    "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}": typeof types.GetProductDocument,
+    "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}": typeof types.GetProductsDocument,
 };
 const documents: Documents = {
     "fragment SimpleAsset on Asset {\n  id\n  name\n  preview\n  source\n  type\n  mimeType\n}": types.SimpleAssetFragmentDoc,
@@ -37,15 +37,15 @@ const documents: Documents = {
     "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}": types.SimpleFacetValueFieldsFragmentDoc,
     "fragment SimpleProductFields on Product {\n  id\n  name\n  slug\n  description\n  facetValues {\n    id\n    facetId\n    name\n  }\n  featuredAsset {\n    ...SimpleAsset\n  }\n  assets {\n    ...SimpleAsset\n  }\n  collections {\n    id\n    parentId\n    name\n    slug\n  }\n}": types.SimpleProductFieldsFragmentDoc,
     "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}": types.SimpleProductVariantFieldsFragmentDoc,
-    "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": types.GetBundleDocument,
-    "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}": types.GetBundlesDocument,
     "mutation Login($username: String!, $password: String!) {\n  login(username: $username, password: $password) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}": types.LoginDocument,
     "mutation ShopLogout {\n  logout {\n    success\n  }\n}": types.ShopLogoutDocument,
     "query ShopMe {\n  me {\n    id\n    identifier\n  }\n}": types.ShopMeDocument,
-    "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}": types.GetProductDocument,
-    "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}": types.GetProductsDocument,
     "mutation Register($input: RegisterCustomerInput!) {\n  registerCustomerAccount(input: $input) {\n    ... on Success {\n      success\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}": types.RegisterDocument,
     "mutation VerifyCustomerAccount($token: String!) {\n  verifyCustomerAccount(token: $token) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}": types.VerifyCustomerAccountDocument,
+    "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": types.GetBundleDocument,
+    "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}": types.GetBundlesDocument,
+    "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}": types.GetProductDocument,
+    "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}": types.GetProductsDocument,
 };
 
 /**
@@ -89,14 +89,6 @@ export function graphql(source: "fragment SimpleProductVariantFields on ProductV
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}"): (typeof documents)["query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}"): (typeof documents)["query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "mutation Login($username: String!, $password: String!) {\n  login(username: $username, password: $password) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}"): (typeof documents)["mutation Login($username: String!, $password: String!) {\n  login(username: $username, password: $password) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -109,19 +101,27 @@ export function graphql(source: "query ShopMe {\n  me {\n    id\n    identifier\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}"): (typeof documents)["query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}"): (typeof documents)["query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "mutation Register($input: RegisterCustomerInput!) {\n  registerCustomerAccount(input: $input) {\n    ... on Success {\n      success\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}"): (typeof documents)["mutation Register($input: RegisterCustomerInput!) {\n  registerCustomerAccount(input: $input) {\n    ... on Success {\n      success\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation VerifyCustomerAccount($token: String!) {\n  verifyCustomerAccount(token: $token) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}"): (typeof documents)["mutation VerifyCustomerAccount($token: String!) {\n  verifyCustomerAccount(token: $token) {\n    ... on CurrentUser {\n      id\n      identifier\n    }\n    ... on ErrorResult {\n      errorCode\n      message\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}"): (typeof documents)["query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}"): (typeof documents)["query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}"): (typeof documents)["query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}"): (typeof documents)["query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { CreateCollectionDocument, LanguageCode, UpdateCollectionDocument } from '~/gql/admin/graphql'
+import { CreateCollectionDocument, LanguageCode, UpdateCollectionDocument } from '~/gql/graphql'
 import { slugify } from '~/utils/slugify'
 
 export type CollectionInput = {
@@ -11,7 +11,7 @@ export type CollectionInput = {
 }
 
 export function useSubmitCollection() {
-  const { $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -37,8 +37,8 @@ export function useSubmitCollection() {
       }
 
       const collection = !input.collectionId
-        ? (await $adminGqlClient.request(CreateCollectionDocument, { input: colInput })).createCollection
-        : (await $adminGqlClient.request(UpdateCollectionDocument, { input: colInput })).updateCollection
+        ? (await $gqlClient.request(CreateCollectionDocument, { input: colInput })).createCollection
+        : (await $gqlClient.request(UpdateCollectionDocument, { input: colInput })).updateCollection
 
       return { collection: collection }
     },

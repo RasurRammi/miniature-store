@@ -7,7 +7,7 @@ import ImageCarousel from '~/components/common/ImageCarousel.vue'
 import { useAssetSelectionDrawerStore } from '~/stores/assetSelectionDrawer'
 import DrawerLayout from '~/components/common/DrawerLayout.vue'
 import { useAssets } from '~/composables/admin/useAssets'
-import { useAdminUser } from '~/composables/admin/useAdminUser'
+import { useAdminUser } from '~/composables/admin/useUser'
 import { useRootReleaseBundle } from '~/composables/useRootReleaseBundle'
 import { useFacets } from '~/composables/admin/useFacets'
 

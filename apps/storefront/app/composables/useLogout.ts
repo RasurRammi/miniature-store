@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/vue-query'
-import { ShopLogoutDocument } from '~/gql/shop/graphql'
+import { ShopLogoutDocument } from '~/gql/graphql'
 import { AdminLogoutDocument } from '~/gql/admin/graphql'
 
 export function useLogout() {

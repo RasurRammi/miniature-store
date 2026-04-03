@@ -1,0 +1,7 @@
+projects:
+  admin:
+    schema: 'http://localhost:3099/admin-api'
+    documents: './../../apps/admin/queries/**/*.graphql'
+  shop:
+    schema: 'http://localhost:3099/shop-api'
+    documents: './../../apps/storefront/queries/**/*.graphql'

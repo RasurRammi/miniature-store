@@ -1,5 +1,5 @@
 {
-  "name": "vendure-backend",
+  "name": "@miniature-store/vendure",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,11 +13,9 @@
     "start:worker": "node ./dist/index-worker.js",
     "start": "concurrently npm:start:*",
     "codegen": "graphql-codegen --config codegen.ts",
-
     "migration:generate": "vendure migrate generate",
     "migration:run": "vendure migrate run",
     "migration:revert": "vendure migrate revert",
-
     "seed": "ts-node src/seed.ts"
   },
   "dependencies": {
@@ -30,14 +28,18 @@
     "@vendure/graphiql-plugin": "3.5.5",
     "dotenv": "17.3.1",
     "graphql": "^16.13.1",
-    "pg": "8.20.0"
+    "graphql-tag": "^2.12.6",
+    "pg": "8.20.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "6.1.3",
     "@vendure/cli": "3.5.5",
     "concurrently": "9.2.1",
     "ts-node": "10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vite": "^6.4.1"
   },
   "packageManager": "pnpm@10.29.3"
 }

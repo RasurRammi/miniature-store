@@ -2,11 +2,6 @@
 import { useBundles } from '~/composables/useBundles'
 import BundleArea from '~/components/BundleArea.vue'
 
-// TODO remove for production
-definePageMeta({
-  layout: 'admin',
-})
-
 const { data: releasesData, isLoading, error } = useBundles()
 const releasesDrawer = useReleaseDrawerStore()
 </script>

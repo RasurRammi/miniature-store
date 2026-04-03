@@ -30,12 +30,16 @@ type Documents = {
     "mutation UpdateProduct($input: UpdateProductInput!) {\n  updateProduct(input: $input) {\n    ...SimpleProductFields\n  }\n}": typeof types.UpdateProductDocument,
     "mutation UpdateProductVariant($input: [UpdateProductVariantInput!]!) {\n  updateProductVariants(input: $input) {\n    ...SimpleProductVariantFields\n  }\n}": typeof types.UpdateProductVariantDocument,
     "mutation UpdateProducts($input: [UpdateProductInput!]!) {\n  updateProducts(input: $input) {\n    ...SimpleProductFields\n  }\n}": typeof types.UpdateProductsDocument,
+    "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": typeof types.GetBundleDocument,
+    "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}": typeof types.GetBundlesDocument,
     "fragment SimpleAsset on Asset {\n  id\n  name\n  preview\n  source\n  type\n  mimeType\n}": typeof types.SimpleAssetFragmentDoc,
     "fragment SimpleCollectionFields on Collection {\n  id\n  name\n  slug\n  description\n  featuredAsset {\n    id\n    preview\n    source\n  }\n  productVariants {\n    items {\n      ...SimpleProductVariantFields\n    }\n  }\n  filters {\n    code\n    args {\n      name\n      value\n    }\n  }\n}": typeof types.SimpleCollectionFieldsFragmentDoc,
     "fragment SimpleFacetFields on Facet {\n  id\n  name\n  code\n  values {\n    ...SimpleFacetValueFields\n  }\n  translations {\n    id\n    name\n    languageCode\n  }\n}": typeof types.SimpleFacetFieldsFragmentDoc,
     "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}": typeof types.SimpleFacetValueFieldsFragmentDoc,
     "fragment SimpleProductFields on Product {\n  id\n  name\n  slug\n  description\n  facetValues {\n    id\n    facetId\n    name\n  }\n  featuredAsset {\n    ...SimpleAsset\n  }\n  assets {\n    ...SimpleAsset\n  }\n  collections {\n    id\n    parentId\n    name\n    slug\n  }\n}": typeof types.SimpleProductFieldsFragmentDoc,
     "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}": typeof types.SimpleProductVariantFieldsFragmentDoc,
+    "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}": typeof types.GetProductDocument,
+    "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}": typeof types.GetProductsDocument,
 };
 const documents: Documents = {
     "query GetAssets($options: AssetListOptions) {\n  assets(options: $options) {\n    items {\n      ...SimpleAsset\n    }\n  }\n}": types.GetAssetsDocument,
@@ -54,12 +58,16 @@ const documents: Documents = {
     "mutation UpdateProduct($input: UpdateProductInput!) {\n  updateProduct(input: $input) {\n    ...SimpleProductFields\n  }\n}": types.UpdateProductDocument,
     "mutation UpdateProductVariant($input: [UpdateProductVariantInput!]!) {\n  updateProductVariants(input: $input) {\n    ...SimpleProductVariantFields\n  }\n}": types.UpdateProductVariantDocument,
     "mutation UpdateProducts($input: [UpdateProductInput!]!) {\n  updateProducts(input: $input) {\n    ...SimpleProductFields\n  }\n}": types.UpdateProductsDocument,
+    "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}": types.GetBundleDocument,
+    "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}": types.GetBundlesDocument,
     "fragment SimpleAsset on Asset {\n  id\n  name\n  preview\n  source\n  type\n  mimeType\n}": types.SimpleAssetFragmentDoc,
     "fragment SimpleCollectionFields on Collection {\n  id\n  name\n  slug\n  description\n  featuredAsset {\n    id\n    preview\n    source\n  }\n  productVariants {\n    items {\n      ...SimpleProductVariantFields\n    }\n  }\n  filters {\n    code\n    args {\n      name\n      value\n    }\n  }\n}": types.SimpleCollectionFieldsFragmentDoc,
     "fragment SimpleFacetFields on Facet {\n  id\n  name\n  code\n  values {\n    ...SimpleFacetValueFields\n  }\n  translations {\n    id\n    name\n    languageCode\n  }\n}": types.SimpleFacetFieldsFragmentDoc,
     "fragment SimpleFacetValueFields on FacetValue {\n  id\n  facetId\n  name\n  code\n  translations {\n    id\n    name\n    languageCode\n  }\n}": types.SimpleFacetValueFieldsFragmentDoc,
     "fragment SimpleProductFields on Product {\n  id\n  name\n  slug\n  description\n  facetValues {\n    id\n    facetId\n    name\n  }\n  featuredAsset {\n    ...SimpleAsset\n  }\n  assets {\n    ...SimpleAsset\n  }\n  collections {\n    id\n    parentId\n    name\n    slug\n  }\n}": types.SimpleProductFieldsFragmentDoc,
     "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}": types.SimpleProductVariantFieldsFragmentDoc,
+    "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}": types.GetProductDocument,
+    "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}": types.GetProductsDocument,
 };
 
 /**
@@ -143,6 +151,14 @@ export function graphql(source: "mutation UpdateProducts($input: [UpdateProductI
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}"): (typeof documents)["query GetBundle($id: ID, $slug: String) {\n  collection(id: $id, slug: $slug) {\n    ...SimpleCollectionFields\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}"): (typeof documents)["query GetBundles($options: CollectionListOptions) {\n  collections(options: $options) {\n    items {\n      ...SimpleCollectionFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "fragment SimpleAsset on Asset {\n  id\n  name\n  preview\n  source\n  type\n  mimeType\n}"): (typeof documents)["fragment SimpleAsset on Asset {\n  id\n  name\n  preview\n  source\n  type\n  mimeType\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -164,6 +180,14 @@ export function graphql(source: "fragment SimpleProductFields on Product {\n  id
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}"): (typeof documents)["fragment SimpleProductVariantFields on ProductVariant {\n  id\n  price\n  currencyCode\n  name\n  product {\n    ...SimpleProductFields\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}"): (typeof documents)["query GetProduct($id: ID, $slug: String) {\n  product(id: $id, slug: $slug) {\n    ...SimpleProductFields\n    variants {\n      ...SimpleProductVariantFields\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}"): (typeof documents)["query GetProducts {\n  products(options: {filter: {enabled: {eq: true}}}) {\n    items {\n      ...SimpleProductFields\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

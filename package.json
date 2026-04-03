@@ -1,6 +1,7 @@
 {
   "name": "miniature-store",
   "private": true,
+  "packageManager": "pnpm@10.29.3",
   "scripts": {
     "dev:storefront": "pnpm --filter @miniature-store/storefront dev",
     "dev:admin":      "pnpm --filter @miniature-store/admin dev",
@@ -8,5 +9,10 @@
     "dev":            "pnpm --filter './apps/*' --parallel dev",
     "codegen":        "pnpm --filter @miniature-store/codegen generate",
     "build":          "pnpm -r build"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "^6.0.0"
+    }
   }
 }

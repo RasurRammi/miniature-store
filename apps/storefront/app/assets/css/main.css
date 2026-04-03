@@ -2,6 +2,8 @@
 @import "@nuxt/ui";
 @import "./themes.css";
 
+@source "../../../../../packages/shared/src";
+
 @theme static {
   --font-sans: 'Public Sans', sans -serif;
 

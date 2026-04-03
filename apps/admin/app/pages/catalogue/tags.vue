@@ -2,12 +2,7 @@
 import Facets from '~/components/tags/Facets.vue'
 import DefaultFilteredSearch from '~/components/filteredSearch/DefaultFilteredSearch.vue'
 import type { FacetValue, Product } from '~/types/fragmentAliases'
-import { useSubmitProductTags } from '~/composables/admin/useSubmitProductTags'
-
-// TODO remove for production
-definePageMeta({
-  layout: 'admin',
-})
+import { useSubmitProductTags } from '~/composables/useSubmitProductTags'
 
 const isEditingFacets = ref<boolean>(false)
 // --- Products ---

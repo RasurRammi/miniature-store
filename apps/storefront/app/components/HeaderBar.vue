@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAdminUser } from '~/composables/admin/useAdminUser'
+import { useAdminUser } from '~/composables/admin/useUser'
 import { useDefaultNavItems, useUserNav } from '~/composables/useNavItems'
 
 const { headerLogo, logoAlt } = defineProps<{ headerLogo: string, logoAlt: string }>()

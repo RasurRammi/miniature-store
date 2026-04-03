@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import SelectionGrid from '~/components/common/SelectionGrid.vue'
-import { useAssets } from '~/composables/admin/useAssets'
+import { useAssets } from '~/composables/useAssets'
 import type { Asset } from '~/types/fragmentAliases'
-
-// TODO remove for production
-definePageMeta({
-  layout: 'admin',
-})
+import {SelectionGrid} from "@miniature-store/shared/components";
 
 const { data: assetsData } = useAssets()
 

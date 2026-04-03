@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@miniature-store/shared/*": ["./packages/shared/src/*"]
+    }
+  }
+}

@@ -3,9 +3,12 @@ import type { CodegenConfig } from '@graphql-codegen/cli'
 const config: CodegenConfig = {
   overwrite: true,
   generates: {
-    './app/gql/shop/': {
-      schema: 'http://localhost:3001/shop-api',
-      documents: ['app/queries/shop/**/*.graphql', 'app/queries/fragments/**/*.graphql'],
+    '../../apps/storefront/app/gql/': {
+      schema: 'http://localhost:3099/shop-api',
+      documents: [
+        '../../apps/storefront/app/queries/**/*.graphql',
+        '../shared/src/queries/**/*.graphql'
+      ],
       preset: 'client',
       presetConfig: {
         fragmentMasking: false,
@@ -21,9 +24,12 @@ const config: CodegenConfig = {
         },
       },
     },
-    './app/gql/admin/': {
-      schema: 'http://localhost:3001/admin-api',
-      documents: ['app/queries/admin/**/*.graphql', 'app/queries/fragments/**/*.graphql'],
+    '../../apps/admin/app/gql/': {
+      schema: 'http://localhost:3099/admin-api',
+      documents: [
+        '../../apps/admin/app/queries/**/*.graphql',
+        '../shared/src/queries/**/*.graphql'
+      ],
       preset: 'client',
       presetConfig: {
         fragmentMasking: false,

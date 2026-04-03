@@ -4,7 +4,7 @@ import {
   CreateFacetValuesDocument, DeleteFacetsDocument, DeleteFacetValuesDocument,
   UpdateFacetDocument,
   UpdateFacetValuesDocument,
-} from '~/gql/admin/graphql'
+} from '~/gql/graphql'
 import { slugify } from '~/utils/slugify'
 
 export type FacetInput = {
@@ -22,13 +22,13 @@ export type FacetValueInput = {
 }
 
 export function useSubmitFacets() {
-  const { $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (input: FacetInput[]) => {
       const deletedFacets = input.filter(fI => fI.isDeleted).map(f => f.id)
-      const { deleteFacets } = await $adminGqlClient.request(DeleteFacetsDocument, { ids: deletedFacets })
+      const { deleteFacets } = await $gqlClient.request(DeleteFacetsDocument, { ids: deletedFacets })
 
       const remainingInput = input.filter(fI => !fI.isDeleted)
       const results = await Promise.all(remainingInput.map(async (facet) => {
@@ -58,7 +58,7 @@ export function useSubmitFacets() {
           })
 
         if (isNew) {
-          const { createFacet } = await $adminGqlClient.request(CreateFacetDocument, { input: facetInput })
+          const { createFacet } = await $gqlClient.request(CreateFacetDocument, { input: facetInput })
 
           const facetVInput = facetValuesInput.map((facetV) => {
             return {
@@ -67,13 +67,13 @@ export function useSubmitFacets() {
             }
           })
           const createdValues = facetVInput.length
-            ? await $adminGqlClient.request(CreateFacetValuesDocument, { input: facetVInput })
+            ? await $gqlClient.request(CreateFacetValuesDocument, { input: facetVInput })
             : []
           return { facet: createFacet, facetValues: createdValues }
         }
         else {
           const updateFacet = facet.isDirty
-            ? (await $adminGqlClient.request(UpdateFacetDocument, { input: facetInput })).updateFacet
+            ? (await $gqlClient.request(UpdateFacetDocument, { input: facetInput })).updateFacet
             : null
 
           const [toCreate, toUpdate, toDelete] = [
@@ -84,13 +84,13 @@ export function useSubmitFacets() {
           ]
 
           const created = toCreate.length
-            ? (await $adminGqlClient.request(CreateFacetValuesDocument, { input: toCreate })).createFacetValues
+            ? (await $gqlClient.request(CreateFacetValuesDocument, { input: toCreate })).createFacetValues
             : []
           const updated = toUpdate.length
-            ? (await $adminGqlClient.request(UpdateFacetValuesDocument, { input: toUpdate })).updateFacetValues
+            ? (await $gqlClient.request(UpdateFacetValuesDocument, { input: toUpdate })).updateFacetValues
             : []
           const deleted = toDelete.length
-            ? (await $adminGqlClient.request(DeleteFacetValuesDocument, { ids: toDelete })).deleteFacetValues
+            ? (await $gqlClient.request(DeleteFacetValuesDocument, { ids: toDelete })).deleteFacetValues
             : []
 
           return { facet: updateFacet, facetValues: [...created, ...updated], deletedValues: deleted }

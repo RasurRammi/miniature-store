@@ -1,0 +1,16 @@
+{
+  "name": "@miniature-store/shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./queries": "./src/queries/index.ts",
+    "./components": "./src/components/index.ts",
+    "./stores": "./src/stores/index.ts",
+    "./utils": "./src/utils/index.ts"
+  },
+  "peerDependencies": {
+    "vue":     "^3.0.0",
+    "@nuxt/ui": "^4.0.0",
+    "pinia":   "^3.0.0"
+  }
+}

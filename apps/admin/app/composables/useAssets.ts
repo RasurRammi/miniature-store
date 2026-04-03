@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/vue-query'
-import { GetAssetsDocument } from '~/gql/admin/graphql'
+import {GetAssetsDocument} from "~/gql/graphql";
 
 export function useAssets() {
-  const { $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const query = useQuery({
     queryKey: ['assets'],
     queryFn: async () => {
-      return $adminGqlClient.request(GetAssetsDocument)
+      return $gqlClient.request(GetAssetsDocument)
     },
   })
 
