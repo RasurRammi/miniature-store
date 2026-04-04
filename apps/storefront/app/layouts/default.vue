@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { useTheme } from '~/composables/admin/useTheme'
-
-const { themeData } = useTheme()
 
 useHead({
   meta: [
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
   ],
   link: [
-    { rel: 'icon', href: themeData.value.logoSrc },
+    { rel: 'icon', href: 'favicon.ico' },
   ],
   htmlAttrs: {
     lang: 'en',
@@ -29,8 +26,8 @@ useSeoMeta({
 <template>
   <div class="flex flex-col min-h-screen">
     <HeaderBar
-      :header-logo="themeData.logoSrc"
-      :logo-alt="themeData.logoTitle"
+      :logo-alt="'Test'"
+      :header-logo="'test'"
     />
 
     <UMain>
@@ -39,7 +36,7 @@ useSeoMeta({
 
     <USeparator
       :avatar="{
-        src: themeData.logoSrc,
+        src: 'test',
         loading: 'lazy',
       }"
     />
@@ -47,7 +44,7 @@ useSeoMeta({
     <UFooter>
       <template #left>
         <p class="text-sm text-muted">
-          Built with for great creators • © {{ new Date().getFullYear() }}
+          Built for great creators • © {{ new Date().getFullYear() }}
         </p>
       </template>
 

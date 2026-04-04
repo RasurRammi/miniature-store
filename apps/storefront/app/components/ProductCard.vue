@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useProductDrawerStore } from '~/stores/productDrawer'
-import { formatCurrency } from '~/utils/formatCurrency'
 import type { ProductVariant } from '~/types/fragmentAliases'
-import GridCard from '~/components/common/GridCard.vue'
+import {GridCard} from "@miniature-store/shared/components";
+import {formatCurrency} from "@miniature-store/shared/utils";
 
 const { productV } = defineProps<{ productV: ProductVariant }>()
 
@@ -44,9 +44,7 @@ const productDrawer = useProductDrawerStore()
       </UButton>
 
       <div class="flex flex-row justify-between items-center">
-        <div v-if="productV.price > 0">
-          {{ formatCurrency(productV.price) }} {{ productV.currencyCode === 'EUR' ? '€' : '?' }}
-        </div>
+        <div v-if="productV.price > 0"/>
         <div
           v-else
           class="text-primary"

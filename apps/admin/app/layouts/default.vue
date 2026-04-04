@@ -14,6 +14,7 @@ useHead({
   },
 })
 
+const config = useRuntimeConfig()
 const route = useRoute()
 const navItems = [
   [
@@ -93,7 +94,7 @@ const navItems = [
     {
       label: 'To Webstore',
       icon: 'i-lucide-store',
-      to: '/store/products',
+      href: `${config.public.storefrontUrl}/products`,
     },
   ],
 ]

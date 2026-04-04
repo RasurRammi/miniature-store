@@ -1,3 +1,5 @@
+import {useDrawerStack} from "@miniature-store/shared/stores";
+
 export default defineNuxtPlugin(() => {
   const router = useRouter()
   const drawerStack = useDrawerStack()

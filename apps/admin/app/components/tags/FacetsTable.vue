@@ -103,12 +103,6 @@ function onRestoreFacet(facet: Facet) {
         @click="onAddFacet"
       />
     </template>
-    <template #empty>
-      <UEmpty
-        v-if="!isEditing"
-        title="No Tag groups exist yet. Edit the Tag groups to create new"
-      />
-    </template>
   </List>
 </template>
 

@@ -1,16 +1,14 @@
 import { useMutation } from '@tanstack/vue-query'
 import { ShopLogoutDocument } from '~/gql/graphql'
-import { AdminLogoutDocument } from '~/gql/admin/graphql'
 
 export function useLogout() {
-  const { $gqlClient, $adminGqlClient } = useNuxtApp()
+  const { $gqlClient } = useNuxtApp()
   const toast = useToast()
 
   return useMutation({
     mutationFn: async () => {
       await Promise.all([
         $gqlClient.request(ShopLogoutDocument),
-        $adminGqlClient.request(AdminLogoutDocument),
       ])
     },
     onSuccess: async () => {
@@ -20,7 +18,6 @@ export function useLogout() {
         color: 'success',
       })
       await refreshNuxtData('auth.user')
-      await refreshNuxtData('auth.adminUser')
       navigateTo('/store/login')
     },
     onError: () => {

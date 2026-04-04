@@ -42,7 +42,7 @@ function toggle(id: string) {
       <!-- Checkbox overlay -->
       <div
         v-if="!disabled"
-        class="absolute top-1 left-1"
+        class="absolute top-1 right-1"
       >
         <UCheckbox
           :model-value="selectedSet.has(item.id)"

@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import type { TokenData } from '~/types/filteredSearch'
 import type { Product } from '~/types/fragmentAliases'
-import { useFacets } from '~/composables/admin/useFacets'
 
 const filterTokens = defineModel<TokenData<any>[]>({ required: true })
 const { products } = defineProps<{
   products: Product[]
 }>()
 
-const { data: facetsData } = useFacets()
-const facets = computed(() => facetsData.value?.facets.items ?? [])
+const facets = computed(() => [])
 
 const facetLists = computed(() => {
   return facets.value?.map((f) => {

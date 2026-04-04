@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import type { Collection } from '~/types/fragmentAliases'
-import GridArea from '~/components/common/GridArea.vue'
-import { useProductDrawerStore, useReleaseDrawerStore } from '#imports'
+import {GridArea} from "@miniature-store/shared/components";
 
-const productDrawer = useProductDrawerStore()
-const releaseDrawer = useReleaseDrawerStore()
 const { release } = defineProps<{ release: Collection }>()
 </script>
 
@@ -14,27 +11,6 @@ const { release } = defineProps<{ release: Collection }>()
     :collapsible="true"
     :initial-state="true"
   >
-    <template #actions>
-      <UButton
-        block
-        variant="solid"
-        color="secondary"
-        icon="i-lucide-plus"
-        label="Create Product"
-        size="lg"
-        :ui="{ label: 'hidden sm:block' }"
-        @click.stop="productDrawer.open()"
-      />
-      <UButton
-        variant="solid"
-        color="primary"
-        icon="i-lucide-pencil"
-        label="Edit Release"
-        size="lg"
-        :ui="{ label: 'hidden sm:block' }"
-        @click.stop="releaseDrawer.open(release)"
-      />
-    </template>
     <template
       v-if="release.productVariants?.items.length"
       #default

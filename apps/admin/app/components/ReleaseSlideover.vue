@@ -17,12 +17,7 @@ const { data: user } = await useUser()
   >
     <template #content>
       <ReleaseInfo
-        v-if="releaseDrawer.isOpen && releaseDrawer.release"
-        :release="releaseDrawer.release"
-        :can-edit="true"
-      />
-      <ReleaseInfo
-        v-else-if="releaseDrawer.isOpen"
+        v-if="releaseDrawer.isOpen"
         :release="releaseDrawer.release"
         :can-edit="!!user"
       />

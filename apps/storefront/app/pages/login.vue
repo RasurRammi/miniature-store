@@ -1,4 +1,3 @@
-<!-- app/pages/admin/login.vue -->
 <script setup lang="ts">
 import { useCustomerLogin } from '~/composables/useLogin'
 

@@ -3,11 +3,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
 
-  ui: {
-    theme: {
-      colors: ['primary', 'secondary', 'neutral', 'info', 'success', 'warning', 'error'],
-    },
+  build: {
+    transpile: ['@miniature-store/shared']
   },
+
   runtimeConfig: {
     vendureShopUrl: process.env.VENDURE_SHOP_URL ?? 'http://localhost:3099/shop-api',
     public: {

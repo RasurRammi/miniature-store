@@ -14,9 +14,11 @@ const facetsCopy = ref<Facet[]>([])
 const isEditingFacets = defineModel<boolean>({ default: () => false })
 
 watch(
-  () => facetsData.value?.facets.items,
-  (items) => {
-    if (items) facetsCopy.value = structuredClone(toRaw(items))
+  facetsData,
+  (data) => {
+    facetsCopy.value = data
+    ? JSON.parse(JSON.stringify(data.facets.items))
+    : []
   },
   { immediate: true },
 )
@@ -60,11 +62,13 @@ function submitChanges() {
   }
   console.debug('submit:', inputs)
   submitFacets.mutate(inputs, {
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data)
       toast.add({
         title: 'All changes were successfully saved',
         color: 'success',
       })
+      isEditingFacets.value = false
     },
     onError: (err) => {
       toast.add({
@@ -79,7 +83,7 @@ function submitChanges() {
 function resetChanges() {
   dirtyStateStore.resetAll()
   facetsCopy.value = facetsData.value
-    ? structuredClone(toRaw(facetsData.value?.facets.items))
+    ? JSON.parse(JSON.stringify(facetsData.value?.facets.items))
     : []
   toast.add({
     title: 'All changes were discarded',
@@ -89,7 +93,7 @@ function resetChanges() {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col min-h-0 gap-2">
     <div class="flex flex-row justify-center-safe items-center-safe p-2">
       <div />
       <div class="text-xl flex-1 text-center">
@@ -104,10 +108,12 @@ function resetChanges() {
         @click.prevent="isEditingFacets = !isEditingFacets"
       />
     </div>
-    <FacetsTable
-      v-model="facetsCopy"
-      :is-editing="isEditingFacets"
-    />
+    <UScrollArea class="flex-1 min-h-0">
+      <FacetsTable
+        v-model="facetsCopy"
+        :is-editing="isEditingFacets"
+      />
+    </UScrollArea>
 
     <FloatingBar
       :total-changes="dirtyStateStore.totalChanges"

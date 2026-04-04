@@ -85,11 +85,11 @@ export function useSubmitProduct() {
       }
 
       // ---- Collections -----
-      // const allCollections = [...new Set(input.releaseId ? [...input.collectionIds, input.releaseId] : input.collectionIds)]
-      if (!isNew || input.collectionIds.length) {
+      const allCollections = [...new Set(input.releaseId ? [...input.collectionIds, input.releaseId] : input.collectionIds)]
+      if (!isNew || allCollections.length) {
         const { collections } = await $gqlClient.request(GetCollectionFiltersDocument, {
           options: isNew
-            ? { filter: { id: { in: input.collectionIds } } } // create: fetch only selected
+            ? { filter: { id: { in: allCollections} } } // create: fetch only selected
             : {}, // update: fetch all to remove from prior-ly included
         })
 
@@ -100,7 +100,7 @@ export function useSubmitProduct() {
               ? JSON.parse(existingFilter.args.find(a => a.name === 'productIds')?.value ?? '[]')
               : []
 
-            const toInclude = input.collectionIds.includes(collection.id)
+            const toInclude = allCollections.includes(collection.id)
             const isAlreadyIncluded = existingIds.includes(product.id)
 
             if (toInclude && isAlreadyIncluded) return

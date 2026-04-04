@@ -1,29 +1,76 @@
 <script setup lang="ts">
-import { useAdminUser } from '~/composables/admin/useUser'
-import { useDefaultNavItems, useUserNav } from '~/composables/useNavItems'
 
 const { headerLogo, logoAlt } = defineProps<{ headerLogo: string, logoAlt: string }>()
-const { data: adminUser } = useAdminUser()
-const { data: currentUser } = useCurrentUser()
-const isLoggedIn = computed(() => !!currentUser.value)
+const { data: user } = useUser()
+const isLoggedIn = computed(() => !!user.value)
 
-const defaultNavItems = useDefaultNavItems()
-const navItems = computed(() => getNavItems())
-const userNavItems = useUserNav(currentUser)
-
-function getNavItems() {
-  const nav = defaultNavItems
-  if (adminUser.value) {
-    nav.push(
+const navItems = [
+  {
+    label: 'Home',
+    icon: 'i-lucide-house',
+    to: '/',
+  },
+  {
+    label: 'Store',
+    icon: 'i-lucide-shopping-cart',
+    to: '/products',
+  },
+  {
+    label: 'Community',
+    icon: 'i-lucide-users',
+    to: '/',
+    children: [
       {
-        label: 'To Admin Dashboard',
-        icon: 'i-lucide-shield',
-        to: '/admin/catalogue/releases',
+        label: 'FAQ',
+        icon: 'i-lucide-badge-question-mark',
+        to: '/',
       },
-    )
-  }
-  return nav
-}
+      {
+        label: 'Discord',
+        icon: 'i-simple-icons-discord',
+        to: '/',
+        target: '_blank',
+      },
+      {
+        label: 'Patreon',
+        icon: 'i-simple-icons-patreon',
+        to: '/',
+        target: '_blank',
+      },
+    ],
+  },
+]
+
+const logoutMut = useLogout()
+const userNavItems = computed(() => {
+    if (!user.value) return []
+    return [
+      [
+        {
+          label: user.value.identifier,
+          type: 'label',
+        },
+      ],
+      [
+        {
+          label: 'Profile',
+          icon: 'i-lucide-user',
+        },
+        {
+          label: 'Settings',
+          icon: 'i-lucide-cog',
+        },
+      ],
+      [
+        {
+          label: 'Logout',
+          icon: 'i-lucide-log-out',
+          onSelect: logoutMut.mutate,
+        },
+      ],
+    ]
+  })
+
 </script>
 
 <template>

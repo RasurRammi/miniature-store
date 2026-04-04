@@ -10,10 +10,17 @@ const { release } = defineProps<{ release: Collection }>()
 
 <template>
   <GridArea
-    :title="release.name"
     :collapsible="true"
     :initial-state="true"
   >
+    <template #header>
+      <span class="font-bold">{{ release.name }}</span>
+      <UBadge
+          :label="'Active'"
+          variant="subtle"
+          color="primary"
+      />
+    </template>
     <template #actions>
       <UButton
         block

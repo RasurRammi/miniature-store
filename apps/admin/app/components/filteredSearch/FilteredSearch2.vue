@@ -132,8 +132,10 @@ function startStrategy(stratId: string) {
 }
 
 const editTokenStep = (tokenData: TokenData<any>, step: TokenStep<FilterTokenBase, any>) => {
-  if (!editingTokenData.value) return
   if (tokenData.immutable) return
+  if (!editingTokenData.value) {
+    editingTokenData.value = tokenData
+  }
   const strategy = filterStrategies.find(s => s.id === tokenData.stratId)
   if (!strategy) throw new Error(`Strategy not found: ${tokenData.stratId}`)
 
@@ -168,14 +170,13 @@ const navigateToStep = (step: TokenStep<FilterTokenBase, any> | null, atStart = 
 const editTokenStrategy = (tokenData: TokenData<any>) => {
   if (tokenData.immutable) return
   replacingUid.value = tokenData.token.uid
-  editingTokenData.value = null
+  editingTokenData.value = tokenData
   activeStratId.value = null
   activeStep.value = null
   workingToken.value = null
   searchValue.value = ''
-  searchInputRef.value = inputRef.value
   isMenuOpen.value = true
-  nextTick(() => inputRef.value?.focus())
+  nextTick(() => requestChipFocus(tokenData.token.uid, null, false))
 }
 
 // ---------------------------------------------------------------------------

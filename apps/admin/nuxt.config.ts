@@ -7,19 +7,15 @@ export default defineNuxtConfig({
     transpile: ['@miniature-store/shared']
   },
 
-  ui: {
-    theme: {
-      colors: ['primary', 'secondary', 'neutral', 'info', 'success', 'warning', 'error'],
-    },
-  },
   runtimeConfig: {
     vendureAdminUrl: process.env.VENDURE_ADMIN_URL ?? 'http://localhost:3099/admin-api',
     public: {
       adminApiUrl: '/api/admin',
+      storefrontUrl: process.env.STOREFRONT_URL ?? 'http://localhost:3000',
     },
   },
   routeRules: {
-    '/admin/**': { ssr: false },
+    '*': { ssr: false },
     '/api/admin/**': { proxy: { to: `${process.env.VENDURE_ADMIN_URL ?? 'http://localhost:3099/admin-api'}/**` } },
   },
   devServer: {

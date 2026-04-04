@@ -47,18 +47,23 @@ onMounted(() => {
     if (stepId === null) {
       // Strategy-label segment
       focusInput(categoryInputRef.value, atStart)
+      setActiveInput(categoryInputRef.value)
     }
     else if (stepId === 'first') {
       // Arrow-right into chip from the left → land on strategy label
       focusInput(categoryInputRef.value, atStart)
+      setActiveInput(categoryInputRef.value)
     }
     else if (stepId === 'last') {
       // Arrow-left into chip from the right → land on last step
       const lastStep = strategy.value.steps.at(-1)
-      focusInput(lastStep ? inputRefs.get(lastStep.id) : categoryInputRef.value, atStart)
+      const inputRef = lastStep ? inputRefs.get(lastStep.id)! : categoryInputRef.value
+      focusInput(inputRef, atStart)
+      setActiveInput(inputRef)
     }
     else {
       focusInput(inputRefs.get(stepId), atStart)
+      setActiveInput(inputRefs.get(stepId)!)
     }
   })
 })

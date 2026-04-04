@@ -67,20 +67,20 @@ function updateSelectedProducts(productIds: string[]) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col min-h-0 gap-4">
     <FilteredSearch2
       v-model="activeSearchTokens"
       :filter-strategies="strategies"
     />
     <!-- Product Selection -->
-    <div class="p-2 rounded-lg bg-elevated/50">
-      <ProductsSelection
-        v-model="selectedProductIds"
-        :products="filteredProducts"
-        :disabled="selectionDisabled"
-        @products-selected="updateSelectedProducts"
-      />
-    </div>
+      <UScrollArea class="flex-1 min-h-0 flex flex-col min-h-0 p-2 rounded-lg bg-elevated/50">
+        <ProductsSelection
+          v-model="selectedProductIds"
+          :products="filteredProducts"
+          :disabled="selectionDisabled"
+          @products-selected="updateSelectedProducts"
+        />
+      </UScrollArea>
   </div>
 </template>
 

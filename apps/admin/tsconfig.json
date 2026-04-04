@@ -15,5 +15,6 @@
       "path": "./.nuxt/tsconfig.node.json"
     }
   ],
-  "extends": "../../tsconfig.json"
+  "extends": "../../tsconfig.json",
+  "exclude": ["node_modules", "dist", ".output"]
 }

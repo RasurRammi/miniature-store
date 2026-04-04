@@ -17,7 +17,7 @@ const isOpen = ref(initialState)
       class="flex items-center px-4 h-16 rounded-lg bg-muted transition-colors"
       :class="collapsible ? 'cursor-pointer ' : ''"
     >
-      <div class="flex-1 truncate min-w-0 flex items-center gap-2 h-6 ">
+      <div class="flex-1 truncate min-w-0 flex items-center gap-2 ">
         <UIcon
           v-if="collapsible"
           :name="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"

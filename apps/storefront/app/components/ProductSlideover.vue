@@ -9,15 +9,12 @@ watch(() => productDrawer.productV,
   newProdV => productV.value = newProdV,
   { immediate: true },
 )
-const isEditingLocked = ref<boolean>(false)
 </script>
 
 <template>
   <USlideover
     v-model:open="productDrawer.isOpen"
-    :overlay="isEditingLocked"
-    :dismissible="!isEditingLocked"
-    :modal="true"
+    :modal="false"
     :ui="{ content: 'max-w-full sm:max-w-lg md:max-w-xl lg:max-w-1/2 xl:max-w-1/3' }"
     @after:leave="productDrawer.onAfterLeave"
   >
@@ -25,7 +22,6 @@ const isEditingLocked = ref<boolean>(false)
       <ProductInfo
         :key="productV?.id ?? 'new'"
         :product-v="productV ?? undefined"
-        @editing-state-changed="(val: boolean) => isEditingLocked = val"
       />
     </template>
   </USlideover>

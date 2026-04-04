@@ -32,6 +32,7 @@ const viableReleases = computed(() => {
     }
   })
 })
+const selectedCollections = computed(() => productV?.product.collections.filter(c => c.parentId !== rootReleaseCol.value?.id))
 
 const { data: assetsData } = useAssets()
 const selectedAssets = computed<Asset[]>(() => {
@@ -83,7 +84,7 @@ function productVToForm(): ProductInput {
     description: productV?.product.description ?? '',
     price: productV?.price ?? 0,
     releaseId: selectedRelease.value?.id,
-    collectionIds: productV?.product.collections.map(c => c.id) ?? [],
+    collectionIds: selectedCollections.value?.map(c => c.id) ?? [],
     tagIds: productV?.product.facetValues.map(fV => fV.id) ?? [],
     assetIds: productV?.product.assets.map(asset => asset.id) ?? [],
   }
@@ -150,7 +151,7 @@ async function submitForm() {
       </template>
       <UButton
         icon="i-lucide-expand"
-        :to="`/store/product/${productV?.product.id}`"
+        :to="`/product/${productV?.product.id}`"
         color="neutral"
         variant="ghost"
         class="cursor-pointer"

@@ -10,7 +10,9 @@ const { data: productsData } = useProducts()
 const allProducts = ref<Product[]>([])
 watch(
   productsData,
-  () => allProducts.value = structuredClone(toRaw(productsData.value?.products.items ?? [])),
+  (data) => allProducts.value = data
+    ? JSON.parse(JSON.stringify(data.products.items))
+    : [],
   { immediate: true },
 )
 const selectedProductIds = ref<string[]>([])
@@ -71,7 +73,9 @@ const changedProducts = computed(() => {
   })
 })
 function resetProductChanges() {
-  allProducts.value = structuredClone(toRaw(productsData.value?.products.items ?? []))
+  allProducts.value = productsData.value?.products.items
+  ? JSON.parse(JSON.stringify(productsData.value?.products.items))
+  : []
 }
 
 const toast = useToast()
@@ -84,6 +88,8 @@ function submitProductChanges() {
   const count = productInputs.length
   submitProductTags.mutate(productInputs, {
     onSuccess: () => {
+      selectedProductIds.value = []
+      resetProductChanges()
       toast.add({
         title: `${count} Products successfully updated`,
         icon: 'i-lucide-check',
@@ -115,14 +121,14 @@ provide('productSelection', {
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-2">
+  <div class="flex flex-col min-h-0 lg:flex-row gap-2">
     <!-- Facets -->
-    <div class="w-full lg:w-1/3 p-2 rounded-lg bg-elevated/25">
+    <div class="w-full flex flex-col min-h-0 lg:w-1/3 p-2 rounded-lg bg-elevated/25">
       <Facets v-model="isEditingFacets" />
     </div>
 
     <!-- Products -->
-    <div class="w-full lg:w-2/3 p-2 rounded-lg bg-elevated/25">
+    <div class="w-full flex flex-col min-h-0 lg:w-2/3 p-2 rounded-lg bg-elevated/25">
       <h2 class="text-xl text-highlighted text-center p-2">
         Products
       </h2>
